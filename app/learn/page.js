@@ -9,6 +9,12 @@ export default function LearnPage() {
   const [editForm, setEditForm] = useState({ title: '', description: '' });
   const [message, setMessage] = useState('');
 
+  const [showCreate, setShowCreate] = useState(false);
+  const [newTraining, setNewTraining] = useState({ title: '', description: '' });
+  const [trainingFiles, setTrainingFiles] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [createMsg, setCreateMsg] = useState('');
+
   const loadTrainings = () => {
     fetch('/api/trainings')
       .then((res) => res.json())
@@ -53,6 +59,46 @@ export default function LearnPage() {
     }
   };
 
+  const handleAddTraining = async () => {
+    if (!newTraining.title) { setCreateMsg('Введите название тренинга'); return; }
+    setSaving(true);
+    let attachmentUrls = [];
+    let fileWarning = '';
+    try {
+      if (trainingFiles.length > 0) {
+        const formData = new FormData();
+        trainingFiles.forEach((file) => formData.append('files', file));
+        try {
+          const uploadRes = await fetch('/api/files', { method: 'POST', body: formData });
+          const uploadData = await uploadRes.json();
+          if (uploadRes.ok) {
+            attachmentUrls = uploadData.fileUrls || [];
+          } else {
+            fileWarning = ' (файлы не загружены: ' + (uploadData.error || 'ошибка') + ')';
+          }
+        } catch {
+          fileWarning = ' (файлы не загружены)';
+        }
+      }
+      const res = await fetch('/api/trainings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...newTraining, attachments: attachmentUrls }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCreateMsg('Тренинг добавлен' + fileWarning);
+        setNewTraining({ title: '', description: '' });
+        setTrainingFiles([]);
+        setShowCreate(false);
+        loadTrainings();
+      } else {
+        setCreateMsg(data.error || 'Ошибка');
+      }
+    } catch { setCreateMsg('Ошибка сети'); }
+    setSaving(false);
+  };
+
   return (
     <div className="min-h-screen">
       <div className="relative flex flex-col items-center justify-center text-center px-6 py-20">
@@ -63,7 +109,60 @@ export default function LearnPage() {
           <p className="animate-fade-in-up delay-300 mt-4 max-w-xl mx-auto text-white/80 text-lg">Курсы, документы и обучающий контент для сотрудников аквапарков.</p>
         </div>
       </div>
+
       <div className="mx-auto max-w-5xl px-6 pb-16">
+        {isAdmin && (
+          <div className="mb-6">
+            <button
+              onClick={() => { setShowCreate(!showCreate); setCreateMsg(''); }}
+              className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg"
+            >
+              {showCreate ? '✕ Отмена' : '+ Добавить тренинг'}
+            </button>
+
+            {showCreate && (
+              <div className="mt-4 rounded-[28px] bg-white/95 p-6 shadow-2xl border border-slate-200">
+                <h2 className="text-xl font-bold text-slate-900 mb-4">Новый тренинг</h2>
+                <div className="space-y-4">
+                  <input
+                    value={newTraining.title}
+                    onChange={e => setNewTraining(p => ({ ...p, title: e.target.value }))}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="Название тренинга *"
+                  />
+                  <textarea
+                    value={newTraining.description}
+                    onChange={e => setNewTraining(p => ({ ...p, description: e.target.value }))}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900 min-h-[100px]"
+                    placeholder="Описание (необязательно)"
+                  />
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Файлы и изображения</label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                      onChange={e => setTrainingFiles(Array.from(e.target.files || []))}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    />
+                    {trainingFiles.length > 0 && (
+                      <p className="text-sm text-slate-600 mt-2">Выбрано файлов: {trainingFiles.length}</p>
+                    )}
+                  </div>
+                  {createMsg && <p className="text-sm text-red-600">{createMsg}</p>}
+                  <button
+                    onClick={handleAddTraining}
+                    disabled={saving}
+                    className="w-full rounded-2xl bg-emerald-600 text-white py-3 font-semibold hover:bg-emerald-700 transition disabled:opacity-50"
+                  >
+                    {saving ? 'Сохранение...' : 'Добавить тренинг'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="rounded-[24px] bg-white/95 p-8 shadow-xl">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-xl">📚</div>
@@ -72,9 +171,13 @@ export default function LearnPage() {
               <h2 className="text-2xl font-bold text-slate-900">Онлайн тренинги</h2>
             </div>
           </div>
-          {message && <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm">{message}</div>}
+          {message && (
+            <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm">{message}</div>
+          )}
           {trainings.length === 0 ? (
-            <div className="rounded-2xl bg-slate-50 border border-slate-200 p-8 text-slate-500 text-center">Пока нет доступных тренингов.</div>
+            <div className="rounded-2xl bg-slate-50 border border-slate-200 p-8 text-slate-500 text-center">
+              {isAdmin ? 'Нет тренингов. Добавьте первый кнопкой выше.' : 'Пока нет доступных тренингов.'}
+            </div>
           ) : (
             <div className="space-y-4">
               {trainings.map((item) => {

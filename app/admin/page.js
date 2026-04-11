@@ -29,7 +29,6 @@ export default function Admin() {
   const [usersData, setUsersData] = useState([]);
   const [testsData, setTestsData] = useState([]);
   const [newsData, setNewsData] = useState([]);
-  const [trainingsData, setTrainingsData] = useState([]);
 
   // Auto-login from localStorage
   useEffect(() => {
@@ -49,8 +48,6 @@ export default function Admin() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [newsForm, setNewsForm] = useState({ title: '', description: '' });
   const [newsImageFile, setNewsImageFile] = useState(null);
-  const [trainingForm, setTrainingForm] = useState({ title: '', description: '' });
-  const [trainingFiles, setTrainingFiles] = useState([]);
   const [rewardForm, setRewardForm] = useState({ name: '', description: '', cost: '' });
   const [adminMessage, setAdminMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -111,29 +108,26 @@ export default function Admin() {
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const [surveyRes, usersRes, testsRes, newsRes, trainingsRes, rewardsRes] = await Promise.all([
+      const [surveyRes, usersRes, testsRes, newsRes, rewardsRes] = await Promise.all([
         fetch('/api/admin'),
         fetch('/api/users'),
         fetch('/api/tests'),
         fetch('/api/news'),
-        fetch('/api/trainings'),
         fetch('/api/rewards')
       ]);
 
-      if (surveyRes.ok && usersRes.ok && testsRes.ok && newsRes.ok && trainingsRes.ok && rewardsRes.ok) {
-        const [survey, users, tests, news, trainings, rewards] = await Promise.all([
+      if (surveyRes.ok && usersRes.ok && testsRes.ok && newsRes.ok && rewardsRes.ok) {
+        const [survey, users, tests, news, rewards] = await Promise.all([
           surveyRes.json(),
           usersRes.json(),
           testsRes.json(),
           newsRes.json(),
-          trainingsRes.json(),
           rewardsRes.json()
         ]);
         setSurveyData(survey);
         setUsersData(users);
         setTestsData(tests);
         setNewsData(news);
-        setTrainingsData(trainings);
         setRewardsData(rewards);
       } else {
         throw new Error('Ошибка при загрузке данных');
@@ -153,7 +147,6 @@ export default function Admin() {
     setUsersData([]);
     setTestsData([]);
     setNewsData([]);
-    setTrainingsData([]);
     setEmployeeForm(initialEmployeeForm);
     setSelectedUser(null);
     setAdminMessage('');
@@ -177,15 +170,6 @@ export default function Admin() {
 
   const handleNewsImageChange = (e) => {
     setNewsImageFile(e.target.files?.[0] || null);
-  };
-
-  const handleTrainingChange = (e) => {
-    const { name, value } = e.target;
-    setTrainingForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleTrainingFilesChange = (e) => {
-    setTrainingFiles(Array.from(e.target.files || []));
   };
 
   const handleRewardChange = (e) => {
@@ -374,53 +358,6 @@ export default function Admin() {
         await fetchAdminData();
       } else {
         setAdminMessage(data.error || 'Ошибка добавления новости');
-      }
-    } catch (error) {
-      setAdminMessage('Ошибка: ' + error.message);
-    }
-  };
-
-  const handleAddTraining = async (e) => {
-    e.preventDefault();
-    if (!trainingForm.title || !trainingForm.description) {
-      setAdminMessage('Заполните заголовок и описание тренинга');
-      return;
-    }
-    let attachmentUrls = [];
-    let fileWarning = '';
-    try {
-      if (trainingFiles.length > 0) {
-        const formData = new FormData();
-        trainingFiles.forEach((file) => formData.append('files', file));
-        try {
-          const uploadResponse = await fetch('/api/files', {
-            method: 'POST',
-            body: formData,
-          });
-          const uploadData = await uploadResponse.json();
-          if (uploadResponse.ok) {
-            attachmentUrls = uploadData.fileUrls || [];
-          } else {
-            fileWarning = ' (файлы не загружены: ' + (uploadData.error || 'ошибка') + ')';
-          }
-        } catch {
-          fileWarning = ' (файлы не загружены)';
-        }
-      }
-
-      const response = await fetch('/api/trainings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...trainingForm, attachments: attachmentUrls }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setAdminMessage('Тренинг добавлен' + fileWarning);
-        setTrainingForm({ title: '', description: '' });
-        setTrainingFiles([]);
-        await fetchAdminData();
-      } else {
-        setAdminMessage(data.error || 'Ошибка добавления тренинга');
       }
     } catch (error) {
       setAdminMessage('Ошибка: ' + error.message);
@@ -656,46 +593,6 @@ export default function Admin() {
               </form>
             </div>
             <div className="space-y-6">
-              <section className="rounded-[36px] bg-white/90 p-6 shadow-2xl border border-slate-200/80 backdrop-blur-xl">
-                <h2 className="text-2xl font-bold text-slate-900 mb-4">Добавить тренинг</h2>
-                <form onSubmit={handleAddTraining} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Заголовок</label>
-                    <input
-                      name="title"
-                      value={trainingForm.title}
-                      onChange={handleTrainingChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="Новый курс для сотрудников"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Описание</label>
-                    <textarea
-                      name="description"
-                      value={trainingForm.description}
-                      onChange={handleTrainingChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 min-h-[120px] text-slate-900"
-                      placeholder="Описание тренинга или обучающего курса"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Файлы и изображения</label>
-                    <input
-                      type="file"
-                      name="files"
-                      multiple
-                      accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
-                      onChange={handleTrainingFilesChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    />
-                    {trainingFiles.length > 0 && (
-                      <p className="mt-2 text-sm text-slate-600">Выбрано файлов: {trainingFiles.length}</p>
-                    )}
-                  </div>
-                  <button className="rounded-2xl bg-emerald-600 text-white px-6 py-3 font-semibold hover:bg-emerald-700 transition">Добавить тренинг</button>
-                </form>
-              </section>
               <section className="rounded-[36px] bg-white/90 p-6 shadow-2xl border border-slate-200/80 backdrop-blur-xl">
                 <h2 className="text-2xl font-bold text-slate-900 mb-4">Добавить / редактировать сотрудника</h2>
                 <form className="space-y-4">
