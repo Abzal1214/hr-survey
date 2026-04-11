@@ -25,14 +25,14 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col text-slate-900">
-        <header className="sticky top-0 z-50 border-b border-white/20 bg-white/10 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-sky-900/40 bg-sky-950/90 backdrop-blur-md">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
             <div className="flex flex-col leading-tight">
-              <span className="text-xs uppercase tracking-widest text-sky-200 font-medium">🌊 Hawaii&amp;Miami · SanRemo</span>
+              <span className="text-xs uppercase tracking-widest text-sky-300 font-medium">🌊 Hawaii&amp;Miami · SanRemo</span>
               <h1 className="text-xl font-bold text-white">Академия сети Аквапарков</h1>
             </div>
 
-            <nav className="hidden flex-1 items-center justify-center gap-3 text-sm text-white lg:flex">
+            <nav className="hidden flex-1 items-center justify-center gap-3 text-sm text-sky-100 lg:flex">
               <Link href="/" className="nav-link rounded-full px-4 py-2 transition hover:bg-sky-500 hover:text-white">
                 Главная страница
               </Link>
