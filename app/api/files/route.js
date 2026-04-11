@@ -1,20 +1,10 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-
-const safeFileName = (name) => name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/_+/g, '_');
+import { put, list } from '@vercel/blob';
 
 export async function GET() {
   try {
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    const files = fs.readdirSync(uploadDir).map((name) => ({
-      name,
-      url: `/uploads/${encodeURIComponent(name)}`
-    }));
+    const { blobs } = await list();
+    const files = blobs.map(b => ({ name: b.pathname, url: b.url }));
     return NextResponse.json(files);
   } catch (error) {
     return NextResponse.json({ error: 'Не удалось получить файлы' }, { status: 500 });
@@ -26,35 +16,24 @@ export async function POST(request) {
     const data = await request.formData();
     let files = data.getAll('files');
     const singleFile = data.get('file');
-    if ((!files || !files.length || files.every((file) => !file)) && singleFile) {
+    if ((!files || !files.length || files.every(f => !f)) && singleFile) {
       files = [singleFile];
     }
     if (!files || !files.length) {
       return NextResponse.json({ error: 'Файл не выбран' }, { status: 400 });
     }
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
     const uploaded = [];
     for (const file of files) {
       if (!file || !file.name) continue;
-      const originalName = file.name;
-      const safeName = `${Date.now()}-${safeFileName(originalName)}`;
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const filePath = path.join(uploadDir, safeName);
-      fs.writeFileSync(filePath, buffer);
-      uploaded.push({
-        name: originalName,
-        url: `/uploads/${encodeURIComponent(safeName)}`,
-        type: file.type,
-        size: buffer.length,
-      });
+      const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      const blob = await put(safeName, file, { access: 'public' });
+      uploaded.push({ name: file.name, url: blob.url, type: file.type, size: file.size });
     }
     if (!uploaded.length) {
       return NextResponse.json({ error: 'Файлы не были загружены' }, { status: 400 });
     }
-    return NextResponse.json({ fileUrls: uploaded.map((item) => item.url), files: uploaded });
+    return NextResponse.json({ fileUrls: uploaded.map(f => f.url), files: uploaded });
   } catch (error) {
-    return NextResponse.json({ error: 'Ошибка загрузки файла' }, { status: 500 });
+    return NextResponse.json({ error: 'Ошибка загрузки файла: ' + error.message }, { status: 500 });
   }
 }
