@@ -147,7 +147,6 @@ export default function Admin() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setLoginData({ username: '', password: '', department: '' });
     setCurrentUser(null);
     setUsersData([]);
     setTestsData([]);
@@ -156,6 +155,19 @@ export default function Admin() {
     setAdminMessage('');
     localStorage.removeItem('currentUser');
     window.dispatchEvent(new Event('userChanged'));
+    // Restore remembered credentials if any
+    try {
+      const remembered = localStorage.getItem('rememberedLogin');
+      if (remembered) {
+        setLoginData(JSON.parse(remembered));
+        setRememberMe(true);
+      } else {
+        setLoginData({ username: '', password: '', department: '' });
+        setRememberMe(false);
+      }
+    } catch {
+      setLoginData({ username: '', password: '', department: '' });
+    }
   };
 
   const handleExport = () => {
