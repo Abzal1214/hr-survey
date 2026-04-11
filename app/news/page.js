@@ -65,7 +65,7 @@ export default function NewsPage() {
             <div className="grid gap-5 sm:grid-cols-2">
               {news.map((item) => (
                 <article key={item.id} className="rounded-[20px] border-l-4 border-sky-400 bg-sky-50 p-6 shadow-sm">
-                  <p className="text-xs uppercase tracking-widest text-sky-400 mb-2">{new Date(item.timestamp).toLocaleDateString('ru-RU')}</p>
+                  <p className="text-xs uppercase tracking-widest text-sky-400 mb-2">{new Date(item.createdAt || item.timestamp).toLocaleDateString('ru-RU')}</p>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
                   {item.imageUrl && (
                     <img src={item.imageUrl} alt={item.title} className="w-full h-40 object-cover rounded-2xl mb-3" />
