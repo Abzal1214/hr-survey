@@ -26,3 +26,16 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Ошибка добавления новости' }, { status: 500 });
   }
 }
+
+export async function DELETE(request) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'ID не указан' }, { status: 400 });
+    await News.findByIdAndDelete(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Ошибка удаления новости' }, { status: 500 });
+  }
+}

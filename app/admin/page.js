@@ -28,7 +28,6 @@ export default function Admin() {
   const [surveyData, setSurveyData] = useState([]);
   const [usersData, setUsersData] = useState([]);
   const [testsData, setTestsData] = useState([]);
-  const [newsData, setNewsData] = useState([]);
 
   // Auto-login from localStorage
   useEffect(() => {
@@ -43,11 +42,8 @@ export default function Admin() {
     } catch {}
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const [rewardsData, setRewardsData] = useState([]);
   const [employeeForm, setEmployeeForm] = useState(initialEmployeeForm);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [newsForm, setNewsForm] = useState({ title: '', description: '' });
-  const [newsImageFile, setNewsImageFile] = useState(null);
   const [rewardForm, setRewardForm] = useState({ name: '', description: '', cost: '' });
   const [adminMessage, setAdminMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -108,26 +104,23 @@ export default function Admin() {
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const [surveyRes, usersRes, testsRes, newsRes, rewardsRes] = await Promise.all([
+      const [surveyRes, usersRes, testsRes, rewardsRes] = await Promise.all([
         fetch('/api/admin'),
         fetch('/api/users'),
         fetch('/api/tests'),
-        fetch('/api/news'),
         fetch('/api/rewards')
       ]);
 
-      if (surveyRes.ok && usersRes.ok && testsRes.ok && newsRes.ok && rewardsRes.ok) {
-        const [survey, users, tests, news, rewards] = await Promise.all([
+      if (surveyRes.ok && usersRes.ok && testsRes.ok && rewardsRes.ok) {
+        const [survey, users, tests, rewards] = await Promise.all([
           surveyRes.json(),
           usersRes.json(),
           testsRes.json(),
-          newsRes.json(),
           rewardsRes.json()
         ]);
         setSurveyData(survey);
         setUsersData(users);
         setTestsData(tests);
-        setNewsData(news);
         setRewardsData(rewards);
       } else {
         throw new Error('Ошибка при загрузке данных');
@@ -146,7 +139,6 @@ export default function Admin() {
     setSurveyData([]);
     setUsersData([]);
     setTestsData([]);
-    setNewsData([]);
     setEmployeeForm(initialEmployeeForm);
     setSelectedUser(null);
     setAdminMessage('');
@@ -161,15 +153,6 @@ export default function Admin() {
   const handleEmployeeFormChange = (e) => {
     const { name, value } = e.target;
     setEmployeeForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleNewsChange = (e) => {
-    const { name, value } = e.target;
-    setNewsForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleNewsImageChange = (e) => {
-    setNewsImageFile(e.target.files?.[0] || null);
   };
 
   const handleRewardChange = (e) => {
@@ -553,45 +536,7 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr] mb-6">
-            <div className="rounded-[36px] bg-white/90 p-6 shadow-2xl border border-slate-200/80 backdrop-blur-xl">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Добавить новость</h2>
-              <form onSubmit={handleAddNews} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Заголовок</label>
-                  <input
-                    name="title"
-                    value={newsForm.title}
-                    onChange={handleNewsChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    placeholder="Новая акция для сотрудников"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Описание</label>
-                  <textarea
-                    name="description"
-                    value={newsForm.description}
-                    onChange={handleNewsChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 min-h-[120px] text-slate-900"
-                    placeholder="Описание новости или акции"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Картинка</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleNewsImageChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                  />
-                  {newsImageFile && (
-                    <p className="text-sm text-slate-600 mt-2">Выбрана: {newsImageFile.name}</p>
-                  )}
-                </div>
-                <button className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold hover:bg-sky-800 transition">Добавить новость</button>
-              </form>
-            </div>
+          <div className="grid gap-6 xl:grid-cols-[1fr] mb-6">
             <div className="space-y-6">
               <section className="rounded-[36px] bg-white/90 p-6 shadow-2xl border border-slate-200/80 backdrop-blur-xl">
                 <h2 className="text-2xl font-bold text-slate-900 mb-4">Добавить / редактировать сотрудника</h2>
