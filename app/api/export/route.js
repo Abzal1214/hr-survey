@@ -1,28 +1,20 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const usersFile = path.join(process.cwd(), 'users.json');
-const testsFile = path.join(process.cwd(), 'test-results.json');
-
-const toCsv = (rows) => rows.map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\n');
+import { connectDB } from '../../../lib/mongodb';
+import { User, TestResult } from '../../../lib/models';
 
 export async function GET() {
   try {
-    const users = fs.existsSync(usersFile) ? JSON.parse(fs.readFileSync(usersFile, 'utf8')) : [];
-    const tests = fs.existsSync(testsFile) ? JSON.parse(fs.readFileSync(testsFile, 'utf8')) : [];
+    await connectDB();
+    const users = await User.find({}).lean();
+    const tests = await TestResult.find({}).lean();
 
-    const userRows = [['Тип', 'Имя', 'Телефон', 'Позиция', 'Место работы', 'Дата регистрации']];
-    users.forEach((user) => {
-      userRows.push(['Пользователь', user.name, user.phone, user.position, user.workplaceType, user.registeredAt]);
-    });
+    const userRows = [['Тип', 'Имя', 'Телефон', 'Позиция', 'Место работы', 'Баланс', 'Дата регистрации']];
+    users.forEach(u => userRows.push(['Пользователь', u.name, u.phone, u.position, u.department || u.workplaceType, u.points || 0, u.registeredAt]));
 
-    const testRows = [['Тип', 'Ответы', 'Баллы', 'Дата']];
-    tests.forEach((test) => {
-      testRows.push(['Тест', JSON.stringify(test.answers), test.score, test.timestamp]);
-    });
+    const testRows = [['Тип', 'Телефон', 'Баллы', 'Дата']];
+    tests.forEach(t => testRows.push(['Тест', t.phone, t.score, t.timestamp]));
 
-    const csvContent = ['Отчеты пользователей', ...userRows.map((r) => r.join(',')), '', 'Результаты тестов', ...testRows.map((r) => r.join(','))].join('\n');
+    const csvContent = ['Отчеты пользователей', ...userRows.map(r => r.join(',')), '', 'Результаты тестов', ...testRows.map(r => r.join(','))].join('\n');
 
     return new NextResponse(csvContent, {
       status: 200,
