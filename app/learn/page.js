@@ -63,7 +63,7 @@ export default function LearnPage() {
                       </div>
                     </div>
                   )}
-                  <p className="text-xs text-slate-400 mt-4">{new Date(item.timestamp).toLocaleDateString('ru-RU')}</p>
+                  <p className="text-xs text-slate-400 mt-4">{item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU') : ''}</p>
                 </div>
               ))}
             </div>

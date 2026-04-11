@@ -6,7 +6,11 @@ export async function GET() {
   try {
     await connectDB();
     const trainings = await Training.find({}).sort({ createdAt: -1 }).lean();
-    return NextResponse.json(trainings.map(t => ({ ...t, id: t._id })));
+    return NextResponse.json(trainings.map(t => ({
+      ...t,
+      id: t._id,
+      attachments: t.fileUrl ? t.fileUrl.split(',').filter(Boolean) : []
+    })));
   } catch (error) {
     return NextResponse.json({ error: 'Не удалось загрузить тренинги' }, { status: 500 });
   }
@@ -20,7 +24,7 @@ export async function POST(request) {
     if (!title || !description) {
       return NextResponse.json({ error: 'Заполните все поля' }, { status: 400 });
     }
-    const training = await Training.create({ title, description, fileUrl: Array.isArray(attachments) ? attachments.join(',') : '' });
+    const training = await Training.create({ title, description, fileUrl: Array.isArray(attachments) ? attachments.join(',') : (attachments || '') });
     return NextResponse.json({ ...training.toObject(), id: training._id });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка добавления тренинга' }, { status: 500 });
