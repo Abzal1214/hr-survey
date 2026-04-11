@@ -378,20 +378,25 @@ export default function Admin() {
       return;
     }
     let attachmentUrls = [];
+    let fileWarning = '';
     try {
       if (trainingFiles.length > 0) {
         const formData = new FormData();
         trainingFiles.forEach((file) => formData.append('files', file));
-        const uploadResponse = await fetch('/api/files', {
-          method: 'POST',
-          body: formData,
-        });
-        const uploadData = await uploadResponse.json();
-        if (!uploadResponse.ok) {
-          setAdminMessage(uploadData.error || 'Ошибка загрузки файлов');
-          return;
+        try {
+          const uploadResponse = await fetch('/api/files', {
+            method: 'POST',
+            body: formData,
+          });
+          const uploadData = await uploadResponse.json();
+          if (uploadResponse.ok) {
+            attachmentUrls = uploadData.fileUrls || [];
+          } else {
+            fileWarning = ' (файлы не загружены: ' + (uploadData.error || 'ошибка') + ')';
+          }
+        } catch {
+          fileWarning = ' (файлы не загружены)';
         }
-        attachmentUrls = uploadData.fileUrls || [];
       }
 
       const response = await fetch('/api/trainings', {
@@ -401,7 +406,7 @@ export default function Admin() {
       });
       const data = await response.json();
       if (response.ok) {
-        setAdminMessage('Тренинг добавлен');
+        setAdminMessage('Тренинг добавлен' + fileWarning);
         setTrainingForm({ title: '', description: '' });
         setTrainingFiles([]);
         await fetchAdminData();
