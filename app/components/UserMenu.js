@@ -88,7 +88,8 @@ export default function UserMenu() {
           <div className="py-1">
             {isAdmin ? (
               <Link href="/admin" onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-black hover:bg-sky-50 transition">
+                style={{ color: '#000' }}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-sky-50 transition">
                 <span className="w-7 h-7 rounded-xl bg-sky-500 flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -100,7 +101,8 @@ export default function UserMenu() {
             ) : (
               <>
                 <Link href="/admin" onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-black hover:bg-sky-50 transition">
+                  style={{ color: '#000' }}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-sky-50 transition">
                   <span className="w-7 h-7 rounded-xl bg-sky-500 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -109,7 +111,8 @@ export default function UserMenu() {
                   Мой кабинет
                 </Link>
                 <Link href="/rewards" onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-black hover:bg-yellow-50 transition">
+                  style={{ color: '#000' }}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-yellow-50 transition">
                   <span className="w-7 h-7 rounded-xl bg-yellow-400 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
