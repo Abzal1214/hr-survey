@@ -113,12 +113,12 @@ export default function TestsPage() {
     setMessage('');
   };
 
-  const handleAnswer = (qIdx, value) => setAnswers(p => ({ ...p, [qIdx]: value }));
+  const handleAnswer = (qIdx, optIdx) => setAnswers(p => ({ ...p, [qIdx]: optIdx }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const questions = selectedQuiz.questions;
-    const correct = questions.filter((q, i) => answers[i] === q.correct).length;
+    const correct = questions.filter((q, i) => q.options[answers[i]] === q.correct).length;
     const percent = Math.round((correct / questions.length) * 100);
     setResult({ correct, total: questions.length, percent });
 
@@ -207,13 +207,13 @@ export default function TestsPage() {
                 <div key={idx} className="rounded-[24px] bg-white/95 p-6 shadow-lg border border-white/60">
                   <p className="font-semibold text-slate-900 mb-4"><span className="text-emerald-600">{idx + 1}.</span> {q.text}</p>
                   <div className="space-y-3">
-                    {q.options.map((opt) => (
-                      <label key={opt} className={`flex items-center gap-3 cursor-pointer rounded-2xl px-4 py-3 border transition ${
-                        answers[idx] === opt ? 'bg-emerald-50 border-emerald-400' : 'bg-slate-50 border-slate-200 hover:border-emerald-300'
+                    {q.options.map((opt, oi) => (
+                      <label key={oi} className={`flex items-center gap-3 cursor-pointer rounded-2xl px-4 py-3 border transition ${
+                        answers[idx] === oi ? 'bg-emerald-50 border-emerald-400' : 'bg-slate-50 border-slate-200 hover:border-emerald-300'
                       }`}>
-                        <input type="radio" name={`q-${idx}`} value={opt}
-                          checked={answers[idx] === opt}
-                          onChange={() => handleAnswer(idx, opt)}
+                        <input type="radio" name={`q-${idx}`} value={oi}
+                          checked={answers[idx] === oi}
+                          onChange={() => handleAnswer(idx, oi)}
                           className="accent-emerald-600" />
                         <span className="text-slate-800">{opt}</span>
                       </label>
