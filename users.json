@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Абзал",
+    "phone": "admin",
+    "password": "password123",
+    "workplaceType": "restaurant",
+    "position": "раннер",
+    "registeredAt": "2026-04-08T10:11:30.087Z",
+    "points": 5
+  },
+  {
+    "name": "GUl",
+    "phone": "GULFAIRUZ",
+    "password": "132456QS",
+    "workplaceType": "restaurant",
+    "position": "бармен",
+    "registeredAt": "2026-04-08T10:13:19.628Z",
+    "points": 5
+  }
+]

@@ -1,0 +1,86 @@
+import { NextResponse } from 'next/server';
+import { connectDB } from '../../../lib/mongodb';
+import { User } from '../../../lib/models';
+
+const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
+
+export async function GET() {
+  try {
+    await connectDB();
+    const users = await User.find({}).lean();
+    return NextResponse.json(users);
+  } catch (error) {
+    return NextResponse.json({ error: 'Не удалось загрузить пользователей' }, { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  try {
+    await connectDB();
+    const body = await request.json();
+    const { name, phone, password, department, position, points = 0, role = 'employee' } = body;
+    if (!name || !phone || !password || !department || !position) {
+      return NextResponse.json({ error: 'Заполните все поля' }, { status: 400 });
+    }
+    const allUsers = await User.find({}).lean();
+    const exists = allUsers.some(u => normalizePhone(u.phone) === normalizePhone(phone));
+    if (exists) {
+      return NextResponse.json({ error: 'Пользователь с таким номером уже зарегистрирован' }, { status: 400 });
+    }
+    await User.create({ name, phone, password, department, position, points: Number(points), role });
+    return NextResponse.json({ message: 'Пользователь зарегистрирован' });
+  } catch (error) {
+    return NextResponse.json({ error: 'Ошибка регистрации' }, { status: 500 });
+  }
+}
+
+export async function PUT(request) {
+  try {
+    await connectDB();
+    const body = await request.json();
+    const { oldPhone, phone, name, password, department, position, points, role } = body;
+    if (!oldPhone && !phone) {
+      return NextResponse.json({ error: 'Не указан пользователь для обновления' }, { status: 400 });
+    }
+    const normalizedOldPhone = normalizePhone(oldPhone || phone);
+    const allUsers = await User.find({}).lean();
+    const current = allUsers.find(u => normalizePhone(u.phone) === normalizedOldPhone);
+    if (!current) return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
+    if (phone && normalizePhone(phone) !== normalizedOldPhone) {
+      const dup = allUsers.find(u => normalizePhone(u.phone) === normalizePhone(phone));
+      if (dup) return NextResponse.json({ error: 'Другой пользователь с таким номером уже существует' }, { status: 400 });
+    }
+    const update = {};
+    if (name !== undefined) update.name = name;
+    if (phone !== undefined) update.phone = phone;
+    if (password) update.password = password;
+    if (department !== undefined) update.department = department;
+    if (position !== undefined) update.position = position;
+    if (points !== undefined) update.points = Number(points);
+    if (role !== undefined) update.role = role;
+    await User.updateOne({ phone: current.phone }, { $set: update });
+    return NextResponse.json({ message: 'Пользователь обновлен' });
+  } catch (error) {
+    return NextResponse.json({ error: 'Ошибка обновления пользователя' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    await connectDB();
+    const body = await request.json();
+    const { phone } = body;
+    if (!phone) return NextResponse.json({ error: 'Не указан телефон для удаления' }, { status: 400 });
+    const result = await User.deleteOne({ phone: { $regex: normalizePhone(phone) } });
+    if (result.deletedCount === 0) {
+      // fallback: find by normalized
+      const allUsers = await User.find({}).lean();
+      const found = allUsers.find(u => normalizePhone(u.phone) === normalizePhone(phone));
+      if (!found) return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
+      await User.deleteOne({ _id: found._id });
+    }
+    return NextResponse.json({ message: 'Пользователь удален' });
+  } catch (error) {
+    return NextResponse.json({ error: 'Ошибка удаления пользователя' }, { status: 500 });
+  }
+}
