@@ -617,7 +617,7 @@ export default function Admin() {
                     name="title"
                     value={newsForm.title}
                     onChange={handleNewsChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3"
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                     placeholder="Новая акция для сотрудников"
                   />
                 </div>
@@ -627,7 +627,7 @@ export default function Admin() {
                     name="description"
                     value={newsForm.description}
                     onChange={handleNewsChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 min-h-[120px]"
+                    className="w-full rounded-2xl border border-slate-300 p-3 min-h-[120px] text-slate-900"
                     placeholder="Описание новости или акции"
                   />
                 </div>
@@ -656,7 +656,7 @@ export default function Admin() {
                       name="title"
                       value={trainingForm.title}
                       onChange={handleTrainingChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                       placeholder="Новый курс для сотрудников"
                     />
                   </div>
@@ -666,7 +666,7 @@ export default function Admin() {
                       name="description"
                       value={trainingForm.description}
                       onChange={handleTrainingChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 min-h-[120px]"
+                      className="w-full rounded-2xl border border-slate-300 p-3 min-h-[120px] text-slate-900"
                       placeholder="Описание тренинга или обучающего курса"
                     />
                   </div>
@@ -696,7 +696,7 @@ export default function Admin() {
                       name="name"
                       value={employeeForm.name}
                       onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                       placeholder="Имя сотрудника"
                     />
                   </div>
@@ -706,7 +706,7 @@ export default function Admin() {
                       name="phone"
                       value={employeeForm.phone}
                       onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                       placeholder="+7 (999) 123-45-67"
                     />
                   </div>
@@ -717,7 +717,7 @@ export default function Admin() {
                       type="password"
                       value={employeeForm.password}
                       onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                       placeholder="Минимум 6 символов"
                     />
                   </div>
@@ -727,7 +727,7 @@ export default function Admin() {
                       name="department"
                       value={employeeForm.department}
                       onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                     >
                       <option value="">Выберите отдел</option>
                       {Object.keys(departmentPositions).map((dept) => (
@@ -741,7 +741,7 @@ export default function Admin() {
                       name="position"
                       value={employeeForm.position}
                       onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                     >
                       <option value="">Выберите должность</option>
                       {(departmentPositions[employeeForm.department] || []).map((role) => (
@@ -756,7 +756,7 @@ export default function Admin() {
                       type="number"
                       value={employeeForm.points}
                       onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                     />
                   </div>
                   <div className="flex flex-col gap-3 sm:flex-row">
@@ -972,7 +972,7 @@ export default function Admin() {
                       name="name"
                       value={rewardForm.name}
                       onChange={handleRewardChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                       placeholder="Например: Подарочная карта 500 руб"
                     />
                   </div>
@@ -983,7 +983,7 @@ export default function Admin() {
                       type="number"
                       value={rewardForm.cost}
                       onChange={handleRewardChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                       placeholder="100"
                     />
                   </div>
@@ -993,7 +993,7 @@ export default function Admin() {
                       name="description"
                       value={rewardForm.description}
                       onChange={handleRewardChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3"
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                       placeholder="Краткое описание награды"
                     />
                   </div>
