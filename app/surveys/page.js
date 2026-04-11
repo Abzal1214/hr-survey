@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
+import KebabMenu from '../components/KebabMenu';
 
 const inputCls = "w-full rounded-2xl bg-white border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-400 transition";
 const labelCls = "block space-y-2";
@@ -44,6 +45,8 @@ export default function SurveysPage() {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
+  const [editingTemplateId, setEditingTemplateId] = useState(null);
+  const [editTemplateForm, setEditTemplateForm] = useState({ title: '', description: '' });
 
   useEffect(() => {
     try {
@@ -124,6 +127,15 @@ export default function SurveysPage() {
       await fetch(`/api/admin?id=${id}`, { method: 'DELETE' });
       setSubmissions(prev => prev.filter(s => String(s._id || s.id) !== String(id)));
     }});
+  };
+
+  const handleSaveTemplateEdit = async (id) => {
+    const res = await fetch('/api/surveys', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...editTemplateForm }),
+    });
+    if (res.ok) { setEditingTemplateId(null); loadTemplates(); }
   };
 
   // Employee: select survey
@@ -293,16 +305,39 @@ export default function SurveysPage() {
                   {templates.map(t => {
                     const tid = String(t._id || t.id);
                     return (
-                      <div key={tid} className="flex items-start justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                        <div>
-                          <h3 className="font-bold text-slate-900">{t.title}</h3>
-                          {t.description && <p className="text-sm text-slate-500 mt-0.5">{t.description}</p>}
-                          <p className="text-xs text-slate-400 mt-1">{t.questions?.length || 0} вопрос(ов)</p>
-                        </div>
-                        <button onClick={() => handleDeleteTemplate(tid)}
-                          className="shrink-0 rounded-lg bg-red-100 text-red-600 px-3 py-1.5 text-xs font-semibold hover:bg-red-200 transition">
-                          Удалить
-                        </button>
+                      <div key={tid} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                        {editingTemplateId === tid ? (
+                          <div className="space-y-3">
+                            <input
+                              value={editTemplateForm.title}
+                              onChange={e => setEditTemplateForm(p => ({ ...p, title: e.target.value }))}
+                              className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm"
+                              placeholder="Название опроса"
+                            />
+                            <textarea
+                              value={editTemplateForm.description}
+                              onChange={e => setEditTemplateForm(p => ({ ...p, description: e.target.value }))}
+                              className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm min-h-[60px]"
+                              placeholder="Описание"
+                            />
+                            <div className="flex gap-2">
+                              <button onClick={() => handleSaveTemplateEdit(tid)} className="rounded-xl bg-violet-600 text-white px-4 py-2 text-sm font-semibold hover:bg-violet-700 transition">Сохранить</button>
+                              <button onClick={() => setEditingTemplateId(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 transition">Отмена</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <h3 className="font-bold text-slate-900">{t.title}</h3>
+                              {t.description && <p className="text-sm text-slate-500 mt-0.5">{t.description}</p>}
+                              <p className="text-xs text-slate-400 mt-1">{t.questions?.length || 0} вопрос(ов)</p>
+                            </div>
+                            <KebabMenu
+                              onEdit={() => { setEditingTemplateId(tid); setEditTemplateForm({ title: t.title, description: t.description || '' }); }}
+                              onDelete={() => handleDeleteTemplate(tid)}
+                            />
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -339,10 +374,7 @@ export default function SurveysPage() {
                               {item.timestamp ? new Date(item.timestamp).toLocaleDateString('ru-RU') : ''}
                             </p>
                           </div>
-                          <button onClick={() => handleDeleteSubmission(itemId)}
-                            className="rounded-lg bg-red-100 text-red-600 px-3 py-1 text-xs font-semibold hover:bg-red-200 transition shrink-0">
-                            Удалить
-                          </button>
+                          <KebabMenu onDelete={() => handleDeleteSubmission(itemId)} />
                         </div>
                         {Array.isArray(item.answers) ? (
                           <div className="grid gap-2 sm:grid-cols-2">

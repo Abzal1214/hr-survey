@@ -27,6 +27,20 @@ export async function POST(request) {
   }
 }
 
+export async function PUT(request) {
+  try {
+    await connectDB();
+    const body = await request.json();
+    const { id, title, description, imageUrl } = body;
+    if (!id) return NextResponse.json({ error: 'ID не указан' }, { status: 400 });
+    const post = await News.findByIdAndUpdate(id, { title, description, imageUrl }, { new: true });
+    if (!post) return NextResponse.json({ error: 'Новость не найдена' }, { status: 404 });
+    return NextResponse.json({ ...post.toObject(), id: post._id });
+  } catch {
+    return NextResponse.json({ error: 'Ошибка обновления новости' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request) {
   try {
     await connectDB();

@@ -27,6 +27,20 @@ export async function POST(request) {
   }
 }
 
+export async function PUT(request) {
+  try {
+    await connectDB();
+    const body = await request.json();
+    const { id, name, description, cost } = body;
+    if (!id) return NextResponse.json({ error: 'ID не указан' }, { status: 400 });
+    const reward = await Reward.findByIdAndUpdate(id, { name, description, cost: parseInt(cost) }, { new: true });
+    if (!reward) return NextResponse.json({ error: 'Награда не найдена' }, { status: 404 });
+    return NextResponse.json({ ...reward.toObject(), id: reward._id });
+  } catch {
+    return NextResponse.json({ error: 'Ошибка обновления награды' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request) {
   try {
     await connectDB();

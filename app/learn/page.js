@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
+import KebabMenu from '../components/KebabMenu';
 
 export default function LearnPage() {
   const [trainings, setTrainings] = useState([]);
@@ -213,10 +214,7 @@ export default function LearnPage() {
                         <div className="flex items-start justify-between gap-4">
                           <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
                           {isAdmin && (
-                            <div className="flex gap-2 shrink-0">
-                              <button onClick={() => startEdit(item)} className="rounded-lg bg-sky-100 text-sky-700 px-3 py-1 text-xs font-semibold hover:bg-sky-200 transition">Изменить</button>
-                              <button onClick={() => handleDelete(itemId)} className="rounded-lg bg-red-100 text-red-600 px-3 py-1 text-xs font-semibold hover:bg-red-200 transition">Удалить</button>
-                            </div>
+                            <KebabMenu onEdit={() => startEdit(item)} onDelete={() => handleDelete(itemId)} />
                           )}
                         </div>
                         {item.description && <p className="text-slate-600 mt-2 text-sm">{item.description}</p>}

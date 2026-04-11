@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ConfirmModal from '../components/ConfirmModal';
+import KebabMenu from '../components/KebabMenu';
 
 export default function RewardsPage() {
   const [rewards, setRewards] = useState([]);
@@ -18,6 +19,8 @@ export default function RewardsPage() {
   const [imagePreview, setImagePreview] = useState('');
   const [saving, setSaving] = useState(false);
   const [createMsg, setCreateMsg] = useState('');
+  const [editingRewardId, setEditingRewardId] = useState(null);
+  const [editRewardForm, setEditRewardForm] = useState({ name: '', description: '', cost: '' });
 
   const loadRewards = () => {
     fetch('/api/rewards')
@@ -124,6 +127,15 @@ export default function RewardsPage() {
     }});
   };
 
+  const handleSaveRewardEdit = async (id) => {
+    const res = await fetch('/api/rewards', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...editRewardForm }),
+    });
+    if (res.ok) { setEditingRewardId(null); loadRewards(); }
+  };
+
   const getIcon = (name = '') => {
     const n = name.toLowerCase();
     if (n.includes('кофе') || n.includes('coffee')) return '☕';
@@ -208,27 +220,57 @@ export default function RewardsPage() {
               <div key={itemId}
                 className="animate-scale-in hover-lift rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3"
                 style={{animationDelay: `${i * 0.08}s`}}>
-                {item.imageUrl
-                  ? <img src={item.imageUrl} alt={item.name} className="w-full h-36 object-cover rounded-2xl mb-1" />
-                  : <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-2xl mb-1">{getIcon(item.name)}</div>
-                }
-                <h3 className="text-lg font-bold text-slate-900">{item.name}</h3>
-                <p className="text-slate-500 text-sm flex-1">{item.description}</p>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="font-bold text-emerald-600">{item.cost} 🪙</span>
-                  <div className="flex items-center gap-2">
-                    {isAdmin && (
-                      <button onClick={() => handleDeleteReward(itemId)}
-                        className="rounded-full bg-red-100 text-red-600 px-3 py-1 text-xs font-semibold hover:bg-red-200 transition">
-                        Удалить
-                      </button>
-                    )}
-                    <button onClick={() => addToCart(itemId)}
-                      className="w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xl font-bold flex items-center justify-center transition shadow">
-                      +
-                    </button>
+                {editingRewardId === itemId ? (
+                  <div className="space-y-3">
+                    <input
+                      value={editRewardForm.name}
+                      onChange={e => setEditRewardForm(p => ({ ...p, name: e.target.value }))}
+                      className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm"
+                      placeholder="Название"
+                    />
+                    <textarea
+                      value={editRewardForm.description}
+                      onChange={e => setEditRewardForm(p => ({ ...p, description: e.target.value }))}
+                      className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm min-h-[60px]"
+                      placeholder="Описание"
+                    />
+                    <input
+                      type="number"
+                      value={editRewardForm.cost}
+                      onChange={e => setEditRewardForm(p => ({ ...p, cost: e.target.value }))}
+                      className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm"
+                      placeholder="Стоимость (🪙)"
+                    />
+                    <div className="flex gap-2">
+                      <button onClick={() => handleSaveRewardEdit(itemId)} className="rounded-xl bg-yellow-500 text-white px-4 py-2 text-sm font-semibold hover:bg-yellow-600 transition">Сохранить</button>
+                      <button onClick={() => setEditingRewardId(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 transition">Отмена</button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    {item.imageUrl
+                      ? <img src={item.imageUrl} alt={item.name} className="w-full h-36 object-cover rounded-2xl mb-1" />
+                      : <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-2xl mb-1">{getIcon(item.name)}</div>
+                    }
+                    <h3 className="text-lg font-bold text-slate-900">{item.name}</h3>
+                    <p className="text-slate-500 text-sm flex-1">{item.description}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="font-bold text-emerald-600">{item.cost} 🪙</span>
+                      <div className="flex items-center gap-2">
+                        {isAdmin && (
+                          <KebabMenu
+                            onEdit={() => { setEditingRewardId(itemId); setEditRewardForm({ name: item.name, description: item.description, cost: item.cost }); }}
+                            onDelete={() => handleDeleteReward(itemId)}
+                          />
+                        )}
+                        <button onClick={() => addToCart(itemId)}
+                          className="w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xl font-bold flex items-center justify-center transition shadow">
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             );
           })}

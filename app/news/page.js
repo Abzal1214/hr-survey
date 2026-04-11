@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
+import KebabMenu from '../components/KebabMenu';
 
 export default function NewsPage() {
   const [news, setNews] = useState([]);
@@ -12,6 +13,8 @@ export default function NewsPage() {
   const [saving, setSaving] = useState(false);
   const [createMsg, setCreateMsg] = useState('');
   const [confirmModal, setConfirmModal] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({ title: '', description: '' });
 
   const loadNews = () => {
     fetch('/api/news')
@@ -34,6 +37,15 @@ export default function NewsPage() {
       await fetch(`/api/news?id=${id}`, { method: 'DELETE' });
       loadNews();
     }});
+  };
+
+  const handleSaveEdit = async (id) => {
+    const res = await fetch('/api/news', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...editForm }),
+    });
+    if (res.ok) { setEditingId(null); loadNews(); }
   };
 
   const handleAddNews = async () => {
@@ -180,24 +192,45 @@ export default function NewsPage() {
                 const itemId = String(item._id || item.id);
                 return (
                   <article key={itemId} className="rounded-[20px] border-l-4 border-sky-400 bg-sky-50 p-6 shadow-sm">
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <p className="text-xs uppercase tracking-widest text-sky-400">
-                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU') : ''}
-                      </p>
-                      {isAdmin && (
-                        <button
-                          onClick={() => handleDelete(itemId)}
-                          className="rounded-lg bg-red-100 text-red-600 px-3 py-1 text-xs font-semibold hover:bg-red-200 transition shrink-0"
-                        >
-                          Удалить
-                        </button>
-                      )}
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
-                    {item.imageUrl && (
-                      <img src={item.imageUrl} alt={item.title} className="w-full h-40 object-cover rounded-2xl mb-3" />
+                    {editingId === itemId ? (
+                      <div className="space-y-3">
+                        <input
+                          value={editForm.title}
+                          onChange={e => setEditForm(p => ({ ...p, title: e.target.value }))}
+                          className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm"
+                          placeholder="Заголовок"
+                        />
+                        <textarea
+                          value={editForm.description}
+                          onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
+                          className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm min-h-[80px]"
+                          placeholder="Описание"
+                        />
+                        <div className="flex gap-2">
+                          <button onClick={() => handleSaveEdit(itemId)} className="rounded-xl bg-sky-600 text-white px-4 py-2 text-sm font-semibold hover:bg-sky-700 transition">Сохранить</button>
+                          <button onClick={() => setEditingId(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 transition">Отмена</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <p className="text-xs uppercase tracking-widest text-sky-400">
+                            {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU') : ''}
+                          </p>
+                          {isAdmin && (
+                            <KebabMenu
+                              onEdit={() => { setEditingId(itemId); setEditForm({ title: item.title, description: item.description }); }}
+                              onDelete={() => handleDelete(itemId)}
+                            />
+                          )}
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
+                        {item.imageUrl && (
+                          <img src={item.imageUrl} alt={item.title} className="w-full h-40 object-cover rounded-2xl mb-3" />
+                        )}
+                        <p className="text-slate-600 text-sm leading-relaxed">{item.description}</p>
+                      </>
                     )}
-                    <p className="text-slate-600 text-sm leading-relaxed">{item.description}</p>
                   </article>
                 );
               })}

@@ -23,6 +23,20 @@ export async function POST(request) {
   }
 }
 
+export async function PUT(request) {
+  try {
+    await connectDB();
+    const body = await request.json();
+    const { id, title, description } = body;
+    if (!id) return NextResponse.json({ error: 'ID не указан' }, { status: 400 });
+    const template = await SurveyTemplate.findByIdAndUpdate(id, { title, description }, { new: true });
+    if (!template) return NextResponse.json({ error: 'Опрос не найден' }, { status: 404 });
+    return NextResponse.json(template);
+  } catch {
+    return NextResponse.json({ error: 'Ошибка обновления опроса' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request) {
   try {
     await connectDB();

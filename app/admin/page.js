@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
+import KebabMenu from '../components/KebabMenu';
 
 const departmentPositions = {
   Аквапарк: ['кассир', 'инструктор'],
@@ -631,22 +632,10 @@ export default function Admin() {
                         <td className="p-3 border-b text-slate-900">{user.position}</td>
                         <td className="p-3 border-b text-slate-900">{new Date(user.registeredAt).toLocaleDateString('ru-RU')}</td>
                         <td className="p-3 border-b">
-                          <div className="flex flex-wrap gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleSelectUser(user)}
-                              className="rounded-full bg-sky-600 px-3 py-2 text-white text-xs font-semibold hover:bg-sky-700 transition"
-                            >
-                              Редактировать
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteEmployee(user)}
-                              className="rounded-full bg-red-600 px-3 py-2 text-white text-xs font-semibold hover:bg-red-700 transition"
-                            >
-                              Удалить
-                            </button>
-                          </div>
+                          <KebabMenu
+                            onEdit={() => handleSelectUser(user)}
+                            onDelete={() => handleDeleteEmployee(user)}
+                          />
                         </td>
                       </tr>
                     ))}
