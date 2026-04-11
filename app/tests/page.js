@@ -316,6 +316,14 @@ export default function TestsPage() {
             {isAdmin ? 'Нет тестов. Создайте первый с кнопкой выше.' : 'Тесты пока не добавлены.'}
           </div>
         ) : (
+          <>
+          {!isAdmin && quizzes.length > 0 && quizzes.every(q => userResults[String(q._id || q.id)]?.passed) && (
+            <div className="rounded-[24px] bg-white/95 p-8 shadow-xl text-center mb-6">
+              <div className="text-5xl mb-4">🏆</div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Все актуальные тесты пройдены!</h2>
+              <p className="text-lg text-slate-600">Вы молодец! 🎉</p>
+            </div>
+          )}
           <div className="grid gap-4 sm:grid-cols-2">
             {quizzes.map((quiz) => {
               const qid = String(quiz._id || quiz.id);
@@ -353,6 +361,7 @@ export default function TestsPage() {
               );
             })}
           </div>
+          </>
         )}
       </div>
     </div>

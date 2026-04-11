@@ -44,7 +44,6 @@ export default function Admin() {
   }, []);
   const [employeeForm, setEmployeeForm] = useState(initialEmployeeForm);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [rewardForm, setRewardForm] = useState({ name: '', description: '', cost: '' });
   const [adminMessage, setAdminMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -104,24 +103,21 @@ export default function Admin() {
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const [surveyRes, usersRes, testsRes, rewardsRes] = await Promise.all([
+      const [surveyRes, usersRes, testsRes] = await Promise.all([
         fetch('/api/admin'),
         fetch('/api/users'),
         fetch('/api/tests'),
-        fetch('/api/rewards')
       ]);
 
-      if (surveyRes.ok && usersRes.ok && testsRes.ok && rewardsRes.ok) {
-        const [survey, users, tests, rewards] = await Promise.all([
+      if (surveyRes.ok && usersRes.ok && testsRes.ok) {
+        const [survey, users, tests] = await Promise.all([
           surveyRes.json(),
           usersRes.json(),
           testsRes.json(),
-          rewardsRes.json()
         ]);
         setSurveyData(survey);
         setUsersData(users);
         setTestsData(tests);
-        setRewardsData(rewards);
       } else {
         throw new Error('Ошибка при загрузке данных');
       }
@@ -153,54 +149,6 @@ export default function Admin() {
   const handleEmployeeFormChange = (e) => {
     const { name, value } = e.target;
     setEmployeeForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleRewardChange = (e) => {
-    const { name, value } = e.target;
-    setRewardForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleAddReward = async (e) => {
-    e.preventDefault();
-    if (!rewardForm.name || !rewardForm.description || !rewardForm.cost) {
-      setAdminMessage('Заполните название, описание и стоимость награды');
-      return;
-    }
-    try {
-      const response = await fetch('/api/rewards', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(rewardForm),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setAdminMessage('Награда добавлена');
-        setRewardForm({ name: '', description: '', cost: '' });
-        await fetchAdminData();
-      } else {
-        setAdminMessage(data.error || 'Ошибка добавления награды');
-      }
-    } catch (error) {
-      setAdminMessage('Ошибка: ' + error.message);
-    }
-  };
-
-  const handleDeleteReward = async (id) => {
-    if (!confirm('Удалить награду?')) return;
-    try {
-      const response = await fetch(`/api/rewards?id=${id}`, {
-        method: 'DELETE',
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setAdminMessage('Награда удалена');
-        await fetchAdminData();
-      } else {
-        setAdminMessage(data.error || 'Ошибка удаления награды');
-      }
-    } catch (error) {
-      setAdminMessage('Ошибка: ' + error.message);
-    }
   };
 
   const handleAddEmployee = async (e) => {
@@ -798,103 +746,28 @@ export default function Admin() {
             </div>
           )}
           <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">💰 AQUA COIN - Программа лояльности</h2>
-            
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Оценки сотрудников</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-sm text-slate-900">
-                  <thead className="bg-emerald-100 text-slate-900">
-                    <tr>
-                      <th className="p-3 text-left">Имя</th>
-                      <th className="p-3 text-left">Телефон</th>
-                      <th className="p-3 text-left">Отдел</th>
-                      <th className="p-3 text-left">Баллы (AQUA COIN)</th>
-                      <th className="p-3 text-left">Положительные отзывы</th>
-                      <th className="p-3 text-left">Процент положительных</th>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">💰 AQUA COIN — баллы сотрудников</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm text-slate-900">
+                <thead className="bg-emerald-100 text-slate-900">
+                  <tr>
+                    <th className="p-3 text-left">Имя</th>
+                    <th className="p-3 text-left">Телефон</th>
+                    <th className="p-3 text-left">Отдел</th>
+                    <th className="p-3 text-left">Баллы (AQUA COIN)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {usersData.map((user, index) => (
+                    <tr key={index} className={index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'}>
+                      <td className="p-3 border-b text-slate-900">{user.name}</td>
+                      <td className="p-3 border-b text-slate-900">{user.phone}</td>
+                      <td className="p-3 border-b text-slate-900">{mapDepartment(user)}</td>
+                      <td className="p-3 border-b text-slate-900 font-bold text-emerald-700">{user.points ?? 0}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {usersData.map((user, index) => {
-                      const userSurveys = surveyData.filter(s => s.phone === user.phone);
-                      const positiveSurveys = userSurveys.filter(s => s.rating === 'понравилось');
-                      const positivePercent = userSurveys.length > 0 ? Math.round((positiveSurveys.length / userSurveys.length) * 100) : 0;
-                      return (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'}>
-                          <td className="p-3 border-b text-slate-900">{user.name}</td>
-                          <td className="p-3 border-b text-slate-900">{user.phone}</td>
-                          <td className="p-3 border-b text-slate-900">{mapDepartment(user)}</td>
-                          <td className="p-3 border-b text-slate-900 font-bold text-emerald-700">{user.points ?? 0}</td>
-                          <td className="p-3 border-b text-slate-900">{positiveSurveys.length} из {userSurveys.length}</td>
-                          <td className="p-3 border-b text-slate-900">{positivePercent}%</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Управление наградами</h3>
-              <form onSubmit={handleAddReward} className="mb-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Название награды</label>
-                    <input
-                      name="name"
-                      value={rewardForm.name}
-                      onChange={handleRewardChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="Например: Подарочная карта 500 руб"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Стоимость (AQUA COIN)</label>
-                    <input
-                      name="cost"
-                      type="number"
-                      value={rewardForm.cost}
-                      onChange={handleRewardChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="100"
-                    />
-                  </div>
-                  <div className="md:col-span-1">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Описание</label>
-                    <input
-                      name="description"
-                      value={rewardForm.description}
-                      onChange={handleRewardChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="Краткое описание награды"
-                    />
-                  </div>
-                </div>
-                <button className="rounded-2xl bg-emerald-600 text-white px-6 py-3 font-semibold hover:bg-emerald-700 transition">Добавить награду</button>
-              </form>
-              
-              <div className="space-y-3">
-                {rewardsData.length === 0 ? (
-                  <p className="text-slate-600">Наград пока нет. Добавьте первую!</p>
-                ) : (
-                  rewardsData.map((reward) => (
-                    <div key={reward.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                      <div>
-                        <p className="font-semibold text-slate-900">{reward.name}</p>
-                        <p className="text-slate-600">{reward.description}</p>
-                        <p className="text-sm text-emerald-700 font-bold">{reward.cost} AQUA COIN</p>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteReward(reward.id)}
-                        className="rounded-full bg-red-600 text-white px-4 py-2 text-sm font-semibold hover:bg-red-700 transition"
-                      >
-                        Удалить
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

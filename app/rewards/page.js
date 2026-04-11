@@ -1,55 +1,60 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function RewardsPage() {
   const [rewards, setRewards] = useState([]);
   const [cart, setCart] = useState({});
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [coupon, setCoupon] = useState(null);
   const [exchangeError, setExchangeError] = useState('');
 
-  useEffect(() => {
+  const [showCreate, setShowCreate] = useState(false);
+  const [newReward, setNewReward] = useState({ name: '', description: '', cost: '' });
+  const [saving, setSaving] = useState(false);
+  const [createMsg, setCreateMsg] = useState('');
+
+  const loadRewards = () => {
     fetch('/api/rewards')
       .then((res) => res.json())
       .then(setRewards)
       .catch(() => setRewards([]));
+  };
+
+  useEffect(() => {
+    loadRewards();
     try {
       const u = JSON.parse(localStorage.getItem('currentUser'));
       setUser(u);
-    } catch {
-      setUser(null);
-    }
+      if (u?.role === 'admin') setIsAdmin(true);
+    } catch { setUser(null); }
   }, []);
 
   let balance = 0;
   if (user?.role === 'admin') balance = '∞';
   else if (user?.points != null) balance = user.points;
 
-  // Добавить товар в корзину
-  const addToCart = (id) => {
-    setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
-  };
-
-  // Удалить товар из корзины
-  const removeFromCart = (id) => {
-    setCart((prev) => {
-      const next = { ...prev };
-      if (next[id] > 1) next[id]--;
-      else delete next[id];
-      return next;
-    });
-  };
-
-  // Очистить корзину
+  const addToCart = (id) => setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  const removeFromCart = (id) => setCart((prev) => {
+    const next = { ...prev };
+    if (next[id] > 1) next[id]--;
+    else delete next[id];
+    return next;
+  });
   const clearCart = () => setCart({});
 
-  // Обработчик обмена
+  const total = Object.entries(cart).reduce((sum, [id, qty]) => {
+    const item = rewards.find((r) => String(r._id || r.id) === id);
+    return sum + (item ? item.cost * qty : 0);
+  }, 0);
+
   const handleExchange = async () => {
     setExchangeError('');
     if (!user?.phone) { setExchangeError('Войдите в аккаунт для обмена.'); return; }
     const items = Object.entries(cart).map(([id, qty]) => {
-      const item = rewards.find(r => r.id === Number(id));
-      return { id: Number(id), name: item.name, qty, cost: item.cost, icon: getIcon(item.name) };
+      const item = rewards.find(r => String(r._id || r.id) === id);
+      return { id, name: item.name, qty, cost: item.cost, icon: getIcon(item.name) };
     });
     try {
       const res = await fetch('/api/exchange', {
@@ -59,23 +64,42 @@ export default function RewardsPage() {
       });
       const data = await res.json();
       if (!res.ok) { setExchangeError(data.error || 'Ошибка обмена'); return; }
-      // Обновить баланс в localStorage
       const updated = { ...user, points: data.newBalance };
       setUser(updated);
       localStorage.setItem('currentUser', JSON.stringify(updated));
       window.dispatchEvent(new Event('userChanged'));
       clearCart();
       setCoupon(data);
-    } catch {
-      setExchangeError('Ошибка сети. Попробуйте ещё раз.');
-    }
+    } catch { setExchangeError('Ошибка сети. Попробуйте ещё раз.'); }
   };
 
-  // Сумма заказа
-  const total = Object.entries(cart).reduce((sum, [id, qty]) => {
-    const item = rewards.find((r) => r.id === Number(id));
-    return sum + (item ? item.cost * qty : 0);
-  }, 0);
+  const handleAddReward = async () => {
+    if (!newReward.name || !newReward.description || !newReward.cost) {
+      setCreateMsg('Заполните все поля'); return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch('/api/rewards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newReward),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCreateMsg('Награда добавлена!');
+        setNewReward({ name: '', description: '', cost: '' });
+        setShowCreate(false);
+        loadRewards();
+      } else { setCreateMsg(data.error || 'Ошибка'); }
+    } catch { setCreateMsg('Ошибка сети'); }
+    setSaving(false);
+  };
+
+  const handleDeleteReward = async (id) => {
+    if (!confirm('Удалить эту награду?')) return;
+    await fetch(`/api/rewards?id=${id}`, { method: 'DELETE' });
+    loadRewards();
+  };
 
   const getIcon = (name = '') => {
     const n = name.toLowerCase();
@@ -97,7 +121,6 @@ export default function RewardsPage() {
   return (
     <>
     <div className="min-h-screen">
-      {/* Hero */}
       <div className="relative flex flex-col items-center justify-center text-center px-6 py-20">
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
         <div className="relative z-10">
@@ -113,32 +136,70 @@ export default function RewardsPage() {
       </div>
 
       <div className="mx-auto max-w-5xl px-6 pb-16 space-y-6">
-        {/* Товары */}
+        {isAdmin && (
+          <div>
+            <button
+              onClick={() => { setShowCreate(!showCreate); setCreateMsg(''); }}
+              className="rounded-full bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 font-semibold transition shadow-lg"
+            >
+              {showCreate ? '✕ Отмена' : '+ Добавить награду'}
+            </button>
+            {showCreate && (
+              <div className="mt-4 rounded-[28px] bg-white/95 p-6 shadow-2xl border border-slate-200">
+                <h2 className="text-xl font-bold text-slate-900 mb-4">Новая награда</h2>
+                <div className="space-y-4">
+                  <input value={newReward.name} onChange={e => setNewReward(p => ({ ...p, name: e.target.value }))}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название награды *" />
+                  <input value={newReward.description} onChange={e => setNewReward(p => ({ ...p, description: e.target.value }))}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Описание *" />
+                  <input type="number" min="1" value={newReward.cost} onChange={e => setNewReward(p => ({ ...p, cost: e.target.value }))}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Стоимость в AQUA COIN *" />
+                  {createMsg && <p className="text-sm text-red-600">{createMsg}</p>}
+                  <button onClick={handleAddReward} disabled={saving}
+                    className="w-full rounded-2xl bg-yellow-500 text-white py-3 font-semibold hover:bg-yellow-600 transition disabled:opacity-50">
+                    {saving ? 'Сохранение...' : 'Добавить награду'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {rewards.length === 0 && (
-            <div className="col-span-3 rounded-[24px] bg-white/95 p-8 text-center text-slate-500 shadow">Нет доступных товаров.</div>
-          )}
-          {rewards.map((item, i) => (
-            <div key={item.id}
-              className="animate-scale-in hover-lift rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3"
-              style={{animationDelay: `${i * 0.08}s`}}>
-              <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-2xl mb-1">{getIcon(item.name)}</div>
-              <h3 className="text-lg font-bold text-slate-900">{item.name}</h3>
-              <p className="text-slate-500 text-sm flex-1">{item.description}</p>
-              <div className="flex items-center justify-between mt-2">
-                <span className="font-bold text-emerald-600">{item.cost} 🪙</span>
-                <button
-                  onClick={() => addToCart(item.id)}
-                  className="w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xl font-bold flex items-center justify-center transition shadow"
-                >
-                  +
-                </button>
-              </div>
+            <div className="col-span-3 rounded-[24px] bg-white/95 p-8 text-center text-slate-500 shadow">
+              {isAdmin ? 'Нет наград. Добавьте первую кнопкой выше.' : 'Нет доступных товаров.'}
             </div>
-          ))}
+          )}
+          {rewards.map((item, i) => {
+            const itemId = String(item._id || item.id);
+            return (
+              <div key={itemId}
+                className="animate-scale-in hover-lift rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3"
+                style={{animationDelay: `${i * 0.08}s`}}>
+                <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-2xl mb-1">{getIcon(item.name)}</div>
+                <h3 className="text-lg font-bold text-slate-900">{item.name}</h3>
+                <p className="text-slate-500 text-sm flex-1">{item.description}</p>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="font-bold text-emerald-600">{item.cost} 🪙</span>
+                  <div className="flex items-center gap-2">
+                    {isAdmin && (
+                      <button onClick={() => handleDeleteReward(itemId)}
+                        className="rounded-full bg-red-100 text-red-600 px-3 py-1 text-xs font-semibold hover:bg-red-200 transition">
+                        Удалить
+                      </button>
+                    )}
+                    <button onClick={() => addToCart(itemId)}
+                      className="w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xl font-bold flex items-center justify-center transition shadow">
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Корзина */}
         <div className="animate-fade-in-up delay-200 rounded-[24px] bg-white/95 p-8 shadow-xl">
           <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             🛒 Корзина
@@ -154,7 +215,7 @@ export default function RewardsPage() {
             <>
               <ul className="space-y-3 mb-6">
                 {Object.entries(cart).map(([id, qty]) => {
-                  const item = rewards.find((r) => r.id === Number(id));
+                  const item = rewards.find((r) => String(r._id || r.id) === id);
                   if (!item) return null;
                   return (
                     <li key={id} className="flex items-center gap-3 rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3">
@@ -184,7 +245,13 @@ export default function RewardsPage() {
               </div>
               {exchangeError && <p className="text-red-500 text-sm mt-3">{exchangeError}</p>}
               {balance !== '∞' && total > balance && (
-                <p className="text-amber-600 text-sm mt-2">⚠️ Недостаточно монет. Нужно ещё {total - balance} 🪙</p>
+                <div className="mt-3 flex flex-col gap-2">
+                  <p className="text-amber-600 text-sm">⚠️ Недостаточно монет. Нужно ещё {total - balance} 🪙</p>
+                  <Link href="/tests"
+                    className="inline-flex items-center gap-2 self-start rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 font-semibold text-sm transition shadow">
+                    🚀 Заработать монеты
+                  </Link>
+                </div>
               )}
             </>
           )}
@@ -192,31 +259,23 @@ export default function RewardsPage() {
       </div>
     </div>
 
-    {/* Купон */}
     {coupon && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
         <div className="relative w-full max-w-md">
-          {/* Купон */}
           <div className="bg-white rounded-[28px] shadow-2xl overflow-hidden" style={{fontFamily: 'monospace'}}>
-            {/* Шапка купона */}
             <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-6 text-center">
               <div className="text-4xl mb-2">🎟️</div>
               <h2 className="text-2xl font-extrabold text-white tracking-wide">AQUA COIN КУПОН</h2>
               <p className="text-emerald-100 text-sm mt-1">Hawaii&Miami · SanRemo</p>
             </div>
-
-            {/* Пунктир */}
             <div className="px-8 py-0 flex items-center gap-2 -my-1 relative z-10">
               <div className="w-5 h-5 bg-slate-200 rounded-full -ml-11 flex-shrink-0" />
               <div className="flex-1 border-t-2 border-dashed border-slate-300" />
               <div className="w-5 h-5 bg-slate-200 rounded-full -mr-11 flex-shrink-0" />
             </div>
-
-            {/* Тело купона */}
             <div className="px-8 py-6">
               <p className="text-xs text-slate-400 mb-1">Сотрудник</p>
               <p className="font-bold text-slate-800 text-lg mb-4">{coupon.userName}</p>
-
               <p className="text-xs text-slate-400 mb-2">Товары</p>
               <ul className="space-y-2 mb-4">
                 {coupon.items.map((item, i) => (
@@ -228,13 +287,10 @@ export default function RewardsPage() {
                   </li>
                 ))}
               </ul>
-
               <div className="flex justify-between items-center border-t border-dashed border-slate-200 pt-3 mb-4">
                 <span className="text-slate-500 text-sm">Итого списано</span>
                 <span className="font-extrabold text-emerald-600 text-lg">{coupon.total} 🪙</span>
               </div>
-
-              {/* Код купона */}
               <div className="bg-slate-50 rounded-2xl border-2 border-dashed border-emerald-300 px-4 py-3 text-center mb-2">
                 <p className="text-xs text-slate-400 mb-1 uppercase tracking-widest">Код купона</p>
                 <p className="text-xl font-extrabold text-emerald-700 tracking-widest">{coupon.couponCode}</p>
@@ -243,26 +299,18 @@ export default function RewardsPage() {
                 {new Date(coupon.issuedAt).toLocaleString('ru-RU')}
               </p>
             </div>
-
-            {/* Пунктир */}
             <div className="px-8 py-0 flex items-center gap-2 -my-1 relative z-10">
               <div className="w-5 h-5 bg-slate-200 rounded-full -ml-11 flex-shrink-0" />
               <div className="flex-1 border-t-2 border-dashed border-slate-300" />
               <div className="w-5 h-5 bg-slate-200 rounded-full -mr-11 flex-shrink-0" />
             </div>
-
-            {/* Футер */}
             <div className="bg-emerald-50 px-8 py-4 text-center">
               <p className="text-emerald-800 text-sm font-semibold">📍 Покажите этот купон администратору</p>
               <p className="text-emerald-600 text-xs mt-1">чтобы получить ваш товар</p>
             </div>
           </div>
-
-          {/* Кнопка закрыть */}
-          <button
-            onClick={() => setCoupon(null)}
-            className="mt-4 w-full rounded-2xl bg-white/20 border border-white/40 text-white py-3 font-semibold hover:bg-white/30 transition backdrop-blur-sm"
-          >
+          <button onClick={() => setCoupon(null)}
+            className="mt-4 w-full rounded-2xl bg-white/90 text-slate-700 py-3 font-semibold hover:bg-white transition shadow">
             Закрыть
           </button>
         </div>

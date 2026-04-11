@@ -11,3 +11,16 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to load data' }, { status: 500 });
   }
 }
+
+export async function DELETE(request) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'ID не указан' }, { status: 400 });
+    await Survey.findByIdAndDelete(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Ошибка удаления' }, { status: 500 });
+  }
+}
