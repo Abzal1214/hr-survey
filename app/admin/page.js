@@ -26,6 +26,7 @@ const initialEmployeeForm = {
 export default function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '', department: '' });
+  const [rememberMe, setRememberMe] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [usersData, setUsersData] = useState([]);
   const [testsData, setTestsData] = useState([]);
@@ -39,6 +40,13 @@ export default function Admin() {
         setCurrentUser(user);
         setIsLoggedIn(true);
         if (user.role === 'admin') fetchAdminData();
+      }
+      // Restore remembered credentials
+      const remembered = localStorage.getItem('rememberedLogin');
+      if (remembered) {
+        const parsed = JSON.parse(remembered);
+        setLoginData(parsed);
+        setRememberMe(true);
       }
     } catch {}
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,6 +91,11 @@ export default function Admin() {
         setCurrentUser(user);
         setIsLoggedIn(true);
         localStorage.setItem('currentUser', JSON.stringify(user));
+        if (rememberMe) {
+          localStorage.setItem('rememberedLogin', JSON.stringify({ username: loginData.username, password: loginData.password, department: loginData.department }));
+        } else {
+          localStorage.removeItem('rememberedLogin');
+        }
         window.dispatchEvent(new Event('userChanged'));
         if (matchedUser.role === 'admin') {
           await fetchAdminData();
@@ -92,6 +105,11 @@ export default function Admin() {
         setCurrentUser(user);
         setIsLoggedIn(true);
         localStorage.setItem('currentUser', JSON.stringify(user));
+        if (rememberMe) {
+          localStorage.setItem('rememberedLogin', JSON.stringify({ username: loginData.username, password: loginData.password, department: loginData.department }));
+        } else {
+          localStorage.removeItem('rememberedLogin');
+        }
         window.dispatchEvent(new Event('userChanged'));
         await fetchAdminData();
       } else {
@@ -358,6 +376,16 @@ export default function Admin() {
               >
                 Войти
               </button>
+
+              <label className="flex items-center gap-2.5 cursor-pointer select-none mt-1">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={e => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded accent-sky-500"
+                />
+                <span className="text-sm text-slate-600">Запомнить меня</span>
+              </label>
             </form>
 
             <p className="text-center text-sm text-slate-400 mt-6">
