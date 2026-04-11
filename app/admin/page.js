@@ -319,12 +319,13 @@ export default function Admin() {
               <p className="text-slate-500 mt-1 text-sm">Войдите для доступа к личному кабинету</p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4" autoComplete="on">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Телефон / логин</label>
                 <input
                   type="text"
                   name="username"
+                  autoComplete="username"
                   value={loginData.username}
                   onChange={handleLoginChange}
                   required
@@ -356,6 +357,7 @@ export default function Admin() {
                 <input
                   type="password"
                   name="password"
+                  autoComplete="current-password"
                   value={loginData.password}
                   onChange={handleLoginChange}
                   required
