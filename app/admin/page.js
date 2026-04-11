@@ -25,7 +25,6 @@ export default function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '', department: '' });
   const [currentUser, setCurrentUser] = useState(null);
-  const [surveyData, setSurveyData] = useState([]);
   const [usersData, setUsersData] = useState([]);
   const [testsData, setTestsData] = useState([]);
 
@@ -103,19 +102,16 @@ export default function Admin() {
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const [surveyRes, usersRes, testsRes] = await Promise.all([
-        fetch('/api/admin'),
+      const [usersRes, testsRes] = await Promise.all([
         fetch('/api/users'),
         fetch('/api/tests'),
       ]);
 
-      if (surveyRes.ok && usersRes.ok && testsRes.ok) {
-        const [survey, users, tests] = await Promise.all([
-          surveyRes.json(),
+      if (usersRes.ok && testsRes.ok) {
+        const [users, tests] = await Promise.all([
           usersRes.json(),
           testsRes.json(),
         ]);
-        setSurveyData(survey);
         setUsersData(users);
         setTestsData(tests);
       } else {
@@ -132,7 +128,6 @@ export default function Admin() {
     setIsLoggedIn(false);
     setLoginData({ username: '', password: '', department: '' });
     setCurrentUser(null);
-    setSurveyData([]);
     setUsersData([]);
     setTestsData([]);
     setEmployeeForm(initialEmployeeForm);
@@ -614,89 +609,6 @@ export default function Admin() {
             </div>
           </div>
 
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-4">⏳</div>
-              <p className="text-gray-600">Загрузка данных...</p>
-            </div>
-          ) : surveyData.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-4">📭</div>
-              <p className="text-gray-600">Пока нет отзывов</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-lg">
-                <thead className="bg-blue-600 text-white">
-                  <tr>
-                    <th className="p-3 text-left">Имя</th>
-                    <th className="p-3 text-left">Телефон</th>
-                    <th className="p-3 text-left">Место работы</th>
-                    <th className="p-3 text-left">Должность</th>
-                    <th className="p-3 text-left">Дата начала</th>
-                    <th className="p-3 text-left">Дни</th>
-                    <th className="p-3 text-left">Оценка</th>
-                    <th className="p-3 text-left">Понравилось</th>
-                    <th className="p-3 text-left">Улучшить</th>
-                    <th className="p-3 text-left">Рекомендация</th>
-                    <th className="p-3 text-left">Комментарии</th>
-                    <th className="p-3 text-left">Дата ответа</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {surveyData.map((item, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-blue-50' : 'bg-white'}>
-                      <td className="p-3 border-b">{item.name}</td>
-                      <td className="p-3 border-b">{item.phone}</td>
-                      <td className="p-3 border-b">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          item.workplaceType === 'restaurant' ? 'bg-orange-100 text-orange-800' :
-                          item.workplaceType === 'waterpark' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {item.workplaceType === 'restaurant' ? '🍽️ Ресторан' :
-                           item.workplaceType === 'waterpark' ? '🏊‍♂️ Аквапарк' : '-'}
-                        </span>
-                      </td>
-                      <td className="p-3 border-b">{item.position || '-'}</td>
-                      <td className="p-3 border-b">{item.startDate}</td>
-                      <td className="p-3 border-b">{item.daysCompleted}</td>
-                      <td className="p-3 border-b">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          item.rating === 'понравилось' ? 'bg-green-100 text-green-800' :
-                          item.rating === 'не понравилось' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {item.rating}
-                        </span>
-                      </td>
-                      <td className="p-3 border-b max-w-xs truncate" title={item.likedAspects}>
-                        {item.likedAspects || '-'}
-                      </td>
-                                <td className="p-3 border-b max-w-xs truncate" title={item.dislikedAspects}>
-                        {item.dislikedAspects || '-'}
-                      </td>
-                      <td className="p-3 border-b">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          item.wouldRecommend === 'да' ? 'bg-green-100 text-green-800' :
-                          item.wouldRecommend === 'нет' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {item.wouldRecommend || '-'}
-                        </span>
-                      </td>
-                      <td className="p-3 border-b max-w-xs truncate" title={item.comments}>
-                        {item.comments || '-'}
-                      </td>
-                      <td className="p-3 border-b text-sm text-gray-600">
-                        {new Date(item.timestamp).toLocaleDateString('ru-RU')}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
           {!loading && usersData.length > 0 && (
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">Зарегистрированные сотрудники</h2>
