@@ -16,26 +16,23 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-    await TestResult.create(body);
+    const { phone, quizId, score, answers } = body;
+    await TestResult.create({ phone, quizId: quizId || null, score, answers });
 
     let alreadyPassed = false;
     let bonus = 0;
 
-    if (body.score >= 70 && body.phone) {
-      const previousPass = await TestResult.findOne({
-        phone: body.phone,
-        score: { $gte: 70 },
-        _id: { $ne: (await TestResult.findOne({ phone: body.phone, score: body.score }))._id }
-      });
-      // simpler: count how many passing results exist BEFORE this one
-      const passingCount = await TestResult.countDocuments({ phone: body.phone, score: { $gte: 70 } });
+    if (score >= 70 && phone) {
+      const query = { phone, score: { $gte: 70 } };
+      if (quizId) query.quizId = quizId;
+      const passingCount = await TestResult.countDocuments(query);
       if (passingCount > 1) {
         alreadyPassed = true;
       } else {
-        const user = await User.findOne({ phone: body.phone });
+        const user = await User.findOne({ phone });
         if (user) {
-          bonus = body.score === 100 ? 5 : 3;
-          await User.updateOne({ phone: body.phone }, { $inc: { points: bonus } });
+          bonus = score === 100 ? 5 : 3;
+          await User.updateOne({ phone }, { $inc: { points: bonus } });
         }
       }
     }
