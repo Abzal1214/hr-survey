@@ -16,11 +16,11 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { name, description, cost } = body;
+    const { name, description, cost, imageUrl } = body;
     if (!name || !description || cost == null) {
       return NextResponse.json({ error: 'Заполните название, описание и стоимость' }, { status: 400 });
     }
-    const reward = await Reward.create({ name, description, cost: parseInt(cost) });
+    const reward = await Reward.create({ name, description, cost: parseInt(cost), imageUrl: imageUrl || '' });
     return NextResponse.json({ message: 'Награда добавлена', reward: { ...reward.toObject(), id: reward._id } });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка добавления награды' }, { status: 500 });

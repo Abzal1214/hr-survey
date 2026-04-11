@@ -12,6 +12,8 @@ export default function RewardsPage() {
 
   const [showCreate, setShowCreate] = useState(false);
   const [newReward, setNewReward] = useState({ name: '', description: '', cost: '' });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
   const [saving, setSaving] = useState(false);
   const [createMsg, setCreateMsg] = useState('');
 
@@ -73,21 +75,38 @@ export default function RewardsPage() {
     } catch { setExchangeError('Ошибка сети. Попробуйте ещё раз.'); }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
   const handleAddReward = async () => {
     if (!newReward.name || !newReward.description || !newReward.cost) {
       setCreateMsg('Заполните все поля'); return;
     }
     setSaving(true);
     try {
+      let imageUrl = '';
+      if (imageFile) {
+        const fd = new FormData();
+        fd.append('file', imageFile);
+        const uploadRes = await fetch('/api/files', { method: 'POST', body: fd });
+        const uploadData = await uploadRes.json();
+        if (uploadRes.ok && uploadData.fileUrls?.[0]) imageUrl = uploadData.fileUrls[0];
+      }
       const res = await fetch('/api/rewards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReward),
+        body: JSON.stringify({ ...newReward, imageUrl }),
       });
       const data = await res.json();
       if (res.ok) {
         setCreateMsg('Награда добавлена!');
         setNewReward({ name: '', description: '', cost: '' });
+        setImageFile(null);
+        setImagePreview('');
         setShowCreate(false);
         loadRewards();
       } else { setCreateMsg(data.error || 'Ошибка'); }
@@ -154,6 +173,14 @@ export default function RewardsPage() {
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Описание *" />
                   <input type="number" min="1" value={newReward.cost} onChange={e => setNewReward(p => ({ ...p, cost: e.target.value }))}
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Стоимость в AQUA COIN *" />
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Картинка товара</label>
+                    <input type="file" accept="image/*" onChange={handleImageChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-700 file:mr-3 file:rounded-full file:border-0 file:bg-yellow-100 file:text-yellow-700 file:font-semibold file:px-4 file:py-1" />
+                    {imagePreview && (
+                      <img src={imagePreview} alt="preview" className="mt-3 h-32 w-full object-cover rounded-2xl border border-slate-200" />
+                    )}
+                  </div>
                   {createMsg && <p className="text-sm text-red-600">{createMsg}</p>}
                   <button onClick={handleAddReward} disabled={saving}
                     className="w-full rounded-2xl bg-yellow-500 text-white py-3 font-semibold hover:bg-yellow-600 transition disabled:opacity-50">
@@ -177,7 +204,10 @@ export default function RewardsPage() {
               <div key={itemId}
                 className="animate-scale-in hover-lift rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3"
                 style={{animationDelay: `${i * 0.08}s`}}>
-                <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-2xl mb-1">{getIcon(item.name)}</div>
+                {item.imageUrl
+                  ? <img src={item.imageUrl} alt={item.name} className="w-full h-36 object-cover rounded-2xl mb-1" />
+                  : <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-2xl mb-1">{getIcon(item.name)}</div>
+                }
                 <h3 className="text-lg font-bold text-slate-900">{item.name}</h3>
                 <p className="text-slate-500 text-sm flex-1">{item.description}</p>
                 <div className="flex items-center justify-between mt-2">
