@@ -100,7 +100,7 @@ export default function UserMenu() {
             ) : (
               <>
                 <Link href="/admin" onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-sky-50 hover:text-sky-700 transition">
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-black hover:bg-sky-50 transition">
                   <span className="w-7 h-7 rounded-xl bg-sky-500 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -109,7 +109,7 @@ export default function UserMenu() {
                   Мой кабинет
                 </Link>
                 <Link href="/rewards" onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-yellow-50 hover:text-yellow-700 transition">
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-black hover:bg-yellow-50 transition">
                   <span className="w-7 h-7 rounded-xl bg-yellow-400 flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
