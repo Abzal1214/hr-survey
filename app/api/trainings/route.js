@@ -30,3 +30,30 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Ошибка добавления тренинга' }, { status: 500 });
   }
 }
+
+export async function PUT(request) {
+  try {
+    await connectDB();
+    const body = await request.json();
+    const { id, title, description } = body;
+    if (!id) return NextResponse.json({ error: 'ID не указан' }, { status: 400 });
+    const training = await Training.findByIdAndUpdate(id, { title, description }, { new: true });
+    if (!training) return NextResponse.json({ error: 'Тренинг не найден' }, { status: 404 });
+    return NextResponse.json({ ...training.toObject(), id: training._id });
+  } catch (error) {
+    return NextResponse.json({ error: 'Ошибка обновления тренинга' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'ID не указан' }, { status: 400 });
+    await Training.findByIdAndDelete(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Ошибка удаления тренинга' }, { status: 500 });
+  }
+}
