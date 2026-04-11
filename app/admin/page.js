@@ -464,11 +464,7 @@ export default function Admin() {
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="rounded-[28px] bg-emerald-50 p-6 border border-emerald-100 shadow-sm">
-              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-emerald-700">Отзывы</p>
-              <p className="mt-4 text-4xl font-bold text-slate-900">{surveyData.length}</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="rounded-[28px] bg-sky-50 p-6 border border-sky-100 shadow-sm">
               <p className="text-sm font-semibold uppercase tracking-[0.35em] text-sky-700">Зарегистрировано</p>
               <p className="mt-4 text-4xl font-bold text-slate-900">{usersData.length}</p>
