@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useState, useEffect } from 'react';
+import ConfirmModal from '../components/ConfirmModal';
 
 const emptyQuestion = () => ({ text: '', options: ['', '', '', ''], correct: '' });
 
@@ -19,6 +20,7 @@ export default function TestsPage() {
   const [newQuiz, setNewQuiz] = useState({ title: '', description: '', coins: 3, questions: [emptyQuestion()] });
   const [createMsg, setCreateMsg] = useState('');
   const [saving, setSaving] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const loadQuizzes = () =>
     fetch('/api/quizzes').then(r => r.json()).then(d => setQuizzes(Array.isArray(d) ? d : [])).catch(() => {});
@@ -100,10 +102,12 @@ export default function TestsPage() {
     setSaving(false);
   };
 
-  const handleDeleteQuiz = async (id) => {
-    if (!confirm('Удалить этот тест?')) return;
-    await fetch(`/api/quizzes?id=${id}`, { method: 'DELETE' });
-    loadQuizzes();
+  const handleDeleteQuiz = (id) => {
+    setConfirmModal({ message: 'Удалить этот тест?', onConfirm: async () => {
+      setConfirmModal(null);
+      await fetch(`/api/quizzes?id=${id}`, { method: 'DELETE' });
+      loadQuizzes();
+    }});
   };
 
   const startQuiz = (quiz) => {
@@ -364,6 +368,7 @@ export default function TestsPage() {
           </>
         )}
       </div>
+      {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
     </div>
   );
 }

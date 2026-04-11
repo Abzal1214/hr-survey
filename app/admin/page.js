@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import ConfirmModal from '../components/ConfirmModal';
 
 const departmentPositions = {
   Аквапарк: ['кассир', 'инструктор'],
@@ -45,6 +46,7 @@ export default function Admin() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [adminMessage, setAdminMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const mapDepartment = (user) => {
     if (user.department) return user.department;
@@ -222,30 +224,30 @@ export default function Admin() {
     }
   };
 
-  const handleDeleteEmployee = async (user) => {
-    if (!confirm(`Удалить сотрудника ${user.name}?`)) {
-      return;
-    }
-    try {
-      const response = await fetch('/api/users', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: user.phone }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setAdminMessage('Сотрудник удален');
-        if (selectedUser?.phone === user.phone) {
-          setSelectedUser(null);
-          setEmployeeForm(initialEmployeeForm);
+  const handleDeleteEmployee = (user) => {
+    setConfirmModal({ message: `Удалить сотрудника ${user.name}?`, onConfirm: async () => {
+      setConfirmModal(null);
+      try {
+        const response = await fetch('/api/users', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: user.phone }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setAdminMessage('Сотрудник удален');
+          if (selectedUser?.phone === user.phone) {
+            setSelectedUser(null);
+            setEmployeeForm(initialEmployeeForm);
+          }
+          await fetchAdminData();
+        } else {
+          setAdminMessage(data.error || 'Ошибка удаления сотрудника');
         }
-        await fetchAdminData();
-      } else {
-        setAdminMessage(data.error || 'Ошибка удаления сотрудника');
+      } catch (error) {
+        setAdminMessage('Ошибка: ' + error.message);
       }
-    } catch (error) {
-      setAdminMessage('Ошибка: ' + error.message);
-    }
+    }});
   };
 
   const handleAddNews = async (e) => {
@@ -680,6 +682,7 @@ export default function Admin() {
           </div>
         </div>
       </div>
+      {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
     </div>
   );
 }

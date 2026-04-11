@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useState, useEffect } from 'react';
+import ConfirmModal from '../components/ConfirmModal';
 
 const inputCls = "w-full rounded-2xl bg-white border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-400 transition";
 const labelCls = "block space-y-2";
@@ -42,6 +43,7 @@ export default function SurveysPage() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   useEffect(() => {
     try {
@@ -108,17 +110,20 @@ export default function SurveysPage() {
   };
 
   // Admin: delete survey template
-  const handleDeleteTemplate = async (id) => {
-    if (!confirm('Удалить этот опрос? Ответы сотрудников останутся.')) return;
-    await fetch(`/api/surveys?id=${id}`, { method: 'DELETE' });
-    setTemplates(prev => prev.filter(t => String(t._id || t.id) !== String(id)));
+  const handleDeleteTemplate = (id) => {
+    setConfirmModal({ message: 'Удалить этот опрос? Ответы сотрудников останутся.', onConfirm: async () => {
+      setConfirmModal(null);
+      await fetch(`/api/surveys?id=${id}`, { method: 'DELETE' });
+      setTemplates(prev => prev.filter(t => String(t._id || t.id) !== String(id)));
+    }});
   };
 
-  // Admin: delete submission
-  const handleDeleteSubmission = async (id) => {
-    if (!confirm('Удалить эту анкету?')) return;
-    await fetch(`/api/admin?id=${id}`, { method: 'DELETE' });
-    setSubmissions(prev => prev.filter(s => String(s._id || s.id) !== String(id)));
+  const handleDeleteSubmission = (id) => {
+    setConfirmModal({ message: 'Удалить эту анкету?', onConfirm: async () => {
+      setConfirmModal(null);
+      await fetch(`/api/admin?id=${id}`, { method: 'DELETE' });
+      setSubmissions(prev => prev.filter(s => String(s._id || s.id) !== String(id)));
+    }});
   };
 
   // Employee: select survey
@@ -431,6 +436,7 @@ export default function SurveysPage() {
           </div>
         )}
       </div>
+      {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function NewsPage() {
   const [news, setNews] = useState([]);
@@ -10,6 +11,7 @@ export default function NewsPage() {
   const [imageFile, setImageFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [createMsg, setCreateMsg] = useState('');
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const loadNews = () => {
     fetch('/api/news')
@@ -26,10 +28,12 @@ export default function NewsPage() {
     } catch {}
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!confirm('Удалить эту новость?')) return;
-    await fetch(`/api/news?id=${id}`, { method: 'DELETE' });
-    loadNews();
+  const handleDelete = (id) => {
+    setConfirmModal({ message: 'Удалить эту новость?', onConfirm: async () => {
+      setConfirmModal(null);
+      await fetch(`/api/news?id=${id}`, { method: 'DELETE' });
+      loadNews();
+    }});
   };
 
   const handleAddNews = async () => {
@@ -201,6 +205,7 @@ export default function NewsPage() {
           )}
         </div>
       </div>
+      {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
     </div>
   );
 }

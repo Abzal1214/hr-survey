@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function LearnPage() {
   const [trainings, setTrainings] = useState([]);
@@ -14,6 +15,7 @@ export default function LearnPage() {
   const [trainingFiles, setTrainingFiles] = useState([]);
   const [saving, setSaving] = useState(false);
   const [createMsg, setCreateMsg] = useState('');
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const loadTrainings = () => {
     fetch('/api/trainings')
@@ -30,14 +32,16 @@ export default function LearnPage() {
     } catch {}
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!confirm('Удалить этот тренинг?')) return;
-    const res = await fetch(`/api/trainings?id=${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setMessage('Тренинг удалён');
-      loadTrainings();
-      setTimeout(() => setMessage(''), 3000);
-    }
+  const handleDelete = (id) => {
+    setConfirmModal({ message: 'Удалить этот тренинг?', onConfirm: async () => {
+      setConfirmModal(null);
+      const res = await fetch(`/api/trainings?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setMessage('Тренинг удалён');
+        loadTrainings();
+        setTimeout(() => setMessage(''), 3000);
+      }
+    }});
   };
 
   const startEdit = (item) => {
@@ -248,6 +252,7 @@ export default function LearnPage() {
           )}
         </div>
       </div>
+      {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
     </div>
   );
 }

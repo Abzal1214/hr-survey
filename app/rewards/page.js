@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function RewardsPage() {
   const [rewards, setRewards] = useState([]);
@@ -9,6 +10,7 @@ export default function RewardsPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [coupon, setCoupon] = useState(null);
   const [exchangeError, setExchangeError] = useState('');
+  const [confirmModal, setConfirmModal] = useState(null);
 
   const [showCreate, setShowCreate] = useState(false);
   const [newReward, setNewReward] = useState({ name: '', description: '', cost: '' });
@@ -114,10 +116,12 @@ export default function RewardsPage() {
     setSaving(false);
   };
 
-  const handleDeleteReward = async (id) => {
-    if (!confirm('Удалить эту награду?')) return;
-    await fetch(`/api/rewards?id=${id}`, { method: 'DELETE' });
-    loadRewards();
+  const handleDeleteReward = (id) => {
+    setConfirmModal({ message: 'Удалить эту награду?', onConfirm: async () => {
+      setConfirmModal(null);
+      await fetch(`/api/rewards?id=${id}`, { method: 'DELETE' });
+      loadRewards();
+    }});
   };
 
   const getIcon = (name = '') => {
@@ -346,6 +350,7 @@ export default function RewardsPage() {
         </div>
       </div>
     )}
+      {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
     </>
   );
 }
