@@ -113,7 +113,7 @@ export default function Home() {
                     <img src={item.imageUrl} alt={item.title} className="w-full h-40 object-cover rounded-2xl mb-4" />
                   )}
                   <p className="text-xs font-semibold uppercase tracking-widest text-sky-600">
-                    {new Date(item.timestamp).toLocaleDateString('ru-RU')}
+                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU') : ''}
                   </p>
                   <h4 className="mt-2 text-xl font-bold text-slate-900">{item.title}</h4>
                   <p className="mt-2 text-slate-600 line-clamp-3">{item.description}</p>

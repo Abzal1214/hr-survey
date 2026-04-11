@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
-import { TestResult, User } from '../../../lib/models';
+import { TestResult, User, Quiz } from '../../../lib/models';
 
 export async function GET() {
   try {
@@ -31,7 +31,8 @@ export async function POST(request) {
       } else {
         const user = await User.findOne({ phone });
         if (user) {
-          bonus = score === 100 ? 5 : 3;
+          const quiz = quizId ? await Quiz.findById(quizId).lean() : null;
+          bonus = quiz?.coins ?? (score === 100 ? 5 : 3);
           await User.updateOne({ phone }, { $inc: { points: bonus } });
         }
       }

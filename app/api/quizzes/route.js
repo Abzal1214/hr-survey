@@ -16,11 +16,11 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { title, description, questions } = body;
+    const { title, description, questions, coins } = body;
     if (!title || !questions || questions.length === 0) {
       return NextResponse.json({ error: 'Укажите название и хотя бы один вопрос' }, { status: 400 });
     }
-    const quiz = await Quiz.create({ title, description: description || '', questions });
+    const quiz = await Quiz.create({ title, description: description || '', coins: coins ?? 3, questions });
     return NextResponse.json({ ...quiz.toObject(), id: quiz._id });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка создания теста' }, { status: 500 });

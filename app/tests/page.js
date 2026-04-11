@@ -16,7 +16,7 @@ export default function TestsPage() {
   const [message, setMessage] = useState('');
 
   const [showCreate, setShowCreate] = useState(false);
-  const [newQuiz, setNewQuiz] = useState({ title: '', description: '', questions: [emptyQuestion()] });
+  const [newQuiz, setNewQuiz] = useState({ title: '', description: '', coins: 3, questions: [emptyQuestion()] });
   const [createMsg, setCreateMsg] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -90,7 +90,7 @@ export default function TestsPage() {
       const data = await res.json();
       if (res.ok) {
         setCreateMsg('Тест создан!');
-        setNewQuiz({ title: '', description: '', questions: [emptyQuestion()] });
+        setNewQuiz({ title: '', description: '', coins: 3, questions: [emptyQuestion()] });
         setShowCreate(false);
         loadQuizzes();
       } else {
@@ -144,7 +144,7 @@ export default function TestsPage() {
         }
         setMessage(data.alreadyPassed
           ? 'Вы уже получали AQUA COIN за этот тест. Повторное начисление не производится.'
-          : percent === 100 ? 'Идеальный результат! +5 AQUA COIN начислено.' : 'Тест пройден! +3 AQUA COIN начислено.');
+          : `Тест пройден! +${data.bonus} AQUA COIN начислено.`);
         if (currentUser?.phone) loadUserResults(currentUser.phone);
       } else {
         setMessage('Для получения баллов нужно 70%+. Попробуйте ещё раз.');
@@ -167,7 +167,7 @@ export default function TestsPage() {
             <div className="text-5xl">🧠</div>
             <h1 className="text-3xl font-bold text-white drop-shadow mt-4">{selectedQuiz.title}</h1>
             {selectedQuiz.description && <p className="text-white/80 mt-2">{selectedQuiz.description}</p>}
-            <p className="text-white/60 mt-1 text-sm">{questions.length} вопросов · Нужно 70% для получения AQUA COIN</p>
+            <p className="text-white/60 mt-1 text-sm">{questions.length} вопросов · За прохождение: +{selectedQuiz.coins ?? 3} AQUA COIN</p>
           </div>
 
           {isPassed && !result ? (
@@ -259,6 +259,12 @@ export default function TestsPage() {
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название теста *" />
                   <input value={newQuiz.description} onChange={e => handleNewQuizChange('description', e.target.value)}
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Описание (необязательно)" />
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">💰 AQUA COIN за прохождение:</label>
+                    <input type="number" min="1" max="100" value={newQuiz.coins}
+                      onChange={e => handleNewQuizChange('coins', Number(e.target.value))}
+                      className="w-24 rounded-2xl border border-slate-300 p-3 text-slate-900" />
+                  </div>
 
                   <div className="space-y-4">
                     {newQuiz.questions.map((q, qi) => (
@@ -321,6 +327,7 @@ export default function TestsPage() {
                       <h3 className="text-lg font-bold text-slate-900">{quiz.title}</h3>
                       {quiz.description && <p className="text-sm text-slate-500 mt-1">{quiz.description}</p>}
                       <p className="text-xs text-slate-400 mt-1">{quiz.questions?.length || 0} вопросов</p>
+                      <p className="text-xs font-semibold text-emerald-600 mt-1">💰 +{quiz.coins ?? 3} AQUA COIN</p>
                     </div>
                     {res && (
                       <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>
