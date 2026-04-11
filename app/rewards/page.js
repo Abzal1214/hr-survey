@@ -296,7 +296,7 @@ export default function RewardsPage() {
     {coupon && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
         <div className="relative w-full max-w-md">
-          <div className="bg-white rounded-[28px] shadow-2xl overflow-hidden" style={{fontFamily: 'monospace'}}>
+          <div className="print-coupon bg-white rounded-[28px] shadow-2xl overflow-hidden" style={{fontFamily: 'monospace'}}>
             <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-6 text-center">
               <div className="text-4xl mb-2">🎟️</div>
               <h2 className="text-2xl font-extrabold text-white tracking-wide">AQUA COIN КУПОН</h2>
@@ -343,10 +343,16 @@ export default function RewardsPage() {
               <p className="text-emerald-600 text-xs mt-1">чтобы получить ваш товар</p>
             </div>
           </div>
-          <button onClick={() => setCoupon(null)}
-            className="mt-4 w-full rounded-2xl bg-white/90 text-slate-700 py-3 font-semibold hover:bg-white transition shadow">
-            Закрыть
-          </button>
+          <div className="no-print flex gap-3 mt-4">
+            <button onClick={() => setCoupon(null)}
+              className="flex-1 rounded-2xl bg-white/90 text-slate-700 py-3 font-semibold hover:bg-white transition shadow">
+              Закрыть
+            </button>
+            <button onClick={() => window.print()}
+              className="flex-1 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white py-3 font-semibold transition shadow flex items-center justify-center gap-2">
+              🖨️ Распечатать
+            </button>
+          </div>
         </div>
       </div>
     )}

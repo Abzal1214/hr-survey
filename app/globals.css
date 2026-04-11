@@ -39,6 +39,21 @@ a {
   box-sizing: border-box;
 }
 
+/* ── Print styles ── */
+@media print {
+  body * { visibility: hidden !important; }
+  .print-coupon, .print-coupon * { visibility: visible !important; }
+  .print-coupon {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    background: white !important;
+  }
+  .no-print { display: none !important; }
+}
+
 /* ── Animations ── */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(28px); }
