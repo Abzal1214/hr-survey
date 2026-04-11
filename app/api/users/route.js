@@ -18,16 +18,22 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { name, phone, password, department, position, points = 0, role = 'employee' } = body;
-    if (!name || !phone || !password || !department || !position) {
-      return NextResponse.json({ error: 'Заполните все поля' }, { status: 400 });
+    const { name, surname, username, phone, password, department, position, points = 0, role = 'employee' } = body;
+    if (!name || !phone || !password || !department) {
+      return NextResponse.json({ error: 'Заполните все обязательные поля' }, { status: 400 });
     }
     const allUsers = await User.find({}).lean();
-    const exists = allUsers.some(u => normalizePhone(u.phone) === normalizePhone(phone));
-    if (exists) {
+    const phoneExists = allUsers.some(u => normalizePhone(u.phone) === normalizePhone(phone));
+    if (phoneExists) {
       return NextResponse.json({ error: 'Пользователь с таким номером уже зарегистрирован' }, { status: 400 });
     }
-    await User.create({ name, phone, password, department, position, points: Number(points), role });
+    if (username) {
+      const usernameExists = allUsers.some(u => u.username && u.username.toLowerCase() === username.toLowerCase());
+      if (usernameExists) {
+        return NextResponse.json({ error: 'Этот логин уже занят' }, { status: 400 });
+      }
+    }
+    await User.create({ name, surname: surname || '', username: username || '', phone, password, department, position: position || '', points: Number(points), role });
     return NextResponse.json({ message: 'Пользователь зарегистрирован' });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка регистрации' }, { status: 500 });
@@ -38,7 +44,7 @@ export async function PUT(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { oldPhone, phone, name, password, department, position, points, role } = body;
+    const { oldPhone, phone, name, surname, username, password, department, position, points, role } = body;
     if (!oldPhone && !phone) {
       return NextResponse.json({ error: 'Не указан пользователь для обновления' }, { status: 400 });
     }
@@ -50,8 +56,14 @@ export async function PUT(request) {
       const dup = allUsers.find(u => normalizePhone(u.phone) === normalizePhone(phone));
       if (dup) return NextResponse.json({ error: 'Другой пользователь с таким номером уже существует' }, { status: 400 });
     }
+    if (username) {
+      const dup = allUsers.find(u => u.username && u.username.toLowerCase() === username.toLowerCase() && String(u._id) !== String(current._id));
+      if (dup) return NextResponse.json({ error: 'Этот логин уже занят' }, { status: 400 });
+    }
     const update = {};
     if (name !== undefined) update.name = name;
+    if (surname !== undefined) update.surname = surname;
+    if (username !== undefined) update.username = username;
     if (phone !== undefined) update.phone = phone;
     if (password) update.password = password;
     if (department !== undefined) update.department = department;

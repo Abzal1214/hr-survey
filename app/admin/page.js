@@ -12,6 +12,8 @@ const departmentPositions = {
 
 const initialEmployeeForm = {
   name: '',
+  surname: '',
+  username: '',
   phone: '',
   password: '',
   department: '',
@@ -74,10 +76,13 @@ export default function Admin() {
       }
       const users = await response.json();
       const normalizePhone = (value) => String(value).replace(/\D/g, '');
-      const enteredPhone = normalizePhone(loginData.username);
-      const matchedUser = users.find(
-        (user) => normalizePhone(user.phone) === enteredPhone && user.password === loginData.password && mapDepartment(user).toLowerCase() === loginData.department.toLowerCase()
-      );
+      const enteredLogin = loginData.username.trim();
+      const enteredPhone = normalizePhone(enteredLogin);
+      const matchedUser = users.find((user) => {
+        const phoneMatch = enteredPhone && normalizePhone(user.phone) === enteredPhone;
+        const usernameMatch = user.username && user.username.toLowerCase() === enteredLogin.toLowerCase();
+        return (phoneMatch || usernameMatch) && user.password === loginData.password && mapDepartment(user).toLowerCase() === loginData.department.toLowerCase();
+      });
 
       if (matchedUser) {
         const user = { ...matchedUser, role: matchedUser.role || 'employee' };
@@ -259,7 +264,9 @@ export default function Admin() {
   const handleSelectUser = (user) => {
     setSelectedUser(user);
     setEmployeeForm({
-      name: user.name,
+      name: user.name || '',
+      surname: user.surname || '',
+      username: user.username || '',
       phone: user.phone,
       password: '',
       department: user.department || user.workplaceType || '',
@@ -282,6 +289,8 @@ export default function Admin() {
         body: JSON.stringify({
           oldPhone: selectedUser.phone,
           name: employeeForm.name,
+          surname: employeeForm.surname,
+          username: employeeForm.username,
           phone: employeeForm.phone,
           password: employeeForm.password || selectedUser.password,
           department: employeeForm.department,
@@ -442,7 +451,7 @@ export default function Admin() {
                   onChange={handleLoginChange}
                   required
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:bg-white transition"
-                  placeholder="+7 (999) 123-45-67"
+                  placeholder="Логин или номер телефона"
                 />
               </div>
 
@@ -690,14 +699,36 @@ export default function Admin() {
               <section className="rounded-[36px] bg-white/90 p-6 shadow-2xl border border-slate-200/80 backdrop-blur-xl">
                 <h2 className="text-2xl font-bold text-slate-900 mb-4">Добавить / редактировать сотрудника</h2>
                 <form className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Имя</label>
+                      <input
+                        name="name"
+                        value={employeeForm.name}
+                        onChange={handleEmployeeFormChange}
+                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                        placeholder="Имя"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Фамилия</label>
+                      <input
+                        name="surname"
+                        value={employeeForm.surname}
+                        onChange={handleEmployeeFormChange}
+                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                        placeholder="Фамилия"
+                      />
+                    </div>
+                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Имя</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Логин</label>
                     <input
-                      name="name"
-                      value={employeeForm.name}
+                      name="username"
+                      value={employeeForm.username}
                       onChange={handleEmployeeFormChange}
                       className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="Имя сотрудника"
+                      placeholder="login123"
                     />
                   </div>
                   <div>
