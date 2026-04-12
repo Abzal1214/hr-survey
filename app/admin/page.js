@@ -9,7 +9,7 @@ const departmentPositions = {
   Ресторан: ['бармен', 'раннер', 'официант'],
   SPA: ['администратор SPA', 'спа-терапевт'],
   Магазин: ['кассир магазина', 'продавец'],
-  Офис: ['менеджер', 'бухгалтер', 'HR', 'админ']
+  Офис: ['менеджер', 'бухгалтер', 'HR']
 };
 
 const initialEmployeeForm = {
@@ -306,7 +306,7 @@ export default function Admin() {
           username: profileForm.username,
           phone: profileForm.phone,
           department: profileForm.department,
-          position: profileForm.position,
+          position: currentUser?.role === 'admin' ? undefined : profileForm.position,
           password: showPasswordResetFields ? profileForm.newPassword : undefined,
           selfService: true,
         }),
@@ -323,7 +323,7 @@ export default function Admin() {
         username: profileForm.username,
         phone: profileForm.phone,
         department: profileForm.department,
-        position: profileForm.position,
+        position: currentUser?.role === 'admin' ? currentUser.position : profileForm.position,
         password: showPasswordResetFields ? profileForm.newPassword : currentUser.password,
       };
 
@@ -903,7 +903,7 @@ export default function Admin() {
                     value={profileForm.department}
                     onChange={(e) => {
                       const dep = e.target.value;
-                      setProfileForm((prev) => ({ ...prev, department: dep, position: departmentPositions[dep]?.[0] || '' }));
+                      setProfileForm((prev) => ({ ...prev, department: dep }));
                     }}
                     disabled={!profileEditEnabled}
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
@@ -913,18 +913,9 @@ export default function Admin() {
                       <option key={dep} value={dep}>{dep}</option>
                     ))}
                   </select>
-                  <select
-                    name="position"
-                    value={profileForm.position}
-                    onChange={handleProfileFormChange}
-                    disabled={!profileEditEnabled || !profileForm.department}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                  >
-                    <option value="">Выберите должность</option>
-                    {(departmentPositions[profileForm.department] || []).map((position) => (
-                      <option key={position} value={position}>{position}</option>
-                    ))}
-                  </select>
+                  <div className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3 text-slate-600">
+                    Должность администратора
+                  </div>
                 </div>
                 {showPasswordResetFields && (
                   <div className="space-y-3">
