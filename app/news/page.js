@@ -6,6 +6,7 @@ import KebabMenu from '../components/KebabMenu';
 
 export default function NewsPage() {
   const [news, setNews] = useState([]);
+  const [highlights, setHighlights] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [newsForm, setNewsForm] = useState({ title: '', description: '' });
@@ -15,6 +16,20 @@ export default function NewsPage() {
   const [confirmModal, setConfirmModal] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ title: '', description: '' });
+  const [editingHighlightId, setEditingHighlightId] = useState(null);
+  const [highlightForm, setHighlightForm] = useState({ badge: '', title: '', description: '', itemsText: '' });
+  const [highlightMsg, setHighlightMsg] = useState('');
+
+  const themeClasses = {
+    sky: {
+      article: 'bg-sky-500',
+      text: 'text-sky-100',
+    },
+    emerald: {
+      article: 'bg-emerald-500',
+      text: 'text-emerald-100',
+    },
+  };
 
   const loadNews = () => {
     fetch('/api/news')
@@ -23,8 +38,16 @@ export default function NewsPage() {
       .catch(() => setNews([]));
   };
 
+  const loadHighlights = () => {
+    fetch('/api/news-highlights')
+      .then((res) => res.json())
+      .then((data) => setHighlights(Array.isArray(data) ? data : []))
+      .catch(() => setHighlights([]));
+  };
+
   useEffect(() => {
     loadNews();
+    loadHighlights();
     try {
       const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
       if (user.role === 'admin') setIsAdmin(true);
@@ -46,6 +69,38 @@ export default function NewsPage() {
       body: JSON.stringify({ id, ...editForm }),
     });
     if (res.ok) { setEditingId(null); loadNews(); }
+  };
+
+  const handleSaveHighlight = async (id) => {
+    const items = highlightForm.itemsText
+      .split('\n')
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    if (!highlightForm.badge || !highlightForm.title || !highlightForm.description || items.length === 0) {
+      setHighlightMsg('Заполните все поля карточки');
+      return;
+    }
+
+    const res = await fetch('/api/news-highlights', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+        badge: highlightForm.badge,
+        title: highlightForm.title,
+        description: highlightForm.description,
+        items,
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setHighlights(Array.isArray(data.highlights) ? data.highlights : []);
+      setEditingHighlightId(null);
+      setHighlightMsg('');
+    } else {
+      setHighlightMsg(data.error || 'Ошибка сохранения');
+    }
   };
 
   const handleAddNews = async () => {
@@ -100,30 +155,79 @@ export default function NewsPage() {
       <div className="mx-auto max-w-6xl px-6 pb-16 space-y-6">
         {/* Static promo blocks */}
         <div className="grid gap-6 lg:grid-cols-2">
-          <article className="animate-fade-in-up hover-lift rounded-[24px] bg-sky-500 p-8 shadow-xl">
-            <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white mb-4">Hawaii&amp;Miami</span>
-            <h2 className="text-2xl font-bold text-white mb-3">Портал команды аквапарка</h2>
-            <p className="text-sky-100 mb-6 text-sm">Тренинги по гостевому сервису, новая документация и расписание смен.</p>
-            <ul className="space-y-3">
-              {['Обновлен график анимации','Добавлены новые правила безопасности','Запуск нового курса для уборщиц и барменов'].map(item => (
-                <li key={item} className="flex items-center gap-3 rounded-2xl bg-white/20 px-4 py-3 text-white text-sm font-medium">
-                  <span className="text-yellow-300 font-bold">→</span>{item}
-                </li>
-              ))}
-            </ul>
-          </article>
-          <article className="animate-fade-in-up delay-200 hover-lift rounded-[24px] bg-emerald-500 p-8 shadow-xl">
-            <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white mb-4">SanRemo</span>
-            <h2 className="text-2xl font-bold text-white mb-3">База знаний и события</h2>
-            <p className="text-emerald-100 mb-6 text-sm">Все новости по SanRemo: тренинги, мероприятия и внутренняя коммуникация.</p>
-            <ul className="space-y-3">
-              {['Составлен новый план обучения','Анонс зимнего тимбилдинга','Обновление инструкций по гостевому сервису'].map(item => (
-                <li key={item} className="flex items-center gap-3 rounded-2xl bg-white/20 px-4 py-3 text-white text-sm font-medium">
-                  <span className="text-yellow-300 font-bold">→</span>{item}
-                </li>
-              ))}
-            </ul>
-          </article>
+          {highlights.map((block, index) => {
+            const theme = themeClasses[block.theme] || themeClasses.sky;
+            return (
+              <article key={block.id} className={`animate-fade-in-up hover-lift rounded-[24px] ${theme.article} p-8 shadow-xl`}>
+                {editingHighlightId === block.id ? (
+                  <div className="space-y-3">
+                    <input
+                      value={highlightForm.badge}
+                      onChange={(e) => setHighlightForm((prev) => ({ ...prev, badge: e.target.value }))}
+                      className="w-full rounded-xl border border-white/40 bg-white/90 p-3 text-slate-900 text-sm"
+                      placeholder="Название бейджа"
+                    />
+                    <input
+                      value={highlightForm.title}
+                      onChange={(e) => setHighlightForm((prev) => ({ ...prev, title: e.target.value }))}
+                      className="w-full rounded-xl border border-white/40 bg-white/90 p-3 text-slate-900 text-sm"
+                      placeholder="Заголовок"
+                    />
+                    <textarea
+                      value={highlightForm.description}
+                      onChange={(e) => setHighlightForm((prev) => ({ ...prev, description: e.target.value }))}
+                      className="w-full rounded-xl border border-white/40 bg-white/90 p-3 text-slate-900 text-sm min-h-[90px]"
+                      placeholder="Описание"
+                    />
+                    <textarea
+                      value={highlightForm.itemsText}
+                      onChange={(e) => setHighlightForm((prev) => ({ ...prev, itemsText: e.target.value }))}
+                      className="w-full rounded-xl border border-white/40 bg-white/90 p-3 text-slate-900 text-sm min-h-[120px]"
+                      placeholder="Каждый пункт с новой строки"
+                    />
+                    {highlightMsg && <p className="text-sm text-red-100">{highlightMsg}</p>}
+                    <div className="flex gap-2">
+                      <button onClick={() => handleSaveHighlight(block.id)} className="rounded-xl bg-white text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-slate-100 transition">Сохранить</button>
+                      <button onClick={() => { setEditingHighlightId(null); setHighlightMsg(''); }} className="rounded-xl bg-white/20 text-white px-4 py-2 text-sm font-semibold hover:bg-white/30 transition">Отмена</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-4 flex items-start justify-between gap-3">
+                      <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white">{block.badge}</span>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingHighlightId(block.id);
+                            setHighlightMsg('');
+                            setHighlightForm({
+                              badge: block.badge || '',
+                              title: block.title || '',
+                              description: block.description || '',
+                              itemsText: Array.isArray(block.items) ? block.items.join('\n') : '',
+                            });
+                          }}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/30"
+                        >
+                          ✎
+                        </button>
+                      )}
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-3">{block.title}</h2>
+                    <p className={`${theme.text} mb-6 text-sm`}>{block.description}</p>
+                    <ul className="space-y-3">
+                      {(block.items || []).map((item) => (
+                        <li key={item} className="flex items-center gap-3 rounded-2xl bg-white/20 px-4 py-3 text-white text-sm font-medium">
+                          <span className="text-yellow-300 font-bold">→</span>{item}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </article>
+            );
+          })}
         </div>
 
         {/* Admin add button */}
