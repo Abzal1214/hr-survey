@@ -186,9 +186,11 @@ export default function RewardsPage() {
       title: 'Подтвердить обмен',
       message: (
         <span className="inline-flex items-center gap-3 font-semibold text-emerald-600">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 via-cyan-400 to-emerald-400 shadow-sm shadow-emerald-200">
-            <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-400 shadow-sm shadow-amber-200 ring-2 ring-yellow-200">
+            <span className="absolute inset-[3px] rounded-full border border-yellow-200/80" />
+            <svg className="relative h-5 w-5 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M3 14c2.5 0 2.5-4 5-4s2.5 4 5 4 2.5-4 5-4 2.5 4 5 4" />
+              <path d="M5 18c2 0 2-2.5 4-2.5S11 18 13 18s2-2.5 4-2.5S19 18 21 18" opacity="0.9" />
             </svg>
           </span>
           <span>{total} AQUA COIN</span>
