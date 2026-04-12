@@ -22,7 +22,7 @@ export default function KebabMenu({ onEdit, onDelete }) {
         ⋮
       </button>
       {open && (
-        <div className="absolute left-full top-0 ml-0 w-40 rounded-2xl bg-white shadow-xl border border-slate-100 py-1.5 z-30">
+        <div className="absolute right-0 top-0 w-40 rounded-2xl bg-white shadow-xl border border-slate-100 py-1.5 z-30">
           {onEdit && (
             <button
               onClick={() => { setOpen(false); onEdit(); }}
