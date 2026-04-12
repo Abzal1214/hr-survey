@@ -725,10 +725,12 @@ export default function Admin() {
                         <td className="p-3 border-b text-slate-900">{user.position}</td>
                         <td className="p-3 border-b text-slate-900">{new Date(user.registeredAt).toLocaleDateString('ru-RU')}</td>
                         <td className="p-3 border-b">
-                          <KebabMenu
-                            onEdit={() => handleSelectUser(user)}
-                            onDelete={() => handleDeleteEmployee(user)}
-                          />
+                          <div className="flex justify-end">
+                            <KebabMenu
+                              onEdit={() => handleSelectUser(user)}
+                              onDelete={() => handleDeleteEmployee(user)}
+                            />
+                          </div>
                         </td>
                       </tr>
                     ))}
