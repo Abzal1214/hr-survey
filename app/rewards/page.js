@@ -478,7 +478,7 @@ export default function RewardsPage() {
                   <div className="w-5 h-5 bg-slate-200 rounded-full -mr-11 flex-shrink-0" />
                 </div>
                 <div className="bg-emerald-50 px-8 py-4 text-center">
-                  <p className="text-emerald-800 text-sm font-semibold">📍 Покажите этот купон администратору</p>
+                  <p className="text-emerald-800 text-sm font-semibold">📍 Покажите этот купон при выдаче</p>
                   <p className="text-emerald-600 text-xs mt-1">чтобы получить ваш товар</p>
                 </div>
               </div>
