@@ -22,6 +22,40 @@ export default function RewardsPage() {
   const [editingRewardId, setEditingRewardId] = useState(null);
   const [editRewardForm, setEditRewardForm] = useState({ name: '', description: '', cost: '' });
 
+  const restoreUserFromRemembered = async () => {
+    try {
+      const rememberedRaw = localStorage.getItem('rememberedLogin');
+      if (!rememberedRaw) return null;
+      const remembered = JSON.parse(rememberedRaw);
+      if (!remembered?.username || !remembered?.password) return null;
+
+      const usersRes = await fetch('/api/users');
+      if (!usersRes.ok) return null;
+      const users = await usersRes.json();
+      const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
+      const enteredLogin = String(remembered.username).trim();
+      const enteredPhone = normalizePhone(enteredLogin);
+
+      const matched = users.find((u) => {
+        const phoneMatch = enteredPhone && normalizePhone(u.phone) === enteredPhone;
+        const usernameMatch = u.username && u.username.toLowerCase() === enteredLogin.toLowerCase();
+        const userDept = (u.department || u.workplaceType || '').toLowerCase();
+        const rememberedDept = String(remembered.department || '').toLowerCase();
+        return (phoneMatch || usernameMatch) && u.password === remembered.password && (!rememberedDept || userDept === rememberedDept);
+      });
+
+      if (!matched) return null;
+      const restoredUser = { ...matched, role: matched.role || 'employee' };
+      setUser(restoredUser);
+      setIsAdmin(restoredUser.role === 'admin');
+      localStorage.setItem('currentUser', JSON.stringify(restoredUser));
+      window.dispatchEvent(new Event('userChanged'));
+      return restoredUser;
+    } catch {
+      return null;
+    }
+  };
+
   const loadRewards = () => {
     fetch('/api/rewards')
       .then((res) => res.json())
@@ -31,11 +65,32 @@ export default function RewardsPage() {
 
   useEffect(() => {
     loadRewards();
-    try {
-      const u = JSON.parse(localStorage.getItem('currentUser'));
-      setUser(u);
-      if (u?.role === 'admin') setIsAdmin(true);
-    } catch { setUser(null); }
+    const loadUser = async () => {
+      try {
+        const u = JSON.parse(localStorage.getItem('currentUser'));
+        setUser(u);
+        setIsAdmin(u?.role === 'admin');
+        if (!u?.phone) await restoreUserFromRemembered();
+      } catch {
+        setUser(null);
+        setIsAdmin(false);
+      }
+    };
+    loadUser();
+
+    const onUserChanged = async () => {
+      try {
+        const u = JSON.parse(localStorage.getItem('currentUser'));
+        setUser(u);
+        setIsAdmin(u?.role === 'admin');
+      } catch {
+        setUser(null);
+        setIsAdmin(false);
+      }
+    };
+
+    window.addEventListener('userChanged', onUserChanged);
+    return () => window.removeEventListener('userChanged', onUserChanged);
   }, []);
 
   let balance = 0;
@@ -58,7 +113,14 @@ export default function RewardsPage() {
 
   const handleExchange = async () => {
     setExchangeError('');
-    if (!user?.phone) { setExchangeError('Войдите в аккаунт для обмена.'); return; }
+    let activeUser = user;
+    if (!activeUser?.phone) {
+      activeUser = await restoreUserFromRemembered();
+    }
+    if (!activeUser?.phone) {
+      setExchangeError('Войдите в аккаунт для обмена.');
+      return;
+    }
     const items = Object.entries(cart).map(([id, qty]) => {
       const item = rewards.find(r => String(r._id || r.id) === id);
       return { id, name: item.name, qty, cost: item.cost, icon: getIcon(item.name) };
@@ -67,11 +129,11 @@ export default function RewardsPage() {
       const res = await fetch('/api/exchange', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: user.phone, items, total }),
+        body: JSON.stringify({ phone: activeUser.phone, items, total }),
       });
       const data = await res.json();
       if (!res.ok) { setExchangeError(data.error || 'Ошибка обмена'); return; }
-      const updated = { ...user, points: data.newBalance };
+      const updated = { ...activeUser, points: data.newBalance };
       setUser(updated);
       localStorage.setItem('currentUser', JSON.stringify(updated));
       window.dispatchEvent(new Event('userChanged'));
