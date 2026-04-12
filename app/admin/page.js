@@ -710,7 +710,7 @@ export default function Admin() {
                     <tr>
                       <th className="p-3 text-left">Имя</th>
                       <th className="p-3 text-left">Телефон</th>
-                      <th className="p-3 text-left">Место работы</th>
+                      <th className="p-3 text-left">Отдел</th>
                       <th className="p-3 text-left">Должность</th>
                       <th className="p-3 text-left">Дата регистрации</th>
                       <th className="p-3 text-left">Действия</th>
@@ -721,7 +721,7 @@ export default function Admin() {
                       <tr key={index} className={index % 2 === 0 ? 'bg-slate-50' : 'bg-white'}>
                         <td className="p-3 border-b text-slate-900">{user.name}</td>
                         <td className="p-3 border-b text-slate-900">{user.phone}</td>
-                        <td className="p-3 border-b text-slate-900">{user.workplaceType === 'restaurant' ? 'Ресторан' : user.workplaceType === 'waterpark' ? 'Аквапарк' : user.department || '—'}</td>
+                        <td className="p-3 border-b text-slate-900">{user.department || '—'}</td>
                         <td className="p-3 border-b text-slate-900">{user.position}</td>
                         <td className="p-3 border-b text-slate-900">{new Date(user.registeredAt).toLocaleDateString('ru-RU')}</td>
                         <td className="p-3 border-b">
