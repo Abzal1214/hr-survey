@@ -739,7 +739,7 @@ export default function Admin() {
                       <th className="p-3 text-left">Отдел</th>
                       <th className="p-3 text-left">Должность</th>
                       <th className="p-3 text-left">Дата регистрации</th>
-                      <th className="p-3 text-left"></th>
+                      <th className="p-3 text-left">Действия</th>
                     </tr>
                   </thead>
                   <tbody>
