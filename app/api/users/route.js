@@ -50,9 +50,16 @@ export async function PUT(request) {
     }
     const allUsers = await User.find({}).lean();
     const normalizedOldPhone = normalizePhone(oldPhone || phone);
-    const current = id
-      ? allUsers.find((u) => String(u._id) === String(id))
-      : allUsers.find((u) => normalizePhone(u.phone) === normalizedOldPhone);
+    let current = null;
+    if (id) {
+      current = allUsers.find((u) => String(u._id) === String(id));
+    }
+    if (!current && normalizedOldPhone) {
+      current = allUsers.find((u) => normalizePhone(u.phone) === normalizedOldPhone);
+    }
+    if (!current && username) {
+      current = allUsers.find((u) => (u.username || '').toLowerCase() === String(username).toLowerCase());
+    }
     if (!current) return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
     if (phone && normalizePhone(phone) !== normalizedOldPhone) {
       const dup = allUsers.find(u => normalizePhone(u.phone) === normalizePhone(phone));
@@ -78,7 +85,7 @@ export async function PUT(request) {
       if (typeof department === 'string') update.department = department;
       if (typeof position === 'string') update.position = position;
     }
-    await User.updateOne({ phone: current.phone }, { $set: update });
+    await User.updateOne({ _id: current._id }, { $set: update });
     return NextResponse.json({ message: 'Пользователь обновлен' });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка обновления пользователя' }, { status: 500 });
