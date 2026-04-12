@@ -46,6 +46,7 @@ export default function Admin() {
     confirmNewPassword: '',
   });
   const [profileMessage, setProfileMessage] = useState('');
+  const [profileIdentity, setProfileIdentity] = useState({ id: '', phone: '', username: '' });
 
   // Auto-login from localStorage
   useEffect(() => {
@@ -54,6 +55,11 @@ export default function Admin() {
       if (stored) {
         const user = JSON.parse(stored);
         setCurrentUser(user);
+        setProfileIdentity({
+          id: String(user._id || user.id || ''),
+          phone: user.phone || '',
+          username: user.username || '',
+        });
         setIsLoggedIn(true);
         setProfileForm((prev) => ({
           ...prev,
@@ -127,6 +133,11 @@ export default function Admin() {
       if (matchedUser) {
         const user = { ...matchedUser, role: matchedUser.role || 'employee' };
         setCurrentUser(user);
+        setProfileIdentity({
+          id: String(user._id || user.id || ''),
+          phone: user.phone || '',
+          username: user.username || '',
+        });
         setIsLoggedIn(true);
         setProfileForm((prev) => ({
           ...prev,
@@ -149,6 +160,11 @@ export default function Admin() {
       } else if (loginData.username === 'admin' && loginData.password === 'admin') {
         const user = { name: 'Администратор', role: 'admin' };
         setCurrentUser(user);
+        setProfileIdentity({
+          id: '',
+          phone: '',
+          username: loginData.username || '',
+        });
         setIsLoggedIn(true);
         setProfileForm((prev) => ({
           ...prev,
@@ -220,6 +236,7 @@ export default function Admin() {
       newPassword: '',
       confirmNewPassword: '',
     });
+    setProfileIdentity({ id: '', phone: '', username: '' });
     setEmployeeForm(initialEmployeeForm);
     setSelectedUser(null);
     setAdminMessage('');
@@ -261,8 +278,9 @@ export default function Admin() {
       }
     }
     try {
-      let targetUserId = currentUser?._id || currentUser?.id;
-      let targetOldPhone = currentUser?.phone || '';
+      let targetUserId = profileIdentity.id || currentUser?._id || currentUser?.id;
+      let targetOldPhone = profileIdentity.phone || currentUser?.phone || '';
+      const targetLookupUsername = profileIdentity.username || currentUser?.username || '';
 
       // Some sessions (e.g., fallback admin login) may miss phone/id in currentUser.
       // Resolve target user from the latest users list by id, then username, then phone.
@@ -275,11 +293,11 @@ export default function Admin() {
             const byId = targetUserId
               ? users.find((u) => String(u._id || u.id) === String(targetUserId))
               : null;
-            const byUsername = profileForm.username
-              ? users.find((u) => (u.username || '').toLowerCase() === String(profileForm.username).toLowerCase())
+            const byUsername = targetLookupUsername
+              ? users.find((u) => (u.username || '').toLowerCase() === String(targetLookupUsername).toLowerCase())
               : null;
-            const byPhone = profileForm.phone
-              ? users.find((u) => normalize(u.phone) === normalize(profileForm.phone))
+            const byPhone = targetOldPhone
+              ? users.find((u) => normalize(u.phone) === normalize(targetOldPhone))
               : null;
             const resolved = byId || byUsername || byPhone;
             if (resolved) {
@@ -304,6 +322,7 @@ export default function Admin() {
         body: JSON.stringify({
           id: targetUserId,
           oldPhone: targetOldPhone,
+          lookupUsername: targetLookupUsername,
           name: profileForm.name,
           surname: profileForm.surname,
           username: profileForm.username,
@@ -351,6 +370,11 @@ export default function Admin() {
       } catch {}
 
       setCurrentUser(persistedUser);
+      setProfileIdentity({
+        id: String(persistedUser._id || persistedUser.id || targetUserId || ''),
+        phone: persistedUser.phone || profileForm.phone || targetOldPhone || '',
+        username: persistedUser.username || profileForm.username || targetLookupUsername || '',
+      });
       localStorage.setItem('currentUser', JSON.stringify(persistedUser));
       localStorage.setItem('rememberedLogin', JSON.stringify({
         username: profileForm.username || profileForm.phone,

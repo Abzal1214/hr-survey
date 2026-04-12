@@ -44,7 +44,7 @@ export async function PUT(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { id, oldPhone, phone, name, surname, username, password, department, position, points, role, selfService } = body;
+    const { id, oldPhone, lookupUsername, phone, name, surname, username, password, department, position, points, role, selfService } = body;
     if (!id && !oldPhone && !phone) {
       return NextResponse.json({ error: 'Не указан пользователь для обновления' }, { status: 400 });
     }
@@ -56,6 +56,9 @@ export async function PUT(request) {
     }
     if (!current && normalizedOldPhone) {
       current = allUsers.find((u) => normalizePhone(u.phone) === normalizedOldPhone);
+    }
+    if (!current && lookupUsername) {
+      current = allUsers.find((u) => (u.username || '').toLowerCase() === String(lookupUsername).toLowerCase());
     }
     if (!current && username) {
       current = allUsers.find((u) => (u.username || '').toLowerCase() === String(username).toLowerCase());
