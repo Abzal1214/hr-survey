@@ -29,6 +29,7 @@ export default function Admin() {
   const [currentUser, setCurrentUser] = useState(null);
   const [usersData, setUsersData] = useState([]);
   const [testsData, setTestsData] = useState([]);
+  const [showEmployeeForm, setShowEmployeeForm] = useState(false);
   const [profileForm, setProfileForm] = useState({
     name: '',
     surname: '',
@@ -288,6 +289,7 @@ export default function Admin() {
       if (response.ok) {
         setAdminMessage('Сотрудник добавлен');
         setEmployeeForm(initialEmployeeForm);
+        setShowEmployeeForm(false);
         await fetchAdminData();
       } else {
         setAdminMessage(data.error || 'Ошибка добавления сотрудника');
@@ -299,6 +301,7 @@ export default function Admin() {
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
+    setShowEmployeeForm(true);
     setEmployeeForm({
       name: user.name || '',
       surname: user.surname || '',
@@ -339,6 +342,7 @@ export default function Admin() {
         setAdminMessage('Данные сотрудника обновлены');
         setSelectedUser(null);
         setEmployeeForm(initialEmployeeForm);
+        setShowEmployeeForm(false);
         await fetchAdminData();
       } else {
         setAdminMessage(data.error || 'Ошибка обновления сотрудника');
@@ -372,6 +376,20 @@ export default function Admin() {
         setAdminMessage('Ошибка: ' + error.message);
       }
     }});
+  };
+
+  const handleStartAddEmployee = () => {
+    setSelectedUser(null);
+    setEmployeeForm(initialEmployeeForm);
+    setAdminMessage('');
+    setShowEmployeeForm(true);
+  };
+
+  const handleCloseEmployeeForm = () => {
+    setSelectedUser(null);
+    setEmployeeForm(initialEmployeeForm);
+    setAdminMessage('');
+    setShowEmployeeForm(false);
   };
 
   const handleAddNews = async (e) => {
@@ -673,139 +691,18 @@ export default function Admin() {
             </div>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[1fr] mb-6">
-            <div className="space-y-6">
-              <section className="rounded-[36px] bg-white/90 p-6 shadow-2xl border border-slate-200/80 backdrop-blur-xl">
-                <h2 className="text-2xl font-bold text-slate-900 mb-4">Добавить / редактировать сотрудника</h2>
-                <form className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Имя</label>
-                      <input
-                        name="name"
-                        value={employeeForm.name}
-                        onChange={handleEmployeeFormChange}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                        placeholder="Имя"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Фамилия</label>
-                      <input
-                        name="surname"
-                        value={employeeForm.surname}
-                        onChange={handleEmployeeFormChange}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                        placeholder="Фамилия"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Логин</label>
-                    <input
-                      name="username"
-                      value={employeeForm.username}
-                      onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="login123"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Телефон</label>
-                    <input
-                      name="phone"
-                      value={employeeForm.phone}
-                      onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="+7 (999) 123-45-67"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Пароль</label>
-                    <input
-                      name="password"
-                      type="password"
-                      value={employeeForm.password}
-                      onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="Минимум 6 символов"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Отдел</label>
-                    <select
-                      name="department"
-                      value={employeeForm.department}
-                      onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    >
-                      <option value="">Выберите отдел</option>
-                      {Object.keys(departmentPositions).map((dept) => (
-                        <option key={dept} value={dept}>{dept}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Должность</label>
-                    <select
-                      name="position"
-                      value={employeeForm.position}
-                      onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    >
-                      <option value="">Выберите должность</option>
-                      {(departmentPositions[employeeForm.department] || []).map((role) => (
-                        <option key={role} value={role}>{role}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Баллы</label>
-                    <input
-                      name="points"
-                      type="number"
-                      value={employeeForm.points}
-                      onChange={handleEmployeeFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <button
-                      type="button"
-                      onClick={handleAddEmployee}
-                      className="rounded-2xl bg-emerald-600 text-white px-6 py-3 font-semibold hover:bg-emerald-700 transition"
-                    >
-                      Добавить сотрудника
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleUpdateEmployee}
-                      disabled={!selectedUser}
-                      className="rounded-2xl bg-sky-600 text-white px-6 py-3 font-semibold hover:bg-sky-700 transition disabled:opacity-50"
-                    >
-                      Обновить данные
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedUser(null);
-                        setEmployeeForm(initialEmployeeForm);
-                        setAdminMessage('');
-                      }}
-                      className="rounded-2xl bg-slate-200 text-slate-900 px-6 py-3 font-semibold hover:bg-slate-300 transition"
-                    >
-                      Сбросить форму
-                    </button>
-                  </div>
-                  {adminMessage && <p className="text-sm text-slate-700">{adminMessage}</p>}
-                </form>
-              </section>
-            </div>
-          </div>
-
           {!loading && usersData.length > 0 && (
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Зарегистрированные сотрудники</h2>
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-2xl font-bold text-slate-900">Зарегистрированные сотрудники</h2>
+                <button
+                  type="button"
+                  onClick={handleStartAddEmployee}
+                  className="rounded-2xl bg-emerald-600 text-white px-5 py-3 font-semibold hover:bg-emerald-700 transition"
+                >
+                  + Добавить сотрудника
+                </button>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-sm text-slate-900">
                   <thead className="bg-slate-100 text-slate-900">
@@ -837,6 +734,131 @@ export default function Admin() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          )}
+          {showEmployeeForm && (
+            <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">{selectedUser ? 'Редактировать сотрудника' : 'Добавить сотрудника'}</h2>
+              <form className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Имя</label>
+                    <input
+                      name="name"
+                      value={employeeForm.name}
+                      onChange={handleEmployeeFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                      placeholder="Имя"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Фамилия</label>
+                    <input
+                      name="surname"
+                      value={employeeForm.surname}
+                      onChange={handleEmployeeFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                      placeholder="Фамилия"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Логин</label>
+                  <input
+                    name="username"
+                    value={employeeForm.username}
+                    onChange={handleEmployeeFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="login123"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Телефон</label>
+                  <input
+                    name="phone"
+                    value={employeeForm.phone}
+                    onChange={handleEmployeeFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="+7 (999) 123-45-67"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Пароль</label>
+                  <input
+                    name="password"
+                    type="password"
+                    value={employeeForm.password}
+                    onChange={handleEmployeeFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder={selectedUser ? 'Оставьте пустым, чтобы не менять' : 'Минимум 6 символов'}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Отдел</label>
+                  <select
+                    name="department"
+                    value={employeeForm.department}
+                    onChange={handleEmployeeFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                  >
+                    <option value="">Выберите отдел</option>
+                    {Object.keys(departmentPositions).map((dept) => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Должность</label>
+                  <select
+                    name="position"
+                    value={employeeForm.position}
+                    onChange={handleEmployeeFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                  >
+                    <option value="">Выберите должность</option>
+                    {(departmentPositions[employeeForm.department] || []).map((role) => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Баллы</label>
+                  <input
+                    name="points"
+                    type="number"
+                    value={employeeForm.points}
+                    onChange={handleEmployeeFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                  />
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  {selectedUser ? (
+                    <button
+                      type="button"
+                      onClick={handleUpdateEmployee}
+                      className="rounded-2xl bg-sky-600 text-white px-6 py-3 font-semibold hover:bg-sky-700 transition"
+                    >
+                      Сохранить изменения
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleAddEmployee}
+                      className="rounded-2xl bg-emerald-600 text-white px-6 py-3 font-semibold hover:bg-emerald-700 transition"
+                    >
+                      Добавить сотрудника
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleCloseEmployeeForm}
+                    className="rounded-2xl bg-slate-200 text-slate-900 px-6 py-3 font-semibold hover:bg-slate-300 transition"
+                  >
+                    Отмена
+                  </button>
+                </div>
+                {adminMessage && <p className="text-sm text-slate-700">{adminMessage}</p>}
+              </form>
             </div>
           )}
           <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
