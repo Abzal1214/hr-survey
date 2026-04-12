@@ -28,16 +28,36 @@ export async function POST(request) {
     await User.updateOne({ _id: found._id }, { $inc: { points: -total } });
     const newBalance = currentPoints - total;
 
-    const couponCode = 'AQ-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const makeCouponCode = () => 'AQ-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const issuedAt = new Date().toISOString();
+    const coupons = [];
+
+    items.forEach((item) => {
+      const qty = Math.max(1, Number(item.qty) || 1);
+      for (let i = 0; i < qty; i += 1) {
+        coupons.push({
+          couponCode: makeCouponCode(),
+          issuedAt,
+          item: {
+            id: item.id,
+            name: item.name,
+            cost: item.cost,
+            icon: item.icon,
+          },
+          index: i + 1,
+          count: qty,
+        });
+      }
+    });
 
     return NextResponse.json({
       success: true,
-      couponCode,
+      coupons,
       newBalance,
       userName: found.name,
       items,
       total,
-      issuedAt: new Date().toISOString(),
+      issuedAt,
     });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка обмена' }, { status: 500 });

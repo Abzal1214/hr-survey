@@ -21,6 +21,21 @@ export default function RewardsPage() {
   const [createMsg, setCreateMsg] = useState('');
   const [editingRewardId, setEditingRewardId] = useState(null);
   const [editRewardForm, setEditRewardForm] = useState({ name: '', description: '', cost: '' });
+  const couponTickets = coupon?.coupons?.length
+    ? coupon.coupons
+    : (coupon?.couponCode
+      ? [{
+          couponCode: coupon.couponCode,
+          issuedAt: coupon.issuedAt,
+          item: {
+            name: coupon.items?.[0]?.name || 'Товар',
+            cost: coupon.items?.[0]?.cost || 0,
+            icon: coupon.items?.[0]?.icon || '🎁',
+          },
+          index: 1,
+          count: 1,
+        }]
+      : []);
 
   const restoreUserFromRemembered = async () => {
     try {
@@ -423,53 +438,51 @@ export default function RewardsPage() {
 
     {coupon && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <div className="relative w-full max-w-md">
-          <div className="print-coupon bg-white rounded-[28px] shadow-2xl overflow-hidden" style={{fontFamily: 'monospace'}}>
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-6 text-center">
-              <div className="text-4xl mb-2">🎟️</div>
-              <h2 className="text-2xl font-extrabold text-white tracking-wide">AQUA COIN КУПОН</h2>
-              <p className="text-emerald-100 text-sm mt-1">Hawaii&Miami · SanRemo</p>
-            </div>
-            <div className="px-8 py-0 flex items-center gap-2 -my-1 relative z-10">
-              <div className="w-5 h-5 bg-slate-200 rounded-full -ml-11 flex-shrink-0" />
-              <div className="flex-1 border-t-2 border-dashed border-slate-300" />
-              <div className="w-5 h-5 bg-slate-200 rounded-full -mr-11 flex-shrink-0" />
-            </div>
-            <div className="px-8 py-6">
-              <p className="text-xs text-slate-400 mb-1">Сотрудник</p>
-              <p className="font-bold text-slate-800 text-lg mb-4">{coupon.userName}</p>
-              <p className="text-xs text-slate-400 mb-2">Товары</p>
-              <ul className="space-y-2 mb-4">
-                {coupon.items.map((item, i) => (
-                  <li key={i} className="flex items-center gap-2 text-slate-700 text-sm">
-                    <span>{item.icon}</span>
-                    <span className="flex-1 font-medium">{item.name}</span>
-                    <span className="text-slate-400">×{item.qty}</span>
-                    <span className="text-emerald-600 font-bold">{item.cost * item.qty} 🪙</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex justify-between items-center border-t border-dashed border-slate-200 pt-3 mb-4">
-                <span className="text-slate-500 text-sm">Итого списано</span>
-                <span className="font-extrabold text-emerald-600 text-lg">{coupon.total} 🪙</span>
+        <div className="relative w-full max-w-3xl">
+          <div className="max-h-[78vh] overflow-y-auto space-y-4 pr-1">
+            {couponTickets.map((ticket, idx) => (
+              <div key={`${ticket.couponCode}-${idx}`} className="print-coupon bg-white rounded-[28px] shadow-2xl overflow-hidden" style={{fontFamily: 'monospace'}}>
+                <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-6 text-center">
+                  <div className="text-4xl mb-2">🎟️</div>
+                  <h2 className="text-2xl font-extrabold text-white tracking-wide">AQUA COIN КУПОН</h2>
+                  <p className="text-emerald-100 text-sm mt-1">Hawaii&Miami · SanRemo</p>
+                </div>
+                <div className="px-8 py-0 flex items-center gap-2 -my-1 relative z-10">
+                  <div className="w-5 h-5 bg-slate-200 rounded-full -ml-11 flex-shrink-0" />
+                  <div className="flex-1 border-t-2 border-dashed border-slate-300" />
+                  <div className="w-5 h-5 bg-slate-200 rounded-full -mr-11 flex-shrink-0" />
+                </div>
+                <div className="px-8 py-6">
+                  <p className="text-xs text-slate-400 mb-1">Сотрудник</p>
+                  <p className="font-bold text-slate-800 text-lg mb-4">{coupon.userName}</p>
+                  <p className="text-xs text-slate-400 mb-2">Товар</p>
+                  <div className="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 mb-4 flex items-center gap-3">
+                    <span className="text-xl">{ticket.item?.icon || '🎁'}</span>
+                    <span className="flex-1 font-semibold text-slate-800">{ticket.item?.name}</span>
+                    <span className="text-emerald-600 font-bold">{ticket.item?.cost} 🪙</span>
+                  </div>
+                  <div className="bg-slate-50 rounded-2xl border-2 border-dashed border-emerald-300 px-4 py-3 text-center mb-2">
+                    <p className="text-xs text-slate-400 mb-1 uppercase tracking-widest">Код купона</p>
+                    <p className="text-xl font-extrabold text-emerald-700 tracking-widest">{ticket.couponCode}</p>
+                  </div>
+                  <p className="text-xs text-slate-400 text-center mb-1">
+                    {new Date(ticket.issuedAt || coupon.issuedAt).toLocaleString('ru-RU')}
+                  </p>
+                  {ticket.count > 1 && (
+                    <p className="text-xs text-slate-500 text-center">Купон {ticket.index} из {ticket.count}</p>
+                  )}
+                </div>
+                <div className="px-8 py-0 flex items-center gap-2 -my-1 relative z-10">
+                  <div className="w-5 h-5 bg-slate-200 rounded-full -ml-11 flex-shrink-0" />
+                  <div className="flex-1 border-t-2 border-dashed border-slate-300" />
+                  <div className="w-5 h-5 bg-slate-200 rounded-full -mr-11 flex-shrink-0" />
+                </div>
+                <div className="bg-emerald-50 px-8 py-4 text-center">
+                  <p className="text-emerald-800 text-sm font-semibold">📍 Покажите этот купон администратору</p>
+                  <p className="text-emerald-600 text-xs mt-1">чтобы получить ваш товар</p>
+                </div>
               </div>
-              <div className="bg-slate-50 rounded-2xl border-2 border-dashed border-emerald-300 px-4 py-3 text-center mb-2">
-                <p className="text-xs text-slate-400 mb-1 uppercase tracking-widest">Код купона</p>
-                <p className="text-xl font-extrabold text-emerald-700 tracking-widest">{coupon.couponCode}</p>
-              </div>
-              <p className="text-xs text-slate-400 text-center mb-2">
-                {new Date(coupon.issuedAt).toLocaleString('ru-RU')}
-              </p>
-            </div>
-            <div className="px-8 py-0 flex items-center gap-2 -my-1 relative z-10">
-              <div className="w-5 h-5 bg-slate-200 rounded-full -ml-11 flex-shrink-0" />
-              <div className="flex-1 border-t-2 border-dashed border-slate-300" />
-              <div className="w-5 h-5 bg-slate-200 rounded-full -mr-11 flex-shrink-0" />
-            </div>
-            <div className="bg-emerald-50 px-8 py-4 text-center">
-              <p className="text-emerald-800 text-sm font-semibold">📍 Покажите этот купон администратору</p>
-              <p className="text-emerald-600 text-xs mt-1">чтобы получить ваш товар</p>
-            </div>
+            ))}
           </div>
           <div className="no-print flex gap-3 mt-4">
             <button onClick={() => setCoupon(null)}
