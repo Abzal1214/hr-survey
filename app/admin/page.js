@@ -30,6 +30,7 @@ export default function Admin() {
   const [usersData, setUsersData] = useState([]);
   const [testsData, setTestsData] = useState([]);
   const [showEmployeeForm, setShowEmployeeForm] = useState(false);
+  const [showAdminProfileForm, setShowAdminProfileForm] = useState(false);
   const [profileForm, setProfileForm] = useState({
     name: '',
     surname: '',
@@ -192,6 +193,7 @@ export default function Admin() {
     setCurrentUser(null);
     setUsersData([]);
     setTestsData([]);
+    setShowAdminProfileForm(false);
     setProfileMessage('');
     setProfileForm({
       name: '',
@@ -691,6 +693,13 @@ export default function Admin() {
               <h1 className="mt-3 text-4xl font-bold text-slate-900">📊 Админ портала</h1>
               <p className="mt-3 text-slate-600">Управление отзывами, регистрациями и результатами обучения.</p>
             </div>
+            <button
+              type="button"
+              onClick={() => setShowAdminProfileForm((p) => !p)}
+              className="rounded-2xl bg-sky-700 text-white px-5 py-3 font-semibold hover:bg-sky-800 transition"
+            >
+              {showAdminProfileForm ? 'Скрыть мои данные' : 'Изменить мои данные'}
+            </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="rounded-[28px] bg-sky-50 p-6 border border-sky-100 shadow-sm">
@@ -702,6 +711,87 @@ export default function Admin() {
               <p className="mt-4 text-4xl font-bold text-slate-900">{testsData.length}</p>
             </div>
           </div>
+
+          {showAdminProfileForm && (
+            <div className="mb-6 rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.35em]">Профиль</p>
+                <h2 className="mt-2 text-xl font-bold text-slate-900">Изменить мои данные</h2>
+                <p className="mt-1 text-sm text-slate-500">Подтвердите изменения текущим паролем. Для смены пароля заполните два поля нового пароля.</p>
+              </div>
+              <form onSubmit={handleProfileSave} className="space-y-4">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <input
+                    name="name"
+                    value={profileForm.name}
+                    onChange={handleProfileFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="Имя"
+                  />
+                  <input
+                    name="surname"
+                    value={profileForm.surname}
+                    onChange={handleProfileFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="Фамилия"
+                  />
+                  <input
+                    name="username"
+                    value={profileForm.username}
+                    onChange={handleProfileFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="Логин"
+                  />
+                  <input
+                    name="phone"
+                    value={profileForm.phone}
+                    onChange={handleProfileFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="Телефон"
+                  />
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    value={profileForm.currentPassword}
+                    onChange={handleProfileFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="Текущий пароль"
+                  />
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
+                    Отдел: <span className="font-semibold text-slate-700">{currentUser.department || currentUser.workplaceType || '—'}</span><br />
+                    Должность: <span className="font-semibold text-slate-700">{currentUser.position || '—'}</span>
+                  </div>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={profileForm.newPassword}
+                    onChange={handleProfileFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="Новый пароль"
+                  />
+                  <input
+                    type="password"
+                    name="confirmNewPassword"
+                    value={profileForm.confirmNewPassword}
+                    onChange={handleProfileFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                    placeholder="Подтвердите новый пароль"
+                  />
+                </div>
+                {profileMessage && (
+                  <div className={`rounded-2xl px-4 py-3 text-sm ${profileMessage.includes('обновлены') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                    {profileMessage}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition"
+                >
+                  Сохранить изменения
+                </button>
+              </form>
+            </div>
+          )}
 
           {!loading && usersData.length > 0 && (
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
