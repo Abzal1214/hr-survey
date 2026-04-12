@@ -185,7 +185,7 @@ export default function RewardsPage() {
     setConfirmModal({
       title: 'Подтвердить обмен',
       message: `Подтвердить обмен на ${total} AQUA COIN?`,
-      confirmText: 'Подтвердить обмен',
+      confirmText: 'Подтвердить',
       variant: 'success',
       onConfirm: async () => {
         setConfirmModal(null);
