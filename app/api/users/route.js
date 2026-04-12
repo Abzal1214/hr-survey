@@ -44,7 +44,7 @@ export async function PUT(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { id, oldPhone, phone, name, surname, username, password, department, position, points, role, selfService, currentPassword } = body;
+    const { id, oldPhone, phone, name, surname, username, password, department, position, points, role, selfService } = body;
     if (!id && !oldPhone && !phone) {
       return NextResponse.json({ error: 'Не указан пользователь для обновления' }, { status: 400 });
     }
@@ -54,14 +54,6 @@ export async function PUT(request) {
       ? allUsers.find((u) => String(u._id) === String(id))
       : allUsers.find((u) => normalizePhone(u.phone) === normalizedOldPhone);
     if (!current) return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
-    if (selfService) {
-      if (!currentPassword) {
-        return NextResponse.json({ error: 'Введите текущий пароль' }, { status: 400 });
-      }
-      if (current.password !== currentPassword) {
-        return NextResponse.json({ error: 'Неверный текущий пароль' }, { status: 400 });
-      }
-    }
     if (phone && normalizePhone(phone) !== normalizedOldPhone) {
       const dup = allUsers.find(u => normalizePhone(u.phone) === normalizePhone(phone));
       if (dup) return NextResponse.json({ error: 'Другой пользователь с таким номером уже существует' }, { status: 400 });

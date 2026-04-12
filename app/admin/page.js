@@ -224,10 +224,6 @@ export default function Admin() {
   const handleProfileSave = async (e) => {
     e.preventDefault();
     if (!currentUser?.phone) return;
-    if (!profileForm.currentPassword) {
-      setProfileMessage('Введите текущий пароль для подтверждения изменений');
-      return;
-    }
     if (showPasswordResetFields) {
       if (!profileForm.newPassword || !profileForm.confirmNewPassword) {
         setProfileMessage('Заполните новый пароль и подтверждение');
@@ -253,7 +249,6 @@ export default function Admin() {
           username: profileForm.username,
           phone: profileForm.phone,
           password: showPasswordResetFields ? profileForm.newPassword : undefined,
-          currentPassword: profileForm.currentPassword,
           selfService: true,
         }),
       });
@@ -274,12 +269,11 @@ export default function Admin() {
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       localStorage.setItem('rememberedLogin', JSON.stringify({
         username: profileForm.username || profileForm.phone,
-        password: showPasswordResetFields ? profileForm.newPassword : profileForm.currentPassword,
+        password: showPasswordResetFields ? profileForm.newPassword : currentUser.password,
         department: currentUser.department || currentUser.workplaceType || '',
       }));
       setProfileForm((prev) => ({
         ...prev,
-        currentPassword: '',
         newPassword: '',
         confirmNewPassword: '',
       }));
@@ -721,7 +715,7 @@ export default function Admin() {
               onClick={() => setShowAdminProfileForm((p) => !p)}
               className="rounded-2xl bg-sky-700 text-white px-5 py-3 font-semibold hover:bg-sky-800 transition"
             >
-              {showAdminProfileForm ? 'Скрыть мои данные' : 'Изменить мои данные'}
+              {showAdminProfileForm ? 'Скрыть мои данные' : 'Мои данные'}
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -740,68 +734,78 @@ export default function Admin() {
               <div className="mb-4">
                 <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.35em]">Профиль</p>
                 <h2 className="mt-2 text-xl font-bold text-slate-900">Изменить мои данные</h2>
-                <p className="mt-1 text-sm text-slate-500">Подтвердите изменения текущим паролем. Для смены пароля нажмите кнопку "Сбросить пароль".</p>
+                <p className="mt-1 text-sm text-slate-500">Изменяйте данные профиля. Для смены пароля нажмите кнопку "Сбросить пароль".</p>
               </div>
               <form onSubmit={handleProfileSave} className="space-y-4">
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <input
-                    name="name"
-                    value={profileForm.name}
-                    onChange={handleProfileFormChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    placeholder="Имя"
-                  />
-                  <input
-                    name="surname"
-                    value={profileForm.surname}
-                    onChange={handleProfileFormChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    placeholder="Фамилия"
-                  />
-                  <input
-                    name="username"
-                    value={profileForm.username}
-                    onChange={handleProfileFormChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    placeholder="Логин"
-                  />
-                  <input
-                    name="phone"
-                    value={profileForm.phone}
-                    onChange={handleProfileFormChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    placeholder="Телефон"
-                  />
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={profileForm.currentPassword}
-                    onChange={handleProfileFormChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    placeholder="Текущий пароль"
-                  />
+                  <div className="relative">
+                    <input
+                      name="name"
+                      value={profileForm.name}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 pr-10 text-slate-900"
+                      placeholder="Имя"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">✎</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      name="surname"
+                      value={profileForm.surname}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 pr-10 text-slate-900"
+                      placeholder="Фамилия"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">✎</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      name="username"
+                      value={profileForm.username}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 pr-10 text-slate-900"
+                      placeholder="Логин"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">✎</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      name="phone"
+                      value={profileForm.phone}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 pr-10 text-slate-900"
+                      placeholder="Телефон"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">✎</span>
+                  </div>
                   <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
                     Отдел: <span className="font-semibold text-slate-700">{currentUser.department || currentUser.workplaceType || '—'}</span><br />
                     Должность: <span className="font-semibold text-slate-700">{currentUser.position || '—'}</span>
                   </div>
                   {showPasswordResetFields && (
                     <>
-                      <input
-                        type="password"
-                        name="newPassword"
-                        value={profileForm.newPassword}
-                        onChange={handleProfileFormChange}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                        placeholder="Новый пароль"
-                      />
-                      <input
-                        type="password"
-                        name="confirmNewPassword"
-                        value={profileForm.confirmNewPassword}
-                        onChange={handleProfileFormChange}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                        placeholder="Подтвердите новый пароль"
-                      />
+                      <div className="relative">
+                        <input
+                          type="password"
+                          name="newPassword"
+                          value={profileForm.newPassword}
+                          onChange={handleProfileFormChange}
+                          className="w-full rounded-2xl border border-slate-300 p-3 pr-10 text-slate-900"
+                          placeholder="Новый пароль"
+                        />
+                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">✎</span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="password"
+                          name="confirmNewPassword"
+                          value={profileForm.confirmNewPassword}
+                          onChange={handleProfileFormChange}
+                          className="w-full rounded-2xl border border-slate-300 p-3 pr-10 text-slate-900"
+                          placeholder="Подтвердите новый пароль"
+                        />
+                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">✎</span>
+                      </div>
                     </>
                   )}
                 </div>
@@ -810,22 +814,24 @@ export default function Admin() {
                     {profileMessage}
                   </div>
                 )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowPasswordResetFields((prev) => !prev);
-                    setProfileForm((prev) => ({ ...prev, newPassword: '', confirmNewPassword: '' }));
-                  }}
-                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
-                >
-                  {showPasswordResetFields ? 'Отменить смену пароля' : 'Сбросить пароль'}
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition"
-                >
-                  Сохранить изменения
-                </button>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="submit"
+                    className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition"
+                  >
+                    Сохранить изменения
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPasswordResetFields((prev) => !prev);
+                      setProfileForm((prev) => ({ ...prev, newPassword: '', confirmNewPassword: '' }));
+                    }}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    {showPasswordResetFields ? 'Отменить смену пароля' : 'Сбросить пароль'}
+                  </button>
+                </div>
               </form>
             </div>
           )}
