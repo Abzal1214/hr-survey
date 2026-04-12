@@ -183,7 +183,10 @@ export default function RewardsPage() {
 
   const handleExchange = () => {
     setConfirmModal({
+      title: 'Подтвердить обмен',
       message: `Подтвердить обмен на ${total} AQUA COIN?`,
+      confirmText: 'Подтвердить обмен',
+      variant: 'success',
       onConfirm: async () => {
         setConfirmModal(null);
         await executeExchange();
@@ -506,7 +509,16 @@ export default function RewardsPage() {
         </div>
       </div>
     )}
-      {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          title={confirmModal.title}
+          confirmText={confirmModal.confirmText}
+          variant={confirmModal.variant}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </>
   );
 }
