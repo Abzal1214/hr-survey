@@ -16,13 +16,13 @@ export default function KebabMenu({ onEdit, onDelete }) {
     <div className="relative shrink-0 -ml-2" ref={ref}>
       <button
         onClick={() => setOpen(p => !p)}
-        className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition text-xl leading-none"
+        className="relative z-20 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition text-xl leading-none"
         title="Действия"
       >
         ⋮
       </button>
       {open && (
-        <div className="absolute right-0 top-0 w-40 rounded-2xl bg-white shadow-xl border border-slate-100 py-1.5 z-50">
+        <div className="absolute left-full top-0 ml-0 w-40 rounded-2xl bg-white shadow-xl border border-slate-100 py-1.5 z-30">
           {onEdit && (
             <button
               onClick={() => { setOpen(false); onEdit(); }}

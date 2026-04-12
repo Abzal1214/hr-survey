@@ -730,7 +730,7 @@ export default function Admin() {
                   </button>
                 </div>
               </div>
-              <div className="overflow-hidden">
+              <div className="overflow-x-auto overflow-y-visible [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 <table className="w-full border-collapse text-sm text-slate-900">
                   <thead className="bg-slate-100 text-slate-900">
                     <tr>
