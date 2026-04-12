@@ -44,13 +44,15 @@ export async function PUT(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { oldPhone, phone, name, surname, username, password, department, position, points, role, selfService, currentPassword } = body;
-    if (!oldPhone && !phone) {
+    const { id, oldPhone, phone, name, surname, username, password, department, position, points, role, selfService, currentPassword } = body;
+    if (!id && !oldPhone && !phone) {
       return NextResponse.json({ error: 'Не указан пользователь для обновления' }, { status: 400 });
     }
-    const normalizedOldPhone = normalizePhone(oldPhone || phone);
     const allUsers = await User.find({}).lean();
-    const current = allUsers.find(u => normalizePhone(u.phone) === normalizedOldPhone);
+    const normalizedOldPhone = normalizePhone(oldPhone || phone);
+    const current = id
+      ? allUsers.find((u) => String(u._id) === String(id))
+      : allUsers.find((u) => normalizePhone(u.phone) === normalizedOldPhone);
     if (!current) return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
     if (selfService) {
       if (!currentPassword) {

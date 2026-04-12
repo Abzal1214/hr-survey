@@ -66,6 +66,7 @@ export default function Admin() {
   }, []);
   const [employeeForm, setEmployeeForm] = useState(initialEmployeeForm);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState('');
   const [adminMessage, setAdminMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
@@ -301,6 +302,7 @@ export default function Admin() {
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
+    setSelectedUserId(String(user._id || user.id || ''));
     setShowEmployeeForm(true);
     setEmployeeForm({
       name: user.name || '',
@@ -326,6 +328,7 @@ export default function Admin() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          id: selectedUserId,
           oldPhone: selectedUser.phone,
           name: employeeForm.name,
           surname: employeeForm.surname,
@@ -341,6 +344,7 @@ export default function Admin() {
       if (response.ok) {
         setAdminMessage('Данные сотрудника обновлены');
         setSelectedUser(null);
+        setSelectedUserId('');
         setEmployeeForm(initialEmployeeForm);
         setShowEmployeeForm(false);
         await fetchAdminData();
@@ -366,6 +370,7 @@ export default function Admin() {
           setAdminMessage('Сотрудник удален');
           if (selectedUser?.phone === user.phone) {
             setSelectedUser(null);
+            setSelectedUserId('');
             setEmployeeForm(initialEmployeeForm);
           }
           await fetchAdminData();
@@ -380,6 +385,7 @@ export default function Admin() {
 
   const handleStartAddEmployee = () => {
     setSelectedUser(null);
+    setSelectedUserId('');
     setEmployeeForm(initialEmployeeForm);
     setAdminMessage('');
     setShowEmployeeForm(true);
@@ -387,6 +393,7 @@ export default function Admin() {
 
   const handleCloseEmployeeForm = () => {
     setSelectedUser(null);
+    setSelectedUserId('');
     setEmployeeForm(initialEmployeeForm);
     setAdminMessage('');
     setShowEmployeeForm(false);
