@@ -31,6 +31,7 @@ export default function Admin() {
   const [testsData, setTestsData] = useState([]);
   const [showEmployeeForm, setShowEmployeeForm] = useState(false);
   const [showAdminProfileForm, setShowAdminProfileForm] = useState(false);
+  const [showPasswordResetFields, setShowPasswordResetFields] = useState(false);
   const [profileForm, setProfileForm] = useState({
     name: '',
     surname: '',
@@ -194,6 +195,7 @@ export default function Admin() {
     setUsersData([]);
     setTestsData([]);
     setShowAdminProfileForm(false);
+    setShowPasswordResetFields(false);
     setProfileMessage('');
     setProfileForm({
       name: '',
@@ -226,13 +228,19 @@ export default function Admin() {
       setProfileMessage('Введите текущий пароль для подтверждения изменений');
       return;
     }
-    if ((profileForm.newPassword || profileForm.confirmNewPassword) && profileForm.newPassword.length < 6) {
-      setProfileMessage('Новый пароль должен быть не меньше 6 символов');
-      return;
-    }
-    if (profileForm.newPassword !== profileForm.confirmNewPassword) {
-      setProfileMessage('Новый пароль и подтверждение не совпадают');
-      return;
+    if (showPasswordResetFields) {
+      if (!profileForm.newPassword || !profileForm.confirmNewPassword) {
+        setProfileMessage('Заполните новый пароль и подтверждение');
+        return;
+      }
+      if (profileForm.newPassword.length < 6) {
+        setProfileMessage('Новый пароль должен быть не меньше 6 символов');
+        return;
+      }
+      if (profileForm.newPassword !== profileForm.confirmNewPassword) {
+        setProfileMessage('Новый пароль и подтверждение не совпадают');
+        return;
+      }
     }
     try {
       const response = await fetch('/api/users', {
@@ -244,7 +252,7 @@ export default function Admin() {
           surname: profileForm.surname,
           username: profileForm.username,
           phone: profileForm.phone,
-          password: profileForm.newPassword || undefined,
+          password: showPasswordResetFields ? profileForm.newPassword : undefined,
           currentPassword: profileForm.currentPassword,
           selfService: true,
         }),
@@ -260,13 +268,13 @@ export default function Admin() {
         surname: profileForm.surname,
         username: profileForm.username,
         phone: profileForm.phone,
-        password: profileForm.newPassword || currentUser.password,
+        password: showPasswordResetFields ? profileForm.newPassword : currentUser.password,
       };
       setCurrentUser(updatedUser);
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       localStorage.setItem('rememberedLogin', JSON.stringify({
         username: profileForm.username || profileForm.phone,
-        password: profileForm.newPassword || profileForm.currentPassword,
+        password: showPasswordResetFields ? profileForm.newPassword : profileForm.currentPassword,
         department: currentUser.department || currentUser.workplaceType || '',
       }));
       setProfileForm((prev) => ({
@@ -275,6 +283,7 @@ export default function Admin() {
         newPassword: '',
         confirmNewPassword: '',
       }));
+      setShowPasswordResetFields(false);
       setProfileMessage('Данные профиля обновлены');
       window.dispatchEvent(new Event('userChanged'));
     } catch (error) {
@@ -586,7 +595,7 @@ export default function Admin() {
                 <div className="mb-4">
                   <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.35em]">Профиль</p>
                   <h2 className="mt-2 text-xl font-bold text-slate-900">Изменить данные аккаунта</h2>
-                  <p className="mt-1 text-sm text-slate-500">Для сохранения любых изменений введите текущий пароль. Для смены пароля дополнительно укажите новый пароль дважды.</p>
+                  <p className="mt-1 text-sm text-slate-500">Для сохранения любых изменений введите текущий пароль. Для смены пароля нажмите кнопку "Сбросить пароль".</p>
                 </div>
                 <form onSubmit={handleProfileSave} className="space-y-4">
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -630,28 +639,42 @@ export default function Admin() {
                       Отдел: <span className="font-semibold text-slate-700">{currentUser.department || currentUser.workplaceType || '—'}</span><br />
                       Должность: <span className="font-semibold text-slate-700">{currentUser.position || '—'}</span>
                     </div>
-                    <input
-                      type="password"
-                      name="newPassword"
-                      value={profileForm.newPassword}
-                      onChange={handleProfileFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="Новый пароль"
-                    />
-                    <input
-                      type="password"
-                      name="confirmNewPassword"
-                      value={profileForm.confirmNewPassword}
-                      onChange={handleProfileFormChange}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                      placeholder="Подтвердите новый пароль"
-                    />
+                    {showPasswordResetFields && (
+                      <>
+                        <input
+                          type="password"
+                          name="newPassword"
+                          value={profileForm.newPassword}
+                          onChange={handleProfileFormChange}
+                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                          placeholder="Новый пароль"
+                        />
+                        <input
+                          type="password"
+                          name="confirmNewPassword"
+                          value={profileForm.confirmNewPassword}
+                          onChange={handleProfileFormChange}
+                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                          placeholder="Подтвердите новый пароль"
+                        />
+                      </>
+                    )}
                   </div>
                   {profileMessage && (
                     <div className={`rounded-2xl px-4 py-3 text-sm ${profileMessage.includes('обновлены') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                       {profileMessage}
                     </div>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPasswordResetFields((prev) => !prev);
+                      setProfileForm((prev) => ({ ...prev, newPassword: '', confirmNewPassword: '' }));
+                    }}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+                  >
+                    {showPasswordResetFields ? 'Отменить смену пароля' : 'Сбросить пароль'}
+                  </button>
                   <button
                     type="submit"
                     className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition"
@@ -717,7 +740,7 @@ export default function Admin() {
               <div className="mb-4">
                 <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.35em]">Профиль</p>
                 <h2 className="mt-2 text-xl font-bold text-slate-900">Изменить мои данные</h2>
-                <p className="mt-1 text-sm text-slate-500">Подтвердите изменения текущим паролем. Для смены пароля заполните два поля нового пароля.</p>
+                <p className="mt-1 text-sm text-slate-500">Подтвердите изменения текущим паролем. Для смены пароля нажмите кнопку "Сбросить пароль".</p>
               </div>
               <form onSubmit={handleProfileSave} className="space-y-4">
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -761,28 +784,42 @@ export default function Admin() {
                     Отдел: <span className="font-semibold text-slate-700">{currentUser.department || currentUser.workplaceType || '—'}</span><br />
                     Должность: <span className="font-semibold text-slate-700">{currentUser.position || '—'}</span>
                   </div>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={profileForm.newPassword}
-                    onChange={handleProfileFormChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    placeholder="Новый пароль"
-                  />
-                  <input
-                    type="password"
-                    name="confirmNewPassword"
-                    value={profileForm.confirmNewPassword}
-                    onChange={handleProfileFormChange}
-                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    placeholder="Подтвердите новый пароль"
-                  />
+                  {showPasswordResetFields && (
+                    <>
+                      <input
+                        type="password"
+                        name="newPassword"
+                        value={profileForm.newPassword}
+                        onChange={handleProfileFormChange}
+                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                        placeholder="Новый пароль"
+                      />
+                      <input
+                        type="password"
+                        name="confirmNewPassword"
+                        value={profileForm.confirmNewPassword}
+                        onChange={handleProfileFormChange}
+                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                        placeholder="Подтвердите новый пароль"
+                      />
+                    </>
+                  )}
                 </div>
                 {profileMessage && (
                   <div className={`rounded-2xl px-4 py-3 text-sm ${profileMessage.includes('обновлены') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                     {profileMessage}
                   </div>
                 )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPasswordResetFields((prev) => !prev);
+                    setProfileForm((prev) => ({ ...prev, newPassword: '', confirmNewPassword: '' }));
+                  }}
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+                >
+                  {showPasswordResetFields ? 'Отменить смену пароля' : 'Сбросить пароль'}
+                </button>
                 <button
                   type="submit"
                   className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition"
