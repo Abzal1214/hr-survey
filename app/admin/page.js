@@ -79,6 +79,7 @@ export default function Admin() {
   const [confirmModal, setConfirmModal] = useState(null);
   const [staffPageSize, setStaffPageSize] = useState(10);
   const [staffPage, setStaffPage] = useState(1);
+  const isProfileSuccessMessage = /успешно|обновлены/i.test(profileMessage);
 
   const totalStaffPages = Math.max(1, Math.ceil(usersData.length / staffPageSize));
   const currentStaffPage = Math.min(staffPage, totalStaffPages);
@@ -236,7 +237,10 @@ export default function Admin() {
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
-    if (!currentUser?.phone) return;
+    if (!currentUser?.phone) {
+      setProfileMessage('Не удалось сохранить: отсутствует номер телефона пользователя');
+      return;
+    }
     if (showPasswordResetFields) {
       if (!profileForm.currentPassword) {
         setProfileMessage('Введите старый пароль');
@@ -264,6 +268,7 @@ export default function Admin() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          id: currentUser._id || currentUser.id,
           oldPhone: currentUser.phone,
           name: profileForm.name,
           surname: profileForm.surname,
@@ -280,7 +285,7 @@ export default function Admin() {
         setProfileMessage(data.error || 'Ошибка обновления профиля');
         return;
       }
-      const updatedUser = {
+      const updatedUserLocal = {
         ...currentUser,
         name: profileForm.name,
         surname: profileForm.surname,
@@ -290,8 +295,29 @@ export default function Admin() {
         position: profileForm.position,
         password: showPasswordResetFields ? profileForm.newPassword : currentUser.password,
       };
-      setCurrentUser(updatedUser);
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+      // Refresh from API to guarantee UI reflects exactly what is stored in DB.
+      let persistedUser = updatedUserLocal;
+      try {
+        const usersRes = await fetch('/api/users');
+        if (usersRes.ok) {
+          const users = await usersRes.json();
+          const normalize = (value) => String(value || '').replace(/\D/g, '');
+          const byPhone = users.find((u) => normalize(u.phone) === normalize(profileForm.phone));
+          const byUsername = users.find((u) => (u.username || '').toLowerCase() === (profileForm.username || '').toLowerCase());
+          const dbUser = byPhone || byUsername;
+          if (dbUser) {
+            persistedUser = {
+              ...dbUser,
+              role: dbUser.role || currentUser.role,
+              password: showPasswordResetFields ? profileForm.newPassword : currentUser.password,
+            };
+          }
+        }
+      } catch {}
+
+      setCurrentUser(persistedUser);
+      localStorage.setItem('currentUser', JSON.stringify(persistedUser));
       localStorage.setItem('rememberedLogin', JSON.stringify({
         username: profileForm.username || profileForm.phone,
         password: showPasswordResetFields ? profileForm.newPassword : currentUser.password,
@@ -305,7 +331,7 @@ export default function Admin() {
       }));
       setProfileEditEnabled(false);
       setShowPasswordResetFields(false);
-      setProfileMessage('Данные профиля обновлены');
+      setProfileMessage('Успешно сохранено');
       window.dispatchEvent(new Event('userChanged'));
     } catch (error) {
       setProfileMessage('Ошибка: ' + error.message);
@@ -704,7 +730,7 @@ export default function Admin() {
                     </div>
                   )}
                   {profileMessage && (
-                    <div className={`rounded-2xl px-4 py-3 text-sm ${profileMessage.includes('обновлены') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                    <div className={`rounded-2xl px-4 py-3 text-sm ${isProfileSuccessMessage ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                       {profileMessage}
                     </div>
                   )}
@@ -901,7 +927,7 @@ export default function Admin() {
                   </div>
                 )}
                 {profileMessage && (
-                  <div className={`rounded-2xl px-4 py-3 text-sm ${profileMessage.includes('обновлены') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                  <div className={`rounded-2xl px-4 py-3 text-sm ${isProfileSuccessMessage ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                     {profileMessage}
                   </div>
                 )}
