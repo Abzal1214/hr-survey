@@ -44,7 +44,7 @@ export async function PUT(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { oldPhone, phone, name, surname, username, password, department, position, points, role } = body;
+    const { oldPhone, phone, name, surname, username, password, department, position, points, role, selfService, currentPassword } = body;
     if (!oldPhone && !phone) {
       return NextResponse.json({ error: 'Не указан пользователь для обновления' }, { status: 400 });
     }
@@ -52,6 +52,14 @@ export async function PUT(request) {
     const allUsers = await User.find({}).lean();
     const current = allUsers.find(u => normalizePhone(u.phone) === normalizedOldPhone);
     if (!current) return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
+    if (selfService) {
+      if (!currentPassword) {
+        return NextResponse.json({ error: 'Введите текущий пароль' }, { status: 400 });
+      }
+      if (current.password !== currentPassword) {
+        return NextResponse.json({ error: 'Неверный текущий пароль' }, { status: 400 });
+      }
+    }
     if (phone && normalizePhone(phone) !== normalizedOldPhone) {
       const dup = allUsers.find(u => normalizePhone(u.phone) === normalizePhone(phone));
       if (dup) return NextResponse.json({ error: 'Другой пользователь с таким номером уже существует' }, { status: 400 });
@@ -66,10 +74,12 @@ export async function PUT(request) {
     if (username !== undefined) update.username = username;
     if (phone !== undefined) update.phone = phone;
     if (password) update.password = password;
-    if (department !== undefined) update.department = department;
-    if (position !== undefined) update.position = position;
-    if (points !== undefined) update.points = Number(points);
-    if (role !== undefined) update.role = role;
+    if (!selfService) {
+      if (department !== undefined) update.department = department;
+      if (position !== undefined) update.position = position;
+      if (points !== undefined) update.points = Number(points);
+      if (role !== undefined) update.role = role;
+    }
     await User.updateOne({ phone: current.phone }, { $set: update });
     return NextResponse.json({ message: 'Пользователь обновлен' });
   } catch (error) {

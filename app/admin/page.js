@@ -29,6 +29,16 @@ export default function Admin() {
   const [currentUser, setCurrentUser] = useState(null);
   const [usersData, setUsersData] = useState([]);
   const [testsData, setTestsData] = useState([]);
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    surname: '',
+    username: '',
+    phone: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
+  });
+  const [profileMessage, setProfileMessage] = useState('');
 
   // Auto-login from localStorage
   useEffect(() => {
@@ -38,6 +48,13 @@ export default function Admin() {
         const user = JSON.parse(stored);
         setCurrentUser(user);
         setIsLoggedIn(true);
+        setProfileForm((prev) => ({
+          ...prev,
+          name: user.name || '',
+          surname: user.surname || '',
+          username: user.username || '',
+          phone: user.phone || '',
+        }));
         if (user.role === 'admin') fetchAdminData();
       }
       // Restore saved credentials
@@ -64,6 +81,11 @@ export default function Admin() {
     setLoginData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleProfileFormChange = (e) => {
+    const { name, value } = e.target;
+    setProfileForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -85,6 +107,16 @@ export default function Admin() {
         const user = { ...matchedUser, role: matchedUser.role || 'employee' };
         setCurrentUser(user);
         setIsLoggedIn(true);
+        setProfileForm((prev) => ({
+          ...prev,
+          name: user.name || '',
+          surname: user.surname || '',
+          username: user.username || '',
+          phone: user.phone || '',
+          currentPassword: '',
+          newPassword: '',
+          confirmNewPassword: '',
+        }));
         localStorage.setItem('currentUser', JSON.stringify(user));
         localStorage.setItem('rememberedLogin', JSON.stringify({ username: loginData.username, password: loginData.password, department: loginData.department }));
         window.dispatchEvent(new Event('userChanged'));
@@ -95,6 +127,16 @@ export default function Admin() {
         const user = { name: 'Администратор', role: 'admin' };
         setCurrentUser(user);
         setIsLoggedIn(true);
+        setProfileForm((prev) => ({
+          ...prev,
+          name: user.name || '',
+          surname: user.surname || '',
+          username: user.username || '',
+          phone: user.phone || '',
+          currentPassword: '',
+          newPassword: '',
+          confirmNewPassword: '',
+        }));
         localStorage.setItem('currentUser', JSON.stringify(user));
         localStorage.setItem('rememberedLogin', JSON.stringify({ username: loginData.username, password: loginData.password, department: loginData.department }));
         window.dispatchEvent(new Event('userChanged'));
@@ -137,6 +179,16 @@ export default function Admin() {
     setCurrentUser(null);
     setUsersData([]);
     setTestsData([]);
+    setProfileMessage('');
+    setProfileForm({
+      name: '',
+      surname: '',
+      username: '',
+      phone: '',
+      currentPassword: '',
+      newPassword: '',
+      confirmNewPassword: '',
+    });
     setEmployeeForm(initialEmployeeForm);
     setSelectedUser(null);
     setAdminMessage('');
@@ -152,8 +204,67 @@ export default function Admin() {
     }
   };
 
-  const handleExport = () => {
-    window.location.href = '/api/export';
+  const handleProfileSave = async (e) => {
+    e.preventDefault();
+    if (!currentUser?.phone) return;
+    if (!profileForm.currentPassword) {
+      setProfileMessage('Введите текущий пароль для подтверждения изменений');
+      return;
+    }
+    if ((profileForm.newPassword || profileForm.confirmNewPassword) && profileForm.newPassword.length < 6) {
+      setProfileMessage('Новый пароль должен быть не меньше 6 символов');
+      return;
+    }
+    if (profileForm.newPassword !== profileForm.confirmNewPassword) {
+      setProfileMessage('Новый пароль и подтверждение не совпадают');
+      return;
+    }
+    try {
+      const response = await fetch('/api/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          oldPhone: currentUser.phone,
+          name: profileForm.name,
+          surname: profileForm.surname,
+          username: profileForm.username,
+          phone: profileForm.phone,
+          password: profileForm.newPassword || undefined,
+          currentPassword: profileForm.currentPassword,
+          selfService: true,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setProfileMessage(data.error || 'Ошибка обновления профиля');
+        return;
+      }
+      const updatedUser = {
+        ...currentUser,
+        name: profileForm.name,
+        surname: profileForm.surname,
+        username: profileForm.username,
+        phone: profileForm.phone,
+        password: profileForm.newPassword || currentUser.password,
+      };
+      setCurrentUser(updatedUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      localStorage.setItem('rememberedLogin', JSON.stringify({
+        username: profileForm.username || profileForm.phone,
+        password: profileForm.newPassword || profileForm.currentPassword,
+        department: currentUser.department || currentUser.workplaceType || '',
+      }));
+      setProfileForm((prev) => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: '',
+      }));
+      setProfileMessage('Данные профиля обновлены');
+      window.dispatchEvent(new Event('userChanged'));
+    } catch (error) {
+      setProfileMessage('Ошибка: ' + error.message);
+    }
   };
 
   const handleEmployeeFormChange = (e) => {
@@ -433,6 +544,84 @@ export default function Admin() {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <section className="sm:col-span-2 rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.35em]">Профиль</p>
+                  <h2 className="mt-2 text-xl font-bold text-slate-900">Изменить данные аккаунта</h2>
+                  <p className="mt-1 text-sm text-slate-500">Для сохранения любых изменений введите текущий пароль. Для смены пароля дополнительно укажите новый пароль дважды.</p>
+                </div>
+                <form onSubmit={handleProfileSave} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <input
+                      name="name"
+                      value={profileForm.name}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                      placeholder="Имя"
+                    />
+                    <input
+                      name="surname"
+                      value={profileForm.surname}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                      placeholder="Фамилия"
+                    />
+                    <input
+                      name="username"
+                      value={profileForm.username}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                      placeholder="Логин"
+                    />
+                    <input
+                      name="phone"
+                      value={profileForm.phone}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                      placeholder="Телефон"
+                    />
+                    <input
+                      type="password"
+                      name="currentPassword"
+                      value={profileForm.currentPassword}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                      placeholder="Текущий пароль"
+                    />
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
+                      Отдел: <span className="font-semibold text-slate-700">{currentUser.department || currentUser.workplaceType || '—'}</span><br />
+                      Должность: <span className="font-semibold text-slate-700">{currentUser.position || '—'}</span>
+                    </div>
+                    <input
+                      type="password"
+                      name="newPassword"
+                      value={profileForm.newPassword}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                      placeholder="Новый пароль"
+                    />
+                    <input
+                      type="password"
+                      name="confirmNewPassword"
+                      value={profileForm.confirmNewPassword}
+                      onChange={handleProfileFormChange}
+                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                      placeholder="Подтвердите новый пароль"
+                    />
+                  </div>
+                  {profileMessage && (
+                    <div className={`rounded-2xl px-4 py-3 text-sm ${profileMessage.includes('обновлены') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                      {profileMessage}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition"
+                  >
+                    Сохранить изменения
+                  </button>
+                </form>
+              </section>
               <a href="/news" className="block rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm hover:border-sky-200 transition">
                 <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.35em]">Новости</p>
                 <p className="mt-4 text-lg font-semibold text-slate-900">Следите за событиями бренда</p>
@@ -466,20 +655,12 @@ export default function Admin() {
               <h1 className="mt-3 text-4xl font-bold text-slate-900">📊 Админ портала</h1>
               <p className="mt-3 text-slate-600">Управление отзывами, регистрациями и результатами обучения.</p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <button
-                onClick={handleExport}
-                className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition"
-              >
-                📥 Скачать отчет
-              </button>
-              <button
-                onClick={handleLogout}
-                className="rounded-2xl bg-emerald-600 text-white px-6 py-3 font-semibold shadow-lg shadow-emerald-600/10 hover:bg-emerald-700 transition"
-              >
-                🚪 Выйти
-              </button>
-            </div>
+            <a
+              href="/"
+              className="inline-flex items-center justify-center rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition"
+            >
+              🏠 На главную
+            </a>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="rounded-[28px] bg-sky-50 p-6 border border-sky-100 shadow-sm">
