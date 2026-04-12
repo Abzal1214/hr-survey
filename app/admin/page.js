@@ -804,6 +804,13 @@ export default function Admin() {
                     </div>
                   )}
                   <button
+                    type="submit"
+                    disabled={!profileEditEnabled}
+                    className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Сохранить изменения
+                  </button>
+                  <button
                     type="button"
                     onClick={() => {
                       setShowPasswordResetFields((prev) => !prev);
@@ -813,13 +820,6 @@ export default function Admin() {
                     className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {showPasswordResetFields ? 'Отменить смену пароля' : 'Сбросить пароль'}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!profileEditEnabled}
-                    className="rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Сохранить изменения
                   </button>
                 </form>
               </section>
