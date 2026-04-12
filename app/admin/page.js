@@ -70,6 +70,17 @@ export default function Admin() {
   const [adminMessage, setAdminMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmModal, setConfirmModal] = useState(null);
+  const [staffPageSize, setStaffPageSize] = useState(10);
+  const [staffPage, setStaffPage] = useState(1);
+
+  const totalStaffPages = Math.max(1, Math.ceil(usersData.length / staffPageSize));
+  const currentStaffPage = Math.min(staffPage, totalStaffPages);
+  const staffStart = (currentStaffPage - 1) * staffPageSize;
+  const staffRows = usersData.slice(staffStart, staffStart + staffPageSize);
+
+  useEffect(() => {
+    setStaffPage(1);
+  }, [staffPageSize, usersData.length]);
 
   const mapDepartment = (user) => {
     if (user.department) return user.department;
@@ -696,15 +707,30 @@ export default function Admin() {
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-2xl font-bold text-slate-900">Зарегистрированные сотрудники</h2>
-                <button
-                  type="button"
-                  onClick={handleStartAddEmployee}
-                  className="rounded-2xl bg-emerald-600 text-white px-5 py-3 font-semibold hover:bg-emerald-700 transition"
-                >
-                  + Добавить сотрудника
-                </button>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <span>Показывать</span>
+                    <select
+                      value={staffPageSize}
+                      onChange={(e) => setStaffPageSize(Number(e.target.value))}
+                      className="rounded-xl border border-slate-300 bg-white px-2 py-1 text-slate-900"
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                    </select>
+                    <span>сотрудников</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleStartAddEmployee}
+                    className="rounded-2xl bg-emerald-600 text-white px-5 py-3 font-semibold hover:bg-emerald-700 transition"
+                  >
+                    + Добавить сотрудника
+                  </button>
+                </div>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-hidden">
                 <table className="w-full border-collapse text-sm text-slate-900">
                   <thead className="bg-slate-100 text-slate-900">
                     <tr>
@@ -717,7 +743,7 @@ export default function Admin() {
                     </tr>
                   </thead>
                   <tbody>
-                    {usersData.map((user, index) => (
+                    {staffRows.map((user, index) => (
                       <tr key={index} className={index % 2 === 0 ? 'bg-slate-50' : 'bg-white'}>
                         <td className="p-3 border-b text-slate-900">{user.name}</td>
                         <td className="p-3 border-b text-slate-900">{user.phone}</td>
@@ -736,6 +762,30 @@ export default function Admin() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-slate-500">
+                  Показано {staffRows.length} из {usersData.length}
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setStaffPage((p) => Math.max(1, p - 1))}
+                    disabled={currentStaffPage === 1}
+                    className="rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 disabled:opacity-40"
+                  >
+                    Назад
+                  </button>
+                  <span className="text-sm text-slate-600">{currentStaffPage} / {totalStaffPages}</span>
+                  <button
+                    type="button"
+                    onClick={() => setStaffPage((p) => Math.min(totalStaffPages, p + 1))}
+                    disabled={currentStaffPage === totalStaffPages}
+                    className="rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 disabled:opacity-40"
+                  >
+                    Вперёд
+                  </button>
+                </div>
               </div>
             </div>
           )}
