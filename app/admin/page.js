@@ -673,12 +673,6 @@ export default function Admin() {
               <h1 className="mt-3 text-4xl font-bold text-slate-900">📊 Админ портала</h1>
               <p className="mt-3 text-slate-600">Управление отзывами, регистрациями и результатами обучения.</p>
             </div>
-            <a
-              href="/"
-              className="inline-flex items-center justify-center rounded-2xl bg-sky-700 text-white px-6 py-3 font-semibold shadow-lg shadow-sky-700/10 hover:bg-sky-800 transition"
-            >
-              🏠 На главную
-            </a>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="rounded-[28px] bg-sky-50 p-6 border border-sky-100 shadow-sm">

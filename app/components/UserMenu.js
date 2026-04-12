@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function UserMenu() {
   const [user, setUser] = useState(null);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const load = () => {
@@ -24,7 +25,6 @@ export default function UserMenu() {
     return () => window.removeEventListener('userChanged', load);
   }, []);
 
-  // Close on outside click
   useEffect(() => {
     const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
@@ -51,13 +51,13 @@ export default function UserMenu() {
     );
   }
 
-  const initials = user.name ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '?';
+  const initials = user.name ? user.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() : '?';
   const isAdmin = user.role === 'admin';
 
   return (
     <div className="relative" ref={ref}>
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((prev) => !prev)}
         className="flex items-center gap-2 rounded-full bg-white/20 border border-white/40 px-3 py-2 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm"
       >
         <span className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-white">
@@ -71,7 +71,6 @@ export default function UserMenu() {
 
       {open && (
         <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white shadow-2xl border border-slate-100 overflow-hidden z-50 animate-scale-in">
-          {/* User info */}
           <div className="px-4 py-3 border-b border-slate-100">
             <div className="flex items-center gap-3">
               <span className="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center text-sm font-bold text-white shrink-0">
@@ -84,8 +83,20 @@ export default function UserMenu() {
             </div>
           </div>
 
-          {/* Menu items */}
           <div className="py-1">
+            {pathname !== '/' && (
+              <Link href="/" onClick={() => setOpen(false)}
+                style={{ color: '#000' }}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-emerald-50 transition">
+                <span className="w-7 h-7 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10.25 12 3l9 7.25" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 9.75V20h14V9.75" />
+                  </svg>
+                </span>
+                На главную
+              </Link>
+            )}
             {isAdmin ? (
               <Link href="/admin" onClick={() => setOpen(false)}
                 style={{ color: '#000' }}
