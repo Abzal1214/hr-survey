@@ -74,6 +74,10 @@ export async function PUT(request) {
       if (points !== undefined) update.points = Number(points);
       if (role !== undefined) update.role = role;
     }
+    if (selfService) {
+      if (typeof department === 'string') update.department = department;
+      if (typeof position === 'string') update.position = position;
+    }
     await User.updateOne({ phone: current.phone }, { $set: update });
     return NextResponse.json({ message: 'Пользователь обновлен' });
   } catch (error) {
