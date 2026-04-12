@@ -24,25 +24,49 @@ export default function RewardsPage() {
 
   const restoreUserFromRemembered = async () => {
     try {
+      const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
+      const currentRaw = localStorage.getItem('currentUser');
       const rememberedRaw = localStorage.getItem('rememberedLogin');
-      if (!rememberedRaw) return null;
-      const remembered = JSON.parse(rememberedRaw);
-      if (!remembered?.username || !remembered?.password) return null;
+      const current = currentRaw ? JSON.parse(currentRaw) : null;
+      const remembered = rememberedRaw ? JSON.parse(rememberedRaw) : null;
+
+      if (current?.phone) {
+        const known = { ...current, role: current.role || 'employee' };
+        setUser(known);
+        setIsAdmin(known.role === 'admin');
+        return known;
+      }
 
       const usersRes = await fetch('/api/users');
       if (!usersRes.ok) return null;
       const users = await usersRes.json();
-      const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
-      const enteredLogin = String(remembered.username).trim();
-      const enteredPhone = normalizePhone(enteredLogin);
 
-      const matched = users.find((u) => {
-        const phoneMatch = enteredPhone && normalizePhone(u.phone) === enteredPhone;
-        const usernameMatch = u.username && u.username.toLowerCase() === enteredLogin.toLowerCase();
-        const userDept = (u.department || u.workplaceType || '').toLowerCase();
-        const rememberedDept = String(remembered.department || '').toLowerCase();
-        return (phoneMatch || usernameMatch) && u.password === remembered.password && (!rememberedDept || userDept === rememberedDept);
-      });
+      const loginCandidates = [current?.username, current?.phone, remembered?.username]
+        .filter(Boolean)
+        .map((v) => String(v).trim());
+
+      let matched = null;
+
+      if (remembered?.username && remembered?.password) {
+        const enteredLogin = String(remembered.username).trim();
+        const enteredPhone = normalizePhone(enteredLogin);
+        matched = users.find((u) => {
+          const phoneMatch = enteredPhone && normalizePhone(u.phone) === enteredPhone;
+          const usernameMatch = u.username && u.username.toLowerCase() === enteredLogin.toLowerCase();
+          const userDept = (u.department || u.workplaceType || '').toLowerCase();
+          const rememberedDept = String(remembered.department || '').toLowerCase();
+          return (phoneMatch || usernameMatch) && u.password === remembered.password && (!rememberedDept || userDept === rememberedDept);
+        });
+      }
+
+      if (!matched && loginCandidates.length) {
+        matched = users.find((u) => loginCandidates.some((login) => {
+          const enteredPhone = normalizePhone(login);
+          const phoneMatch = enteredPhone && normalizePhone(u.phone) === enteredPhone;
+          const usernameMatch = u.username && u.username.toLowerCase() === login.toLowerCase();
+          return phoneMatch || usernameMatch;
+        }));
+      }
 
       if (!matched) return null;
       const restoredUser = { ...matched, role: matched.role || 'employee' };
