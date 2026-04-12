@@ -57,6 +57,7 @@ export default function Admin() {
         const user = JSON.parse(stored);
         setCurrentUser(user);
         setIsVirtualAdmin(Boolean(user?.role === 'admin' && !user?._id && !user?.id));
+        if (user?.role === 'admin') setShowAdminProfileForm(true);
         setProfileIdentity({
           id: String(user._id || user.id || ''),
           phone: user.phone || '',
@@ -136,6 +137,7 @@ export default function Admin() {
         const user = { ...matchedUser, role: matchedUser.role || 'employee' };
         setCurrentUser(user);
         setIsVirtualAdmin(false);
+        if (user.role === 'admin') setShowAdminProfileForm(true);
         setProfileIdentity({
           id: String(user._id || user.id || ''),
           phone: user.phone || '',
@@ -165,6 +167,7 @@ export default function Admin() {
         const user = adminFromDb ? { ...adminFromDb, role: 'admin' } : { name: 'Администратор', role: 'admin' };
         setCurrentUser(user);
         setIsVirtualAdmin(!adminFromDb);
+        setShowAdminProfileForm(true);
         setProfileIdentity({
           id: String(user._id || user.id || ''),
           phone: user.phone || '',
@@ -854,18 +857,6 @@ export default function Admin() {
               <h1 className="mt-3 text-4xl font-bold text-slate-900">📊 Админ портала</h1>
               <p className="mt-3 text-slate-600">Управление отзывами, регистрациями и результатами обучения.</p>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setShowAdminProfileForm((p) => !p);
-                setProfileEditEnabled(false);
-                setShowPasswordResetFields(false);
-                setProfileForm((prev) => ({ ...prev, currentPassword: '', newPassword: '', confirmNewPassword: '' }));
-              }}
-              className="rounded-2xl bg-sky-700 text-white px-5 py-3 font-semibold hover:bg-sky-800 transition"
-            >
-              {showAdminProfileForm ? 'Скрыть мои данные' : 'Мои данные'}
-            </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="rounded-[28px] bg-sky-50 p-6 border border-sky-100 shadow-sm">
