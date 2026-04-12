@@ -167,7 +167,7 @@ export default function Admin() {
     try {
       const [usersRes, testsRes] = await Promise.all([
         fetch('/api/users'),
-        fetch('/api/tests'),
+        fetch('/api/quizzes'),
       ]);
 
       if (usersRes.ok && testsRes.ok) {
