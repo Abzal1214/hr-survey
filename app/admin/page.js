@@ -290,6 +290,9 @@ export default function Admin() {
         } catch {}
       }
 
+      if (!targetUserId && !targetOldPhone && profileForm.phone) {
+        targetOldPhone = profileForm.phone;
+      }
       if (!targetUserId && !targetOldPhone) {
         setProfileMessage('Не удалось определить пользователя для сохранения');
         return;
