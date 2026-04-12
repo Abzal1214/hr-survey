@@ -45,11 +45,11 @@ export async function PUT(request) {
     await connectDB();
     const body = await request.json();
     const { id, oldPhone, lookupUsername, phone, name, surname, username, password, department, position, points, role, selfService } = body;
-    if (!id && !oldPhone && !phone) {
+    if (!id && !oldPhone && !lookupUsername) {
       return NextResponse.json({ error: 'Не указан пользователь для обновления' }, { status: 400 });
     }
     const allUsers = await User.find({}).lean();
-    const normalizedOldPhone = normalizePhone(oldPhone || phone);
+    const normalizedOldPhone = normalizePhone(oldPhone);
     let current = null;
     if (id) {
       current = allUsers.find((u) => String(u._id) === String(id));
@@ -60,11 +60,9 @@ export async function PUT(request) {
     if (!current && lookupUsername) {
       current = allUsers.find((u) => (u.username || '').toLowerCase() === String(lookupUsername).toLowerCase());
     }
-    if (!current && username) {
-      current = allUsers.find((u) => (u.username || '').toLowerCase() === String(username).toLowerCase());
-    }
     if (!current) return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
-    if (phone && normalizePhone(phone) !== normalizedOldPhone) {
+    const normalizedCurrentPhone = normalizePhone(current.phone);
+    if (phone && normalizePhone(phone) !== normalizedCurrentPhone) {
       const dup = allUsers.find(u => normalizePhone(u.phone) === normalizePhone(phone));
       if (dup) return NextResponse.json({ error: 'Другой пользователь с таким номером уже существует' }, { status: 400 });
     }

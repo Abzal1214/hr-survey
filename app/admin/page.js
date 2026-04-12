@@ -32,6 +32,7 @@ export default function Admin() {
   const [showEmployeeForm, setShowEmployeeForm] = useState(false);
   const [showEmployeeProfileForm, setShowEmployeeProfileForm] = useState(false);
   const [showAdminProfileForm, setShowAdminProfileForm] = useState(false);
+  const [isVirtualAdmin, setIsVirtualAdmin] = useState(false);
   const [profileEditEnabled, setProfileEditEnabled] = useState(false);
   const [showPasswordResetFields, setShowPasswordResetFields] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -55,6 +56,7 @@ export default function Admin() {
       if (stored) {
         const user = JSON.parse(stored);
         setCurrentUser(user);
+        setIsVirtualAdmin(Boolean(user?.role === 'admin' && !user?._id && !user?.id));
         setProfileIdentity({
           id: String(user._id || user.id || ''),
           phone: user.phone || '',
@@ -133,6 +135,7 @@ export default function Admin() {
       if (matchedUser) {
         const user = { ...matchedUser, role: matchedUser.role || 'employee' };
         setCurrentUser(user);
+        setIsVirtualAdmin(false);
         setProfileIdentity({
           id: String(user._id || user.id || ''),
           phone: user.phone || '',
@@ -158,12 +161,14 @@ export default function Admin() {
           await fetchAdminData();
         }
       } else if (loginData.username === 'admin' && loginData.password === 'admin') {
-        const user = { name: 'Администратор', role: 'admin' };
+        const adminFromDb = users.find((u) => (u.role || '').toLowerCase() === 'admin');
+        const user = adminFromDb ? { ...adminFromDb, role: 'admin' } : { name: 'Администратор', role: 'admin' };
         setCurrentUser(user);
+        setIsVirtualAdmin(!adminFromDb);
         setProfileIdentity({
-          id: '',
-          phone: '',
-          username: loginData.username || '',
+          id: String(user._id || user.id || ''),
+          phone: user.phone || '',
+          username: user.username || loginData.username || '',
         });
         setIsLoggedIn(true);
         setProfileForm((prev) => ({
@@ -222,6 +227,7 @@ export default function Admin() {
     setTestsData([]);
     setShowEmployeeProfileForm(false);
     setShowAdminProfileForm(false);
+    setIsVirtualAdmin(false);
     setProfileEditEnabled(false);
     setShowPasswordResetFields(false);
     setProfileMessage('');
@@ -254,6 +260,11 @@ export default function Admin() {
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
+
+    if (isVirtualAdmin) {
+      setProfileMessage('Профиль встроенного admin/admin нельзя редактировать. Войдите под зарегистрированным админ-аккаунтом.');
+      return;
+    }
 
     if (showPasswordResetFields) {
       if (!profileForm.currentPassword) {
@@ -308,9 +319,6 @@ export default function Admin() {
         } catch {}
       }
 
-      if (!targetUserId && !targetOldPhone && profileForm.phone) {
-        targetOldPhone = profileForm.phone;
-      }
       if (!targetUserId && !targetOldPhone) {
         setProfileMessage('Не удалось определить пользователя для сохранения');
         return;
