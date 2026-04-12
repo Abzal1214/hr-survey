@@ -237,10 +237,7 @@ export default function Admin() {
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
-    if (!currentUser?.phone) {
-      setProfileMessage('Не удалось сохранить: отсутствует номер телефона пользователя');
-      return;
-    }
+
     if (showPasswordResetFields) {
       if (!profileForm.currentPassword) {
         setProfileMessage('Введите старый пароль');
@@ -264,12 +261,46 @@ export default function Admin() {
       }
     }
     try {
+      let targetUserId = currentUser?._id || currentUser?.id;
+      let targetOldPhone = currentUser?.phone || '';
+
+      // Some sessions (e.g., fallback admin login) may miss phone/id in currentUser.
+      // Resolve target user from the latest users list by id, then username, then phone.
+      if (!targetUserId || !targetOldPhone) {
+        try {
+          const usersRes = await fetch('/api/users');
+          if (usersRes.ok) {
+            const users = await usersRes.json();
+            const normalize = (value) => String(value || '').replace(/\D/g, '');
+            const byId = targetUserId
+              ? users.find((u) => String(u._id || u.id) === String(targetUserId))
+              : null;
+            const byUsername = profileForm.username
+              ? users.find((u) => (u.username || '').toLowerCase() === String(profileForm.username).toLowerCase())
+              : null;
+            const byPhone = profileForm.phone
+              ? users.find((u) => normalize(u.phone) === normalize(profileForm.phone))
+              : null;
+            const resolved = byId || byUsername || byPhone;
+            if (resolved) {
+              targetUserId = resolved._id || resolved.id;
+              targetOldPhone = resolved.phone || targetOldPhone;
+            }
+          }
+        } catch {}
+      }
+
+      if (!targetUserId && !targetOldPhone) {
+        setProfileMessage('Не удалось определить пользователя для сохранения');
+        return;
+      }
+
       const response = await fetch('/api/users', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: currentUser._id || currentUser.id,
-          oldPhone: currentUser.phone,
+          id: targetUserId,
+          oldPhone: targetOldPhone,
           name: profileForm.name,
           surname: profileForm.surname,
           username: profileForm.username,
