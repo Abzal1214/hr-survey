@@ -150,7 +150,7 @@ export default function RewardsPage() {
     return sum + (item ? item.cost * qty : 0);
   }, 0);
 
-  const handleExchange = async () => {
+  const executeExchange = async () => {
     setExchangeError('');
     let activeUser = user;
     if (!activeUser?.phone) {
@@ -179,6 +179,16 @@ export default function RewardsPage() {
       clearCart();
       setCoupon(data);
     } catch { setExchangeError('Ошибка сети. Попробуйте ещё раз.'); }
+  };
+
+  const handleExchange = () => {
+    setConfirmModal({
+      message: `Подтвердить обмен на ${total} AQUA COIN?`,
+      onConfirm: async () => {
+        setConfirmModal(null);
+        await executeExchange();
+      },
+    });
   };
 
   const handleImageChange = (e) => {
