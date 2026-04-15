@@ -54,7 +54,7 @@ export default function UserMenu() {
 
   const initials = user.name ? user.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() : '?';
   const isAdmin = user.role === 'admin';
-  const coinBalance = isAdmin ? '∞' : Number(user.points || 0);
+  const coinBalance = isAdmin ? 1000000 : Number(user.points || 0);
 
   return (
     <div className="relative" ref={ref}>

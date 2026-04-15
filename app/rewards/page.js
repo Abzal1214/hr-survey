@@ -134,7 +134,7 @@ export default function RewardsPage() {
   }, []);
 
   let balance = 0;
-  if (user?.role === 'admin') balance = '∞';
+  if (user?.role === 'admin') balance = 1000000;
   else if (user?.points != null) balance = user.points;
 
   const addToCart = (id) => setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
@@ -433,14 +433,14 @@ export default function RewardsPage() {
                 </div>
                 <button
                   onClick={handleExchange}
-                  disabled={balance !== '∞' && total > balance}
+                  disabled={total > balance}
                   className="rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 font-bold text-base transition shadow-lg disabled:bg-slate-300 disabled:cursor-not-allowed"
                 >
                   Обменять
                 </button>
               </div>
               {exchangeError && <p className="text-red-500 text-sm mt-3">{exchangeError}</p>}
-              {balance !== '∞' && total > balance && (
+              {total > balance && (
                 <div className="mt-3 flex flex-col gap-2">
                   <p className="text-amber-600 text-sm inline-flex items-center gap-1">⚠️ Недостаточно монет. Нужно ещё {total - balance} <GoldCoin size="xs" /></p>
                   <Link href="/tests"
