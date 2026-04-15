@@ -939,19 +939,6 @@ export default function Admin() {
                       <button onClick={() => setStaffSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">✕</button>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <span>Показывать</span>
-                    <select
-                      value={staffPageSize}
-                      onChange={(e) => setStaffPageSize(Number(e.target.value))}
-                      className="rounded-xl border border-slate-300 bg-white px-2 py-1 text-slate-900"
-                    >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                    </select>
-                    <span>сотрудников</span>
-                  </div>
                   <button
                     type="button"
                     onClick={handleStartAddEmployee}
@@ -993,9 +980,20 @@ export default function Admin() {
                 </table>
               </div>
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm text-slate-500">
-                  Показано {staffRows.length} из {usersData.length}
-                </p>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <p className="text-slate-500">Показано {staffRows.length} из {filteredStaff.length}</p>
+                  <span>· по</span>
+                  <select
+                    value={staffPageSize}
+                    onChange={(e) => setStaffPageSize(Number(e.target.value))}
+                    className="rounded-xl border border-slate-300 bg-white px-2 py-1 text-slate-900"
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                  </select>
+                  <span>сотрудников</span>
+                </div>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
