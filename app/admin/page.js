@@ -190,7 +190,7 @@ export default function Admin() {
         if (matchedUser.role === 'admin') {
           await fetchAdminData();
         }
-      } else if ((loginData.username === 'admin' || loginData.username.replace(/\D/g,'') === '77762292586') && loginData.password === 'admin123@') {
+      } else if (loginData.username === 'admin' && loginData.password === 'admin123@') {
         const user = { name: 'Администратор', role: 'admin' };
         setCurrentUser(user);
         setIsVirtualAdmin(true);
