@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
 import KebabMenu from '../components/KebabMenu';
 import GoldCoin from '../components/GoldCoin';
@@ -105,6 +105,7 @@ export default function Admin() {
   const [staffPageSize, setStaffPageSize] = useState(10);
   const [staffPage, setStaffPage] = useState(1);
   const [staffSearch, setStaffSearch] = useState('');
+  const employeeFormRef = useRef(null);
   const isProfileSuccessMessage = /успешно|обновлены/i.test(profileMessage);
 
   const filteredStaff = staffSearch.trim()
@@ -503,6 +504,7 @@ export default function Admin() {
       points: user.points ?? 0,
     });
     setAdminMessage('Редактируется сотрудник ' + user.name);
+    setTimeout(() => employeeFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   };
 
   const handleUpdateEmployee = async (e) => {
@@ -577,6 +579,7 @@ export default function Admin() {
     setEmployeeForm(initialEmployeeForm);
     setAdminMessage('');
     setShowEmployeeForm(true);
+    setTimeout(() => employeeFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   };
 
   const handleCloseEmployeeForm = () => {
@@ -1017,7 +1020,7 @@ export default function Admin() {
             </div>
           )}
           {showEmployeeForm && (
-            <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+            <div ref={employeeFormRef} className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">{selectedUser ? 'Редактировать сотрудника' : 'Добавить сотрудника'}</h2>
               <form className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
