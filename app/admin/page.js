@@ -504,10 +504,10 @@ export default function Admin() {
       points: user.points ?? 0,
     });
     setAdminMessage('Редактируется сотрудник ' + user.name);
-    setTimeout(() => employeeFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    setTimeout(() => { const el = employeeFormRef.current; if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }, 50);
   };
 
-  const handleUpdateEmployee = async (e) => {
+  const handleCloseEmployeeForm = async (e) => {
     e.preventDefault();
     if (!selectedUser) {
       setAdminMessage('Выберите сотрудника для редактирования');
@@ -579,10 +579,8 @@ export default function Admin() {
     setEmployeeForm(initialEmployeeForm);
     setAdminMessage('');
     setShowEmployeeForm(true);
-    setTimeout(() => employeeFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-  };
-
-  const handleCloseEmployeeForm = () => {
+    setTimeout(() => { const el = employeeFormRef.current; if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }, 50);
+  }; = () => {
     setSelectedUser(null);
     setSelectedUserId('');
     setEmployeeForm(initialEmployeeForm);
