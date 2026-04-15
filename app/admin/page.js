@@ -104,16 +104,28 @@ export default function Admin() {
   const [confirmModal, setConfirmModal] = useState(null);
   const [staffPageSize, setStaffPageSize] = useState(10);
   const [staffPage, setStaffPage] = useState(1);
+  const [staffSearch, setStaffSearch] = useState('');
   const isProfileSuccessMessage = /успешно|обновлены/i.test(profileMessage);
 
-  const totalStaffPages = Math.max(1, Math.ceil(usersData.length / staffPageSize));
+  const filteredStaff = staffSearch.trim()
+    ? usersData.filter((u) => {
+        const q = staffSearch.trim().toLowerCase();
+        return [
+          u.name, u.surname, u.phone, u.username,
+          u.department, u.position, u.points,
+          new Date(u.registeredAt).toLocaleDateString('ru-RU'),
+        ].some((v) => String(v ?? '').toLowerCase().includes(q));
+      })
+    : usersData;
+
+  const totalStaffPages = Math.max(1, Math.ceil(filteredStaff.length / staffPageSize));
   const currentStaffPage = Math.min(staffPage, totalStaffPages);
   const staffStart = (currentStaffPage - 1) * staffPageSize;
-  const staffRows = usersData.slice(staffStart, staffStart + staffPageSize);
+  const staffRows = filteredStaff.slice(staffStart, staffStart + staffPageSize);
 
   useEffect(() => {
     setStaffPage(1);
-  }, [staffPageSize, usersData.length]);
+  }, [staffPageSize, usersData.length, staffSearch]);
 
   const mapDepartment = (user) => {
     if (user.department) return user.department;
@@ -885,6 +897,21 @@ export default function Admin() {
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-2xl font-bold text-slate-900">Зарегистрированные сотрудники</h2>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <div className="relative">
+                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m0 0A7 7 0 104.65 4.65a7 7 0 0012 12z" />
+                    </svg>
+                    <input
+                      type="text"
+                      value={staffSearch}
+                      onChange={e => { setStaffSearch(e.target.value); setStaffPage(1); }}
+                      placeholder="Поиск по имени, телефону, отделу..."
+                      className="pl-9 pr-4 py-2 rounded-xl border border-slate-300 text-slate-900 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    />
+                    {staffSearch && (
+                      <button onClick={() => setStaffSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">✕</button>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 text-sm text-slate-600">
                     <span>Показывать</span>
                     <select
