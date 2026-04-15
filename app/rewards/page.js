@@ -280,7 +280,7 @@ export default function RewardsPage() {
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
         <div className="relative z-10">
           <span className="animate-fade-in inline-block rounded-full bg-yellow-400 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Программа лояльности</span>
-          <h1 className="animate-fade-in-up delay-100 text-5xl font-extrabold text-white drop-shadow-lg flex items-center justify-center gap-3"><GoldCoin size="lg" /> Магазин наград</h1>
+          <h1 className="animate-fade-in-up delay-100 text-5xl font-extrabold text-white drop-shadow-lg">Магазин наград</h1>
           <p className="animate-fade-in-up delay-300 mt-4 max-w-xl mx-auto text-white/80 text-lg">Обменивайте AQUA COIN на приятные бонусы и подарки.</p>
           <div className="animate-fade-in-up delay-400 mt-4 inline-flex items-center gap-2 rounded-full bg-white/20 border border-white/40 px-6 py-2.5 backdrop-blur-sm">
             <GoldCoin size="md" />
