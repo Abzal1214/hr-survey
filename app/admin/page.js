@@ -905,7 +905,7 @@ export default function Admin() {
                       type="text"
                       value={staffSearch}
                       onChange={e => { setStaffSearch(e.target.value); setStaffPage(1); }}
-                      placeholder="Поиск по имени, телефону, отделу..."
+                      placeholder="Поиск"
                       className="pl-9 pr-4 py-2 rounded-xl border border-slate-300 text-slate-900 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                     />
                     {staffSearch && (
