@@ -582,14 +582,6 @@ export default function Admin() {
     setTimeout(() => { const el = employeeFormRef.current; if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }, 50);
   };
 
-  const handleCloseEmployeeForm = () => {
-    setSelectedUser(null);
-    setSelectedUserId('');
-    setEmployeeForm(initialEmployeeForm);
-    setAdminMessage('');
-    setShowEmployeeForm(false);
-  };
-
   const handleAddNews = async (e) => {
     e.preventDefault();
     if (!newsForm.title || !newsForm.description) {
