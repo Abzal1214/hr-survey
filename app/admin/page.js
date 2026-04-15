@@ -507,7 +507,7 @@ export default function Admin() {
     setTimeout(() => { const el = employeeFormRef.current; if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }, 50);
   };
 
-  const handleCloseEmployeeForm = async (e) => {
+  const handleUpdateEmployee = async (e) => {
     e.preventDefault();
     if (!selectedUser) {
       setAdminMessage('Выберите сотрудника для редактирования');
@@ -544,6 +544,14 @@ export default function Admin() {
     } catch (error) {
       setAdminMessage('Ошибка: ' + error.message);
     }
+  };
+
+  const handleCloseEmployeeForm = () => {
+    setSelectedUser(null);
+    setSelectedUserId('');
+    setEmployeeForm(initialEmployeeForm);
+    setAdminMessage('');
+    setShowEmployeeForm(false);
   };
 
   const handleDeleteEmployee = (user) => {
