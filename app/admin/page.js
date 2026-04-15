@@ -163,7 +163,7 @@ export default function Admin() {
         if (matchedUser.role === 'admin') {
           await fetchAdminData();
         }
-      } else if (loginData.username === 'admin' && loginData.password === 'admin') {
+      } else if (loginData.username === 'admin' && loginData.password === 'admin123@') {
         const adminFromDb = users.find((u) => (u.role || '').toLowerCase() === 'admin');
         const user = adminFromDb ? { ...adminFromDb, role: 'admin' } : { name: 'Администратор', role: 'admin' };
         setCurrentUser(user);
