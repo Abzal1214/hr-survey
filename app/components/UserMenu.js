@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import GoldCoin from './GoldCoin';
 
 export default function UserMenu() {
   const [user, setUser] = useState(null);
@@ -125,10 +126,7 @@ export default function UserMenu() {
                 <Link href="/rewards" onClick={() => setOpen(false)}
                   style={{ color: '#000' }}
                   className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-yellow-50 transition">
-                  <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-400 shadow-sm shadow-amber-200 ring-2 ring-yellow-200">
-                    <span className="absolute inset-[2px] rounded-full border border-yellow-200/80" />
-                    <span className="relative text-[11px] leading-none" style={{filter:'sepia(1) saturate(4) brightness(1.1) hue-rotate(-5deg)'}}>🌊</span>
-                  </span>
+                  <GoldCoin size="sm" />
                   <span className="flex-1">Мои AQUA COIN</span>
                   <span className="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-bold text-yellow-700">
                     {coinBalance}

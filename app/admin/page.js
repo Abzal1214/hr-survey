@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
 import KebabMenu from '../components/KebabMenu';
+import GoldCoin from '../components/GoldCoin';
 
 const departmentPositions = {
   Аквапарк: ['кассир', 'инструктор'],
@@ -1079,7 +1080,7 @@ export default function Admin() {
             </div>
           )}
           <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">💰 AQUA COIN — баллы сотрудников</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2"><GoldCoin size="md" /> AQUA COIN — баллы сотрудников</h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm text-slate-900">
                 <thead className="bg-emerald-100 text-slate-900">

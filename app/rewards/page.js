@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ConfirmModal from '../components/ConfirmModal';
 import KebabMenu from '../components/KebabMenu';
+import GoldCoin from '../components/GoldCoin';
 
 export default function RewardsPage() {
   const [rewards, setRewards] = useState([]);
@@ -186,10 +187,7 @@ export default function RewardsPage() {
       title: 'Подтвердить обмен',
       message: (
         <span className="inline-flex items-center gap-3 font-semibold text-emerald-600">
-          <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-400 shadow-sm shadow-amber-200 ring-2 ring-yellow-200">
-            <span className="absolute inset-[3px] rounded-full border border-yellow-200/80" />
-            <span className="relative text-[15px] leading-none" style={{filter:'sepia(1) saturate(4) brightness(1.1) hue-rotate(-5deg)'}}>🌊</span>
-          </span>
+            <GoldCoin size="lg" />
           <span>{total} AQUA COIN</span>
         </span>
       ),
@@ -282,13 +280,10 @@ export default function RewardsPage() {
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
         <div className="relative z-10">
           <span className="animate-fade-in inline-block rounded-full bg-yellow-400 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Программа лояльности</span>
-          <h1 className="animate-fade-in-up delay-100 text-5xl font-extrabold text-white drop-shadow-lg">💰 Магазин наград</h1>
+          <h1 className="animate-fade-in-up delay-100 text-5xl font-extrabold text-white drop-shadow-lg flex items-center justify-center gap-3"><GoldCoin size="lg" /> Магазин наград</h1>
           <p className="animate-fade-in-up delay-300 mt-4 max-w-xl mx-auto text-white/80 text-lg">Обменивайте AQUA COIN на приятные бонусы и подарки.</p>
           <div className="animate-fade-in-up delay-400 mt-4 inline-flex items-center gap-2 rounded-full bg-white/20 border border-white/40 px-6 py-2.5 backdrop-blur-sm">
-            <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-400 shadow-sm shadow-amber-200 ring-2 ring-yellow-200">
-              <span className="absolute inset-[2px] rounded-full border border-yellow-200/80" />
-              <span className="relative text-[13px] leading-none" style={{filter:'sepia(1) saturate(4) brightness(1.1) hue-rotate(-5deg)'}}>🌊</span>
-            </span>
+            <GoldCoin size="md" />
             <span className="text-white font-bold text-lg">{balance}</span>
             <span className="text-white/70 text-sm">AQUA COIN</span>
           </div>
@@ -380,7 +375,7 @@ export default function RewardsPage() {
                     <h3 className="text-lg font-bold text-slate-900">{item.name}</h3>
                     <p className="text-slate-500 text-sm flex-1">{item.description}</p>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="font-bold text-emerald-600">{item.cost} 🪙</span>
+                      <span className="font-bold text-emerald-600 inline-flex items-center gap-1">{item.cost} <GoldCoin size="xs" /></span>
                       <div className="flex items-center gap-2">
                         {isAdmin && (
                           <KebabMenu
@@ -422,7 +417,7 @@ export default function RewardsPage() {
                     <li key={id} className="flex items-center gap-3 rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3">
                       <span className="flex-1 font-medium text-slate-800">{item.name}</span>
                       <span className="text-slate-400 text-sm">×{qty}</span>
-                      <span className="text-emerald-600 font-bold text-sm">{item.cost * qty} 🪙</span>
+                      <span className="text-emerald-600 font-bold text-sm inline-flex items-center gap-1">{item.cost * qty} <GoldCoin size="xs" /></span>
                       <button onClick={() => removeFromCart(id)}
                         className="w-7 h-7 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 font-bold flex items-center justify-center transition text-sm">
                         –
@@ -434,7 +429,7 @@ export default function RewardsPage() {
               <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                 <div>
                   <p className="text-sm text-slate-400">Итого</p>
-                  <p className="text-2xl font-extrabold text-emerald-600">{total} 🪙</p>
+                  <p className="text-2xl font-extrabold text-emerald-600 flex items-center gap-2">{total} <GoldCoin size="sm" /></p>
                 </div>
                 <button
                   onClick={handleExchange}
@@ -447,7 +442,7 @@ export default function RewardsPage() {
               {exchangeError && <p className="text-red-500 text-sm mt-3">{exchangeError}</p>}
               {balance !== '∞' && total > balance && (
                 <div className="mt-3 flex flex-col gap-2">
-                  <p className="text-amber-600 text-sm">⚠️ Недостаточно монет. Нужно ещё {total - balance} 🪙</p>
+                  <p className="text-amber-600 text-sm inline-flex items-center gap-1">⚠️ Недостаточно монет. Нужно ещё {total - balance} <GoldCoin size="xs" /></p>
                   <Link href="/tests"
                     className="inline-flex items-center gap-2 self-start rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 font-semibold text-sm transition shadow">
                     🚀 Заработать монеты
@@ -483,7 +478,7 @@ export default function RewardsPage() {
                   <div className="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 mb-4 flex items-center gap-3">
                     <span className="text-xl">{ticket.item?.icon || '🎁'}</span>
                     <span className="flex-1 font-semibold text-slate-800">{ticket.item?.name}</span>
-                    <span className="text-emerald-600 font-bold">{ticket.item?.cost} 🪙</span>
+                    <span className="text-emerald-600 font-bold inline-flex items-center gap-1">{ticket.item?.cost} <GoldCoin size="xs" /></span>
                   </div>
                   <div className="bg-slate-50 rounded-2xl border-2 border-dashed border-emerald-300 px-4 py-3 text-center mb-2">
                     <p className="text-xs text-slate-400 mb-1 uppercase tracking-widest">Код купона</p>

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import GoldCoin from './components/GoldCoin';
 
 const quickLinks = [
   { icon: '📰', label: 'Новости', desc: 'Последние события компании', href: '/news', color: 'from-sky-400 to-blue-500' },
@@ -87,7 +88,7 @@ export default function Home() {
         <section className="mt-10 animate-fade-in-up delay-300 rounded-[32px] bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 p-8 text-white shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
             <p className="text-sm uppercase tracking-widest text-emerald-100">Программа лояльности</p>
-            <h3 className="mt-2 text-3xl font-extrabold">💰 AQUA COIN</h3>
+            <h3 className="mt-2 text-3xl font-extrabold flex items-center gap-2"><GoldCoin size="lg" /> AQUA COIN</h3>
             <p className="mt-2 text-white/90">Зарабатывайте баллы за активность и обменивайте на товары в магазине наград.</p>
           </div>
           <Link href="/rewards" className="shrink-0 rounded-full bg-white font-bold px-8 py-3 shadow-lg hover:bg-emerald-50 transition" style={{color:'#047857'}}>
