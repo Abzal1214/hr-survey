@@ -458,7 +458,7 @@ export default function RewardsPage() {
     {coupon && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
         <div className="relative w-full max-w-3xl">
-          <div className="max-h-[78vh] overflow-y-auto space-y-4 pr-1">
+          <div className="print-area max-h-[78vh] overflow-y-auto space-y-4 pr-1">
             {couponTickets.map((ticket, idx) => (
               <div key={`${ticket.couponCode}-${idx}`} className="print-coupon bg-white rounded-[28px] shadow-2xl overflow-hidden" style={{fontFamily: 'monospace'}}>
                 <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-6 text-center">
