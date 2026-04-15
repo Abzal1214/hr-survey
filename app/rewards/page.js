@@ -157,8 +157,23 @@ export default function RewardsPage() {
     if (!activeUser?.phone) {
       activeUser = await restoreUserFromRemembered();
     }
+
+    // Virtual admin (no phone/id) — generate coupon locally without deducting
     if (!activeUser?.phone) {
-      setExchangeError('Войдите в аккаунт для обмена.');
+      const makeCouponCode = () => 'AQ-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+      const issuedAt = new Date().toISOString();
+      const items = Object.entries(cart).map(([id, qty]) => {
+        const item = rewards.find(r => String(r._id || r.id) === id);
+        return { id, name: item.name, qty, cost: item.cost, icon: getIcon(item.name) };
+      });
+      const coupons = [];
+      items.forEach((item) => {
+        for (let i = 0; i < item.qty; i++) {
+          coupons.push({ couponCode: makeCouponCode(), issuedAt, item: { id: item.id, name: item.name, cost: item.cost, icon: item.icon }, index: i + 1, count: item.qty });
+        }
+      });
+      clearCart();
+      setCoupon({ coupons, userName: 'Администратор', items, total, issuedAt });
       return;
     }
     const items = Object.entries(cart).map(([id, qty]) => {
