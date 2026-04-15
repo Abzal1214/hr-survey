@@ -164,16 +164,11 @@ export default function Admin() {
           await fetchAdminData();
         }
       } else if (loginData.username === 'admin' && loginData.password === 'admin123@') {
-        const adminFromDb = users.find((u) => (u.role || '').toLowerCase() === 'admin');
-        const user = adminFromDb ? { ...adminFromDb, role: 'admin' } : { name: 'Администратор', role: 'admin' };
+        const user = { name: 'Администратор', role: 'admin' };
         setCurrentUser(user);
-        setIsVirtualAdmin(!adminFromDb);
+        setIsVirtualAdmin(true);
         setShowAdminProfileForm(true);
-        setProfileIdentity({
-          id: String(user._id || user.id || ''),
-          phone: user.phone || '',
-          username: user.username || loginData.username || '',
-        });
+        setProfileIdentity({ id: '', phone: '', username: 'admin' });
         setIsLoggedIn(true);
         setProfileForm((prev) => ({
           ...prev,
