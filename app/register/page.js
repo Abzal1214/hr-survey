@@ -19,8 +19,27 @@ export default function RegisterPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handlePhoneChange = (e) => {
+    let digits = e.target.value.replace(/\D/g, '');
+    // Always keep leading 7
+    if (!digits.startsWith('7')) digits = '7' + digits.replace(/^7*/, '');
+    digits = digits.slice(0, 11);
+    let formatted = '+7';
+    if (digits.length > 1) formatted += ' (' + digits.slice(1, 4);
+    if (digits.length >= 4) formatted += ')';
+    if (digits.length > 4) formatted += ' ' + digits.slice(4, 7);
+    if (digits.length > 7) formatted += '-' + digits.slice(7, 9);
+    if (digits.length > 9) formatted += '-' + digits.slice(9, 11);
+    setFormData((prev) => ({ ...prev, phone: formatted }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const phoneDigits = formData.phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 11) {
+      setMessage('Введите полный номер телефона в формате +7 (XXX) XXX-XX-XX');
+      return;
+    }
     if (formData.password.length < 6) {
       setMessage('Пароль должен быть не меньше 6 символов');
       return;
@@ -78,8 +97,8 @@ export default function RegisterPage() {
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-800 mb-2">Номер телефона <span className="text-red-500">*</span></label>
-              <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required
-                className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="+7 (999) 123-45-67" />
+              <input type="tel" name="phone" value={formData.phone} onChange={handlePhoneChange} required
+                className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="+7 (707) 559-90-25" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-800 mb-2">Пароль <span className="text-red-500">*</span></label>
