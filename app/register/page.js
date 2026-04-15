@@ -19,9 +19,7 @@ export default function RegisterPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePhoneChange = (e) => {
-    let digits = e.target.value.replace(/\D/g, '');
-    // Always keep leading 7
+  const formatPhone = (digits) => {
     if (!digits.startsWith('7')) digits = '7' + digits.replace(/^7*/, '');
     digits = digits.slice(0, 11);
     let formatted = '+7';
@@ -30,7 +28,24 @@ export default function RegisterPage() {
     if (digits.length > 4) formatted += ' ' + digits.slice(4, 7);
     if (digits.length > 7) formatted += '-' + digits.slice(7, 9);
     if (digits.length > 9) formatted += '-' + digits.slice(9, 11);
-    setFormData((prev) => ({ ...prev, phone: formatted }));
+    return formatted;
+  };
+
+  const handlePhoneChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '');
+    setFormData((prev) => ({ ...prev, phone: formatPhone(digits) }));
+  };
+
+  const handlePhoneKeyDown = (e) => {
+    if (e.key === 'Backspace') {
+      const val = formData.phone;
+      // If cursor is right after a non-digit char, strip it plus the last digit
+      const digits = val.replace(/\D/g, '');
+      if (digits.length > 1) {
+        e.preventDefault();
+        setFormData((prev) => ({ ...prev, phone: formatPhone(digits.slice(0, -1)) }));
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -97,7 +112,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-800 mb-2">Номер телефона <span className="text-red-500">*</span></label>
-              <input type="tel" name="phone" value={formData.phone} onChange={handlePhoneChange} required
+              <input type="tel" name="phone" value={formData.phone} onChange={handlePhoneChange} onKeyDown={handlePhoneKeyDown} required
                 className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="+7 (707) 559-90-25" />
             </div>
             <div>
