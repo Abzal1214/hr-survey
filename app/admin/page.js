@@ -5,13 +5,25 @@ import ConfirmModal from '../components/ConfirmModal';
 import KebabMenu from '../components/KebabMenu';
 import GoldCoin from '../components/GoldCoin';
 
-const departmentPositions = {
+const DEFAULT_POSITIONS = {
   Аквапарк: ['кассир', 'инструктор'],
   Ресторан: ['бармен', 'раннер', 'официант'],
   SPA: ['администратор SPA', 'спа-терапевт'],
   Магазин: ['кассир магазина', 'продавец'],
   Офис: ['менеджер', 'бухгалтер', 'HR']
 };
+
+function loadPositions() {
+  try {
+    const saved = localStorage.getItem('departmentPositions');
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return DEFAULT_POSITIONS;
+}
+
+function savePositions(pos) {
+  try { localStorage.setItem('departmentPositions', JSON.stringify(pos)); } catch {}
+}
 
 const initialEmployeeForm = {
   name: '',
@@ -27,6 +39,8 @@ const initialEmployeeForm = {
 export default function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '', department: '' });
+  const [departmentPositions, setDepartmentPositions] = useState(DEFAULT_POSITIONS);
+  const [newPositionInput, setNewPositionInput] = useState({ dept: '', value: '', show: false, context: '' });
   const [currentUser, setCurrentUser] = useState(null);
   const [usersData, setUsersData] = useState([]);
   const [testsData, setTestsData] = useState([]);
@@ -52,6 +66,7 @@ export default function Admin() {
 
   // Auto-login from localStorage
   useEffect(() => {
+    setDepartmentPositions(loadPositions());
     try {
       const stored = localStorage.getItem('currentUser');
       if (stored) {
@@ -1025,14 +1040,42 @@ export default function Admin() {
                   <select
                     name="position"
                     value={employeeForm.position}
-                    onChange={handleEmployeeFormChange}
+                    onChange={(e) => {
+                      if (e.target.value === '__new__') {
+                        setNewPositionInput({ dept: employeeForm.department, value: '', show: true, context: 'form' });
+                      } else {
+                        handleEmployeeFormChange(e);
+                      }
+                    }}
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                   >
                     <option value="">Выберите должность</option>
                     {(departmentPositions[employeeForm.department] || []).map((role) => (
                       <option key={role} value={role}>{role}</option>
                     ))}
+                    {employeeForm.department && <option value="__new__">➕ Новая должность...</option>}
                   </select>
+                  {newPositionInput.show && newPositionInput.context === 'form' && newPositionInput.dept === employeeForm.department && (
+                    <div className="flex gap-2 mt-2">
+                      <input
+                        autoFocus
+                        value={newPositionInput.value}
+                        onChange={e => setNewPositionInput(p => ({ ...p, value: e.target.value }))}
+                        placeholder="Название должности"
+                        className="flex-1 rounded-2xl border border-slate-300 p-2.5 text-slate-900 text-sm"
+                      />
+                      <button type="button" onClick={() => {
+                        const val = newPositionInput.value.trim();
+                        if (!val) return;
+                        const updated = { ...departmentPositions, [newPositionInput.dept]: [...(departmentPositions[newPositionInput.dept] || []), val] };
+                        setDepartmentPositions(updated);
+                        savePositions(updated);
+                        handleEmployeeFormChange({ target: { name: 'position', value: val } });
+                        setNewPositionInput({ dept: '', value: '', show: false, context: '' });
+                      }} className="rounded-2xl bg-emerald-500 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-600 transition">Добавить</button>
+                      <button type="button" onClick={() => setNewPositionInput({ dept: '', value: '', show: false, context: '' })} className="rounded-2xl bg-slate-100 text-slate-600 px-3 py-2 text-sm hover:bg-slate-200 transition">✕</button>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Баллы</label>
