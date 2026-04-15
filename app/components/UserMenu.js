@@ -127,10 +127,7 @@ export default function UserMenu() {
                   className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-yellow-50 transition">
                   <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-400 shadow-sm shadow-amber-200 ring-2 ring-yellow-200">
                     <span className="absolute inset-[2px] rounded-full border border-yellow-200/80" />
-                    <svg className="relative h-3.5 w-3.5 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M3 14c2.5 0 2.5-4 5-4s2.5 4 5 4 2.5-4 5-4 2.5 4 5 4" />
-                      <path d="M5 18c2 0 2-2.5 4-2.5S11 18 13 18s2-2.5 4-2.5S19 18 21 18" opacity="0.9" />
-                    </svg>
+                    <span className="relative text-[11px] leading-none">🌊</span>
                   </span>
                   <span className="flex-1">Мои AQUA COIN</span>
                   <span className="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-bold text-yellow-700">

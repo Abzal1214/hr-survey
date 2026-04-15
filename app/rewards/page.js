@@ -188,10 +188,7 @@ export default function RewardsPage() {
         <span className="inline-flex items-center gap-3 font-semibold text-emerald-600">
           <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-400 shadow-sm shadow-amber-200 ring-2 ring-yellow-200">
             <span className="absolute inset-[3px] rounded-full border border-yellow-200/80" />
-            <svg className="relative h-5 w-5 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M3 14c2.5 0 2.5-4 5-4s2.5 4 5 4 2.5-4 5-4 2.5 4 5 4" />
-              <path d="M5 18c2 0 2-2.5 4-2.5S11 18 13 18s2-2.5 4-2.5S19 18 21 18" opacity="0.9" />
-            </svg>
+            <span className="relative text-[15px] leading-none">🌊</span>
           </span>
           <span>{total} AQUA COIN</span>
         </span>
@@ -290,10 +287,7 @@ export default function RewardsPage() {
           <div className="animate-fade-in-up delay-400 mt-4 inline-flex items-center gap-2 rounded-full bg-white/20 border border-white/40 px-6 py-2.5 backdrop-blur-sm">
             <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-400 shadow-sm shadow-amber-200 ring-2 ring-yellow-200">
               <span className="absolute inset-[2px] rounded-full border border-yellow-200/80" />
-              <svg className="relative h-4 w-4 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 14c2.5 0 2.5-4 5-4s2.5 4 5 4 2.5-4 5-4 2.5 4 5 4" />
-                <path d="M5 18c2 0 2-2.5 4-2.5S11 18 13 18s2-2.5 4-2.5S19 18 21 18" opacity="0.9" />
-              </svg>
+              <span className="relative text-[13px] leading-none">🌊</span>
             </span>
             <span className="text-white font-bold text-lg">{balance}</span>
             <span className="text-white/70 text-sm">AQUA COIN</span>
