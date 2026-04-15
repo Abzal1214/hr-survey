@@ -430,6 +430,33 @@ export default function Admin() {
     }
   };
 
+  const formatPhone = (digits) => {
+    if (!digits.startsWith('7')) digits = '7' + digits.replace(/^7*/, '');
+    digits = digits.slice(0, 11);
+    let f = '+7';
+    if (digits.length > 1) f += ' (' + digits.slice(1, 4);
+    if (digits.length >= 4) f += ')';
+    if (digits.length > 4) f += ' ' + digits.slice(4, 7);
+    if (digits.length > 7) f += '-' + digits.slice(7, 9);
+    if (digits.length > 9) f += '-' + digits.slice(9, 11);
+    return f;
+  };
+
+  const handleEmployeePhoneChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '');
+    setEmployeeForm((prev) => ({ ...prev, phone: formatPhone(digits) }));
+  };
+
+  const handleEmployeePhoneKeyDown = (e) => {
+    if (e.key === 'Backspace') {
+      const digits = employeeForm.phone.replace(/\D/g, '');
+      if (digits.length > 1) {
+        e.preventDefault();
+        setEmployeeForm((prev) => ({ ...prev, phone: formatPhone(digits.slice(0, -1)) }));
+      }
+    }
+  };
+
   const handleEmployeeFormChange = (e) => {
     const { name, value } = e.target;
     setEmployeeForm((prev) => ({ ...prev, [name]: value }));
@@ -1032,9 +1059,10 @@ export default function Admin() {
                   <input
                     name="phone"
                     value={employeeForm.phone}
-                    onChange={handleEmployeeFormChange}
+                    onChange={handleEmployeePhoneChange}
+                    onKeyDown={handleEmployeePhoneKeyDown}
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
-                    placeholder="+7 (999) 123-45-67"
+                    placeholder="+7 (707) 559-90-25"
                   />
                 </div>
                 <div>
