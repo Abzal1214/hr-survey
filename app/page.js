@@ -158,13 +158,13 @@ export default function Home() {
               <div className="flex-1 overflow-hidden" ref={carouselRef}>
                 {(() => {
                   // All cards are the same base width, scale drives the size difference
-                  const cardW = Math.min(carouselW * 0.62, 520);
+                  const cardW = Math.min(carouselW * 0.72, 600);
                   const centerScale = 1;
-                  const sideScale = 0.62;
+                  const sideScale = 0.68;
                   // Distance from center to side card center = half of center + gap + half of side (in scaled terms)
-                  const sideSpacing = cardW * (centerScale / 2 + sideScale / 2) + 16;
+                  const sideSpacing = cardW * (centerScale / 2 + sideScale / 2) + 14;
                   const offscreenSpacing = sideSpacing * 2;
-                  const containerH = 340;
+                  const containerH = 400;
                   const cardH = containerH; // card height before scaling
                   return (
                     <div className="relative" style={{ height: containerH }}>
@@ -175,7 +175,7 @@ export default function Home() {
                         const isOffscreen = Math.abs(offset) === 2;
                         const scale = isCenter ? centerScale : isSide ? sideScale : sideScale * 0.85;
                         const x = isOffscreen ? offset * offscreenSpacing : offset * sideSpacing;
-                        const opacity = isCenter ? 1 : isSide ? 0.75 : 0;
+                        const opacity = isCenter ? 1 : isSide ? 0.92 : 0;
                         const item = news[idx];
                         return (
                           <div
@@ -200,7 +200,7 @@ export default function Home() {
                             {isCenter ? (
                               <article className="rounded-[24px] bg-white/95 shadow-2xl overflow-hidden h-full flex flex-col">
                                 {item?.imageUrl
-                                  ? <div className="overflow-hidden" style={{ height: 190 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
+                                  ? <div className="overflow-hidden" style={{ height: 220 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
                                   : <div className="h-3 bg-gradient-to-r from-sky-400 to-blue-500" />}
                                 <div className="p-6 flex flex-col flex-1">
                                   <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-1">
@@ -212,9 +212,9 @@ export default function Home() {
                                 </div>
                               </article>
                             ) : (
-                              <article className="rounded-[20px] bg-white/90 shadow-lg overflow-hidden flex flex-col h-full hover:bg-white/95 transition-colors">
+                              <article className="rounded-[24px] bg-white/95 shadow-lg overflow-hidden flex flex-col h-full hover:bg-white/98 transition-colors">
                                 {item?.imageUrl
-                                  ? <div className="overflow-hidden shrink-0" style={{ height: 160 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
+                                  ? <div className="overflow-hidden shrink-0" style={{ height: 200 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
                                   : <div className="bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" style={{ height: 4 }} />}
                                 <div className="flex flex-col justify-center p-4 overflow-hidden flex-1">
                                   <p className="text-xs font-semibold text-sky-400 mb-1 truncate">
