@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col text-slate-900">
-        <header className="sticky top-0 z-50 border-b border-sky-900/40 bg-sky-950/90 backdrop-blur-md">
+        <header className="no-print sticky top-0 z-50 border-b border-sky-900/40 bg-sky-950/90 backdrop-blur-md">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
             <div className="flex flex-col leading-tight">
               <span className="text-xs uppercase tracking-widest text-sky-300 font-medium">🌊 Hawaii&amp;Miami · SanRemo</span>
