@@ -4,13 +4,12 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import GoldCoin from './components/GoldCoin';
 
-const quickLinks = [
+const staticLinks = [
   { icon: '📰', label: 'Новости', desc: 'Последние события компании', href: '/news', color: 'from-sky-400 to-blue-500' },
-  { icon: '📚', label: 'Тренинги', desc: 'Обучающие материалы и курсы', href: '/learn', color: 'from-emerald-400 to-teal-500' },
+  { icon: '📚', label: 'Обучение', desc: 'Материалы и тесты', href: '/learn', color: 'from-emerald-400 to-teal-500' },
   { icon: '📝', label: 'Опросы', desc: 'Поделитесь обратной связью', href: '/surveys', color: 'from-violet-400 to-purple-500' },
-  { icon: '🧪', label: 'Тесты', desc: 'Проверка знаний онлайн', href: '/tests', color: 'from-orange-400 to-red-500' },
+  { icon: '🏋️', label: 'Тренинги', desc: 'Запись на офлайн тренинги', href: '/tests', color: 'from-orange-400 to-red-500' },
   { icon: '🎁', label: 'Награды', desc: 'Обмен аква койнов на товары', href: '/rewards', color: 'from-yellow-400 to-amber-500' },
-  { icon: '👤', label: 'Войти', desc: 'Личный кабинет сотрудника', href: '/admin', color: 'from-pink-400 to-rose-500' },
 ];
 
 export default function Home() {
@@ -72,7 +71,7 @@ export default function Home() {
         <section className="mt-4">
           <h2 className="text-2xl font-bold text-white drop-shadow mb-6 text-center">Быстрый доступ</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {quickLinks.map((item, i) => (
+            {staticLinks.map((item, i) => (
               <Link key={item.href} href={item.href}
                 className={`animate-scale-in hover-lift group relative overflow-hidden rounded-3xl bg-gradient-to-br ${item.color} p-6 text-white shadow-xl`}
                 style={{animationDelay: `${i * 0.08}s`}}>
@@ -81,6 +80,26 @@ export default function Home() {
                 <p className="mt-1 text-sm text-white/80">{item.desc}</p>
               </Link>
             ))}
+            {/* Динамическая карточка: кабинет или вход */}
+            <Link href="/admin"
+              className="animate-scale-in hover-lift group relative overflow-hidden rounded-3xl bg-gradient-to-br from-pink-400 to-rose-500 p-6 text-white shadow-xl"
+              style={{animationDelay: `${staticLinks.length * 0.08}s`}}>
+              {user ? (
+                <>
+                  <div className="text-4xl mb-3">👋</div>
+                  <p className="text-lg font-bold truncate">{user.name || user.fullName || 'Мой кабинет'}</p>
+                  <p className="mt-1 text-sm text-white/80 flex items-center gap-1">
+                    <GoldCoin size="xs" /> {user.points ?? 0} AQUA COIN
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-4xl mb-3">👤</div>
+                  <p className="text-lg font-bold">Войти</p>
+                  <p className="mt-1 text-sm text-white/80">Личный кабинет сотрудника</p>
+                </>
+              )}
+            </Link>
           </div>
         </section>
 
