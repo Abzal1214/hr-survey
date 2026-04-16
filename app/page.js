@@ -212,16 +212,16 @@ export default function Home() {
                                 </div>
                               </article>
                             ) : (
-                              <article className="rounded-[20px] bg-white/90 shadow-lg overflow-hidden flex flex-row h-full hover:bg-white/95 transition-colors">
+                              <article className="rounded-[20px] bg-white/90 shadow-lg overflow-hidden flex flex-col h-full hover:bg-white/95 transition-colors">
                                 {item?.imageUrl
-                                  ? <div className="shrink-0 overflow-hidden" style={{ width: 130 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
-                                  : <div className="shrink-0 bg-gradient-to-b from-sky-400 to-blue-500" style={{ width: 6 }} />}
-                                <div className="flex flex-col justify-center p-4 overflow-hidden">
+                                  ? <div className="overflow-hidden shrink-0" style={{ height: 160 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
+                                  : <div className="bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" style={{ height: 4 }} />}
+                                <div className="flex flex-col justify-center p-4 overflow-hidden flex-1">
                                   <p className="text-xs font-semibold text-sky-400 mb-1 truncate">
                                     {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
                                   </p>
-                                  <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-4">{item?.title}</h4>
-                                  <p className="text-slate-400 text-xs mt-1 line-clamp-3">{item?.description}</p>
+                                  <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-3">{item?.title}</h4>
+                                  <p className="text-slate-400 text-xs mt-1 line-clamp-2">{item?.description}</p>
                                 </div>
                               </article>
                             )}
