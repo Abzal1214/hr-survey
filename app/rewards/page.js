@@ -18,9 +18,12 @@ export default function RewardsPage() {
 
   useEffect(() => {
     if (printMode) {
+      const prevTitle = document.title;
+      document.title = `Купон — ${coupon?.userName || ''}`;
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           window.print();
+          document.title = prevTitle;
           setPrintMode(false);
         });
       });
