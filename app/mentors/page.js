@@ -21,7 +21,7 @@ export default function MentorsPage() {
 
   useEffect(() => {
     fetch('/api/mentors').then(r => r.json()).then(setMentors).catch(() => setMentors([]));
-    const stored = localStorage.getItem('user');
+    const stored = localStorage.getItem('currentUser');
     if (stored) {
       const u = JSON.parse(stored);
       setUser(u);
@@ -84,27 +84,24 @@ export default function MentorsPage() {
     <div className="min-h-screen">
       {/* Hero */}
       <div className="relative flex flex-col items-center justify-center text-center px-6 py-16">
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
         <div className="relative z-10">
           <span className="inline-block rounded-full bg-sky-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Команда</span>
           <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
+          {isAdmin && (
+            <button onClick={() => { setShowForm(true); setForm(emptyForm); setEditingId(null); setImagePreview(''); }}
+              className="mt-6 rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
+              + Добавить наставника
+            </button>
+          )}
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-10">
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
-          <div>
-          </div>
-          {isAdmin && (
-            <button onClick={() => { setShowForm(true); setForm(emptyForm); setEditingId(null); setImagePreview(''); }}
-              className="rounded-full bg-sky-500 text-white px-5 py-2 text-sm font-semibold hover:bg-sky-600 transition">
-              + Добавить наставника
-            </button>
-          )}
-        </div>
+        {/* Header - empty now, button moved to hero */}
+        <div className="mb-0" />
 
         {/* Dept filter */}
         <div className="flex gap-2 flex-wrap mb-8">
