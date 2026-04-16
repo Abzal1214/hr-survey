@@ -41,13 +41,9 @@ a {
 
 /* ── Print styles ── */
 @media print {
-  .no-print { display: none !important; }
-  header { display: none !important; }
-  body {
-    background: none !important;
-    background-image: none !important;
-  }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body > *:not(#coupon-print-portal) { display: none !important; }
+  #coupon-print-portal { display: block !important; }
 }
 
 /* ── Animations ── */

@@ -1,5 +1,6 @@
 ﻿"use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import ConfirmModal from '../components/ConfirmModal';
 import KebabMenu from '../components/KebabMenu';
@@ -14,21 +15,12 @@ export default function RewardsPage() {
   const [exchangeError, setExchangeError] = useState('');
   const [confirmModal, setConfirmModal] = useState(null);
 
-  const [printMode, setPrintMode] = useState(false);
-
-  useEffect(() => {
-    if (printMode) {
-      const prevTitle = document.title;
-      document.title = `Купон — ${coupon?.userName || ''}`;
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.print();
-          document.title = prevTitle;
-          setPrintMode(false);
-        });
-      });
-    }
-  }, [printMode]);
+  const handlePrint = () => {
+    const prevTitle = document.title;
+    document.title = `Купон — ${coupon?.userName || ''}`;
+    window.print();
+    document.title = prevTitle;
+  };
   const [showCreate, setShowCreate] = useState(false);
   const [newReward, setNewReward] = useState({ name: '', description: '', cost: '' });
   const [imageFile, setImageFile] = useState(null);
@@ -212,7 +204,7 @@ export default function RewardsPage() {
     } catch { setExchangeError('Ошибка сети. Попробуйте ещё раз.'); }
   };
 
-  const handlePrint = () => setPrintMode(true);
+
 
   const handleExchange = () => {
     setConfirmModal({
@@ -305,44 +297,34 @@ export default function RewardsPage() {
     return '🎁';
   };
 
-  if (printMode && coupon) {
-    return (
-      <div style={{fontFamily: 'monospace', background: 'white', padding: '20px'}}>
-        {couponTickets.map((ticket, idx) => (
-          <div key={idx} style={{background: 'white', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden', maxWidth: '480px', margin: '0 auto 24px', pageBreakAfter: idx < couponTickets.length - 1 ? 'always' : 'avoid'}}>
-            <div style={{background: 'linear-gradient(to right, #10b981, #14b8a6)', padding: '24px 32px', textAlign: 'center', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact'}}>
-              <div style={{fontSize: '2.5rem', marginBottom: '8px'}}>🎟️</div>
-              <h2 style={{color: 'white', fontSize: '1.4rem', fontWeight: 900, margin: 0, letterSpacing: '0.05em'}}>AQUA COIN КУПОН</h2>
-              <p style={{color: '#d1fae5', fontSize: '0.875rem', margin: '4px 0 0'}}>Hawaii&amp;Miami · SanRemo</p>
-            </div>
-            <div style={{padding: '24px 32px'}}>
-              <div style={{fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px'}}>Сотрудник</div>
-              <div style={{fontWeight: 700, color: '#1e293b', fontSize: '1rem', marginBottom: '12px'}}>{coupon.userName}</div>
-              <div style={{fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px', marginTop: '12px'}}>Товар</div>
-              <div style={{display: 'flex', alignItems: 'center', gap: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px 16px', marginBottom: '16px', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact'}}>
-                <span style={{fontSize: '1.25rem'}}>{ticket.item?.icon || '🎁'}</span>
-                <span style={{flex: 1, fontWeight: 600, color: '#1e293b'}}>{ticket.item?.name}</span>
-                <span style={{color: '#10b981', fontWeight: 700}}>{ticket.item?.cost} монет</span>
-              </div>
-              <div style={{background: '#f8fafc', border: '2px dashed #6ee7b7', borderRadius: '12px', padding: '12px 16px', textAlign: 'center', marginBottom: '12px', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact'}}>
-                <div style={{fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px'}}>КОД КУПОНА</div>
-                <div style={{fontSize: '1.4rem', fontWeight: 900, color: '#059669', letterSpacing: '0.15em'}}>{ticket.couponCode}</div>
-              </div>
-              <div style={{fontSize: '0.75rem', color: '#94a3b8', textAlign: 'center', marginBottom: '4px'}}>
-                {new Date(ticket.issuedAt || coupon.issuedAt).toLocaleString('ru-RU')}
-              </div>
-              {ticket.count > 1 && (
-                <div style={{fontSize: '0.75rem', color: '#64748b', textAlign: 'center'}}>Купон {ticket.index} из {ticket.count}</div>
-              )}
-            </div>
-            <div style={{background: '#ecfdf5', padding: '16px 32px', textAlign: 'center', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact'}}>
-              <p style={{color: '#065f46', fontSize: '0.875rem', fontWeight: 600, margin: 0}}>📍 Покажи этот купон для получения товара</p>
-            </div>
-          </div>
-        ))}
+  const CouponContent = () => couponTickets.map((ticket, idx) => (
+    <div key={idx} id={`coupon-${idx}`} style={{background:'white',border:'1px solid #e2e8f0',borderRadius:'16px',overflow:'hidden',maxWidth:'480px',margin:'0 auto 24px',pageBreakAfter: idx < couponTickets.length - 1 ? 'always' : 'avoid'}}>
+      <div style={{background:'linear-gradient(to right,#10b981,#14b8a6)',padding:'24px 32px',textAlign:'center',WebkitPrintColorAdjust:'exact',printColorAdjust:'exact'}}>
+        <div style={{fontSize:'2.5rem',marginBottom:'8px'}}>🎟️</div>
+        <h2 style={{color:'white',fontSize:'1.4rem',fontWeight:900,margin:0,letterSpacing:'0.05em'}}>AQUA COIN КУПОН</h2>
+        <p style={{color:'#d1fae5',fontSize:'0.875rem',margin:'4px 0 0'}}>Hawaii&amp;Miami · SanRemo</p>
       </div>
-    );
-  }
+      <div style={{padding:'24px 32px'}}>
+        <div style={{fontSize:'0.7rem',color:'#94a3b8',textTransform:'uppercase',marginBottom:'4px'}}>Сотрудник</div>
+        <div style={{fontWeight:700,color:'#1e293b',fontSize:'1rem',marginBottom:'12px'}}>{coupon.userName}</div>
+        <div style={{fontSize:'0.7rem',color:'#94a3b8',textTransform:'uppercase',marginBottom:'8px',marginTop:'12px'}}>Товар</div>
+        <div style={{display:'flex',alignItems:'center',gap:'12px',background:'#f8fafc',border:'1px solid #e2e8f0',borderRadius:'12px',padding:'12px 16px',marginBottom:'16px',WebkitPrintColorAdjust:'exact',printColorAdjust:'exact'}}>
+          <span style={{fontSize:'1.25rem'}}>{ticket.item?.icon||'🎁'}</span>
+          <span style={{flex:1,fontWeight:600,color:'#1e293b'}}>{ticket.item?.name}</span>
+          <span style={{color:'#10b981',fontWeight:700}}>{ticket.item?.cost} монет</span>
+        </div>
+        <div style={{background:'#f8fafc',border:'2px dashed #6ee7b7',borderRadius:'12px',padding:'12px 16px',textAlign:'center',marginBottom:'12px',WebkitPrintColorAdjust:'exact',printColorAdjust:'exact'}}>
+          <div style={{fontSize:'0.65rem',color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'4px'}}>КОД КУПОНА</div>
+          <div style={{fontSize:'1.4rem',fontWeight:900,color:'#059669',letterSpacing:'0.15em'}}>{ticket.couponCode}</div>
+        </div>
+        <div style={{fontSize:'0.75rem',color:'#94a3b8',textAlign:'center',marginBottom:'4px'}}>{new Date(ticket.issuedAt||coupon.issuedAt).toLocaleString('ru-RU')}</div>
+        {ticket.count>1&&<div style={{fontSize:'0.75rem',color:'#64748b',textAlign:'center'}}>Купон {ticket.index} из {ticket.count}</div>}
+      </div>
+      <div style={{background:'#ecfdf5',padding:'16px 32px',textAlign:'center',WebkitPrintColorAdjust:'exact',printColorAdjust:'exact'}}>
+        <p style={{color:'#065f46',fontSize:'0.875rem',fontWeight:600,margin:0}}>📍 Покажи этот купон для получения товара</p>
+      </div>
+    </div>
+  ));
 
   return (
     <>
@@ -587,7 +569,13 @@ export default function RewardsPage() {
       </div>
     )}
 
-    {/* Отдельная зона для печати — вне модального окна, без fixed/relative родителей */}
+    {coupon && typeof document !== 'undefined' && createPortal(
+      <div id="coupon-print-portal" style={{display:'none',fontFamily:'monospace',background:'white',padding:'20px'}}>
+        <CouponContent />
+      </div>,
+      document.body
+    )}
+
       {confirmModal && (
         <ConfirmModal
           message={confirmModal.message}
