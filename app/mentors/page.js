@@ -23,13 +23,14 @@ export default function MentorsPage() {
   const [saving, setSaving] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [copiedPhone, setCopiedPhone] = useState('');
+  const [phonePopup, setPhonePopup] = useState('');
 
-  const copyPhone = (phone, e) => {
-    e?.stopPropagation();
+  const copyPhone = (phone) => {
     navigator.clipboard.writeText(phone).then(() => {
       setCopiedPhone(phone);
       setTimeout(() => setCopiedPhone(''), 2000);
     });
+    setPhonePopup('');
   };
 
   useEffect(() => {
@@ -196,13 +197,24 @@ export default function MentorsPage() {
                     {mentor.bio && <p className="text-slate-500 text-sm mt-3 line-clamp-2 flex-1">{mentor.bio}</p>}
                     <div className="mt-4 flex flex-col gap-1">
                       {mentor.phone && (
-                        <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
-                          <span className="text-emerald-500">📞</span>
-                          <span className="text-sm text-slate-800 font-medium">{mentor.phone}</span>
-                          <button onClick={(e) => copyPhone(mentor.phone, e)} title="Копировать" className="ml-1 text-slate-400 hover:text-emerald-600 transition text-xs">
-                            {copiedPhone === mentor.phone ? '✓' : '⎘'}
+                        <div className="relative" onClick={e => e.stopPropagation()}>
+                          <button onClick={() => setPhonePopup(phonePopup === mentor.phone ? '' : mentor.phone)}
+                            className="flex items-center gap-1.5 text-sm font-medium text-slate-800 hover:text-emerald-600 transition">
+                            <span className="text-emerald-500">📞</span>
+                            {mentor.phone}
                           </button>
-                          <a href={`tel:${mentor.phone}`} onClick={e => e.stopPropagation()} title="Позвонить" className="text-slate-400 hover:text-emerald-600 transition text-xs">📲</a>
+                          {phonePopup === mentor.phone && (
+                            <div className="absolute left-0 top-7 z-20 flex gap-2 rounded-2xl bg-white shadow-xl border border-slate-100 px-3 py-2">
+                              <button onClick={() => copyPhone(mentor.phone)}
+                                className="flex items-center gap-1 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 px-3 py-1.5 text-xs font-semibold transition">
+                                {copiedPhone === mentor.phone ? '✓ Скопировано' : '📋 Копировать'}
+                              </button>
+                              <a href={`tel:${mentor.phone}`}
+                                className="flex items-center gap-1 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold transition">
+                                📲 Позвонить
+                              </a>
+                            </div>
+                          )}
                         </div>
                       )}
                       {mentor.email && <a href={`mailto:${mentor.email}`} onClick={e => e.stopPropagation()} className="text-sm text-slate-600 hover:text-sky-600 transition truncate">✉️ {mentor.email}</a>}
@@ -230,17 +242,24 @@ export default function MentorsPage() {
               {selectedMentor.bio && <p className="mt-4 text-slate-700 leading-relaxed whitespace-pre-wrap">{selectedMentor.bio}</p>}
               <div className="mt-5 flex flex-col gap-3">
                 {selectedMentor.phone && (
-                  <div className="flex items-center gap-3">
-                    <span className="text-emerald-500 text-xl">📞</span>
-                    <span className="text-slate-800 font-medium">{selectedMentor.phone}</span>
-                    <button onClick={(e) => copyPhone(selectedMentor.phone, e)}
-                      className="ml-1 rounded-full bg-slate-100 hover:bg-emerald-100 text-slate-600 hover:text-emerald-700 px-3 py-1 text-xs font-semibold transition">
-                      {copiedPhone === selectedMentor.phone ? '✓ Скопировано' : '⎘ Копировать'}
+                  <div className="relative">
+                    <button onClick={() => setPhonePopup(phonePopup === selectedMentor.phone ? '' : selectedMentor.phone)}
+                      className="flex items-center gap-2 text-slate-800 font-medium hover:text-emerald-600 transition">
+                      <span className="text-emerald-500 text-lg">📞</span>
+                      {selectedMentor.phone}
                     </button>
-                    <a href={`tel:${selectedMentor.phone}`}
-                      className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 text-xs font-semibold transition">
-                      📲 Позвонить
-                    </a>
+                    {phonePopup === selectedMentor.phone && (
+                      <div className="absolute left-0 top-9 z-20 flex gap-2 rounded-2xl bg-white shadow-xl border border-slate-100 px-3 py-2">
+                        <button onClick={() => copyPhone(selectedMentor.phone)}
+                          className="flex items-center gap-1 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 px-4 py-2 text-sm font-semibold transition">
+                          {copiedPhone === selectedMentor.phone ? '✓ Скопировано' : '📋 Копировать'}
+                        </button>
+                        <a href={`tel:${selectedMentor.phone}`}
+                          className="flex items-center gap-1 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 text-sm font-semibold transition">
+                          📲 Позвонить
+                        </a>
+                      </div>
+                    )}
                   </div>
                 )}
                 {selectedMentor.email && <a href={`mailto:${selectedMentor.email}`} className="text-slate-700 hover:text-sky-600 transition">✉️ {selectedMentor.email}</a>}
