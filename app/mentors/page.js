@@ -81,14 +81,22 @@ export default function MentorsPage() {
   const filtered = filter === 'Все отделы' ? mentors : mentors.filter(m => m.department === filter);
 
   return (
-    <main className="min-h-screen py-10 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen">
+      {/* Hero */}
+      <div className="relative flex flex-col items-center justify-center text-center px-6 py-16">
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+        <div className="relative z-10">
+          <span className="inline-block rounded-full bg-sky-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Команда</span>
+          <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
+          <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-10">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-900 drop-shadow">🧑‍🏫 Наставники</h1>
-            <p className="text-slate-500 mt-1 text-sm">Опытные сотрудники, готовые помочь</p>
           </div>
           {isAdmin && (
             <button onClick={() => { setShowForm(true); setForm(emptyForm); setEditingId(null); setImagePreview(''); }}
@@ -220,6 +228,6 @@ export default function MentorsPage() {
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }
