@@ -16,16 +16,19 @@ export default function Home() {
   const [news, setNews] = useState([]);
   const [user, setUser] = useState(null);
   const [newsIdx, setNewsIdx] = useState(0);
-  const [newsDir, setNewsDir] = useState(0); // -1 left, 1 right
+  const [newsPrevIdx, setNewsPrevIdx] = useState(null);
+  const [newsDir, setNewsDir] = useState(1);
   const [newsAnimating, setNewsAnimating] = useState(false);
   const [selectedNews, setSelectedNews] = useState(null);
 
   const goNews = (dir) => {
-    if (newsAnimating) return;
+    if (newsAnimating || news.length < 2) return;
+    const nextIdx = (newsIdx + dir + news.length) % news.length;
     setNewsDir(dir);
+    setNewsPrevIdx(newsIdx);
+    setNewsIdx(nextIdx);
     setNewsAnimating(true);
-    setNewsIdx(i => (i + dir + news.length) % news.length);
-    setTimeout(() => setNewsAnimating(false), 350);
+    setTimeout(() => { setNewsAnimating(false); setNewsPrevIdx(null); }, 400);
   };
 
   useEffect(() => {
@@ -149,9 +152,59 @@ export default function Home() {
 
               {/* Carousel body */}
               <div className="flex-1 overflow-hidden">
-                <div
-                  key={newsIdx}
-                  className={`flex gap-4 items-stretch ${newsDir >= 0 ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}>
+                <div className="relative" style={{minHeight: '1px'}}>
+                {/* Exiting slide */}
+                {newsAnimating && newsPrevIdx !== null && (() => {
+                  const exitClass = newsDir > 0 ? 'animate-slide-out-left' : 'animate-slide-out-right';
+                  const prevN = newsPrevIdx;
+                  return (
+                    <div className={`absolute inset-0 flex gap-4 items-stretch ${exitClass}`} style={{zIndex:1}}>
+
+                  {/* Left small card - prev */}
+                  {news.length > 2 && (() => {
+                    const item = news[(prevN - 1 + news.length) % news.length];
+                    return (
+                      <article className="hidden lg:flex w-56 shrink-0 rounded-[20px] bg-white/80 shadow overflow-hidden flex-col">
+                        {item.imageUrl ? <div className="h-28 overflow-hidden shrink-0"><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div> : <div className="h-1.5 bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" />}
+                        <div className="p-4 flex flex-col justify-center flex-1">
+                          <p className="text-xs font-semibold uppercase tracking-widest text-sky-400 mb-1">{item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}</p>
+                          <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-2">{item.title}</h4>
+                          <p className="text-slate-400 text-xs mt-1 line-clamp-2">{item.description}</p>
+                        </div>
+                      </article>
+                    );
+                  })()}
+                  {/* Center featured card - prev */}
+                  <div className="flex-1">
+                    <article className="h-full rounded-[24px] bg-white/95 shadow-2xl overflow-hidden">
+                      {news[prevN]?.imageUrl ? <div className="h-52 overflow-hidden"><img src={news[prevN].imageUrl} alt={news[prevN].title} className="w-full h-full object-cover" /></div> : <div className="h-3 bg-gradient-to-r from-sky-400 to-blue-500" />}
+                      <div className="p-6">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-2">{news[prevN]?.createdAt ? new Date(news[prevN].createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}</p>
+                        <h3 className="text-xl font-extrabold text-slate-900 leading-snug mb-2">{news[prevN]?.title}</h3>
+                        <p className="text-slate-500 text-sm leading-relaxed line-clamp-3">{news[prevN]?.description}</p>
+                      </div>
+                    </article>
+                  </div>
+                  {/* Right small card - prev */}
+                  {news.length > 1 && (() => {
+                    const item = news[(prevN + 1) % news.length];
+                    return (
+                      <article className="hidden sm:flex w-56 shrink-0 rounded-[20px] bg-white/80 shadow overflow-hidden flex-col">
+                        {item.imageUrl ? <div className="h-28 overflow-hidden shrink-0"><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div> : <div className="h-1.5 bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" />}
+                        <div className="p-4 flex flex-col justify-center flex-1">
+                          <p className="text-xs font-semibold uppercase tracking-widest text-sky-400 mb-1">{item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}</p>
+                          <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-2">{item.title}</h4>
+                          <p className="text-slate-400 text-xs mt-1 line-clamp-2">{item.description}</p>
+                        </div>
+                      </article>
+                    );
+                  })()}
+                    </div>
+                  );
+                })()}
+
+                {/* Entering slide */}
+                <div className={`relative flex gap-4 items-stretch ${newsAnimating ? (newsDir > 0 ? 'animate-slide-in-right' : 'animate-slide-in-left') : ''}`} style={{zIndex:2}}>
 
                   {/* Left small card */}
                   {news.length > 2 && (() => {
@@ -207,6 +260,7 @@ export default function Home() {
                       </article>
                     );
                   })()}
+                </div>
                 </div>
               </div>
 
