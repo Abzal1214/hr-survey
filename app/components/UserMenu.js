@@ -99,6 +99,14 @@ export default function UserMenu() {
                 На главную
               </Link>
             )}
+            {(user.role === 'mentor' || isAdmin) && (
+              <Link href="/mentor-dashboard" onClick={() => setOpen(false)}
+                style={{ color: '#000' }}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-emerald-50 transition">
+                <span className="w-7 h-7 rounded-xl bg-emerald-600 flex items-center justify-center shrink-0 text-white text-sm">👨‍🏫</span>
+                Кабинет наставника
+              </Link>
+            )}
             {isAdmin ? (
               <Link href="/admin" onClick={() => setOpen(false)}
                 style={{ color: '#000' }}

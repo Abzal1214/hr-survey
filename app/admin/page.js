@@ -33,7 +33,8 @@ const initialEmployeeForm = {
   password: '',
   department: '',
   position: '',
-  points: 0
+  points: 0,
+  role: 'employee',
 };
 
 export default function Admin() {
@@ -502,6 +503,7 @@ export default function Admin() {
       department: user.department || user.workplaceType || '',
       position: user.position || '',
       points: user.points ?? 0,
+      role: user.role || 'employee',
     });
     setAdminMessage('Редактируется сотрудник ' + user.name);
     setTimeout(() => { const el = employeeFormRef.current; if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }, 50);
@@ -528,6 +530,7 @@ export default function Admin() {
           department: employeeForm.department,
           position: employeeForm.position,
           points: employeeForm.points,
+          role: employeeForm.role,
         }),
       });
       const data = await response.json();
@@ -959,6 +962,7 @@ export default function Admin() {
                       <th className="p-3 text-left">Телефон</th>
                       <th className="p-3 text-left">Отдел</th>
                       <th className="p-3 text-left">Должность</th>
+                      <th className="p-3 text-left">Роль</th>
                       <th className="p-3 text-left">Дата регистрации</th>
                       <th className="p-3 text-left">Действия</th>
                     </tr>
@@ -970,6 +974,13 @@ export default function Admin() {
                         <td className="p-3 border-b text-slate-900">{user.phone}</td>
                         <td className="p-3 border-b text-slate-900">{user.department || '—'}</td>
                         <td className="p-3 border-b text-slate-900">{user.position}</td>
+                        <td className="p-3 border-b">
+                          <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                            user.role === 'admin' ? 'bg-sky-100 text-sky-700' :
+                            user.role === 'mentor' ? 'bg-emerald-100 text-emerald-700' :
+                            'bg-slate-100 text-slate-500'
+                          }`}>{user.role === 'admin' ? 'Админ' : user.role === 'mentor' ? 'Наставник' : 'Сотрудник'}</span>
+                        </td>
                         <td className="p-3 border-b text-slate-900">{new Date(user.registeredAt).toLocaleDateString('ru-RU')}</td>
                         <td className="p-3 border-b">
                           <KebabMenu
@@ -1142,6 +1153,19 @@ export default function Admin() {
                     onChange={handleEmployeeFormChange}
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Роль</label>
+                  <select
+                    name="role"
+                    value={employeeForm.role}
+                    onChange={handleEmployeeFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                  >
+                    <option value="employee">Сотрудник</option>
+                    <option value="mentor">Наставник</option>
+                    <option value="admin">Администратор</option>
+                  </select>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   {selectedUser ? (

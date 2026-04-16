@@ -8,9 +8,12 @@ const emptyForm = { name: '', position: '', department: '', phone: '', email: ''
 
 export default function MentorsPage() {
   const [mentors, setMentors] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [empSearch, setEmpSearch] = useState('');
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [filter, setFilter] = useState('Все отделы');
+  const [showAssign, setShowAssign] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -21,6 +24,7 @@ export default function MentorsPage() {
 
   useEffect(() => {
     fetch('/api/mentors').then(r => r.json()).then(setMentors).catch(() => setMentors([]));
+    fetch('/api/users').then(r => r.json()).then(all => setEmployees(Array.isArray(all) ? all : [])).catch(() => {});
     const stored = localStorage.getItem('currentUser');
     if (stored) {
       const u = JSON.parse(stored);
@@ -28,6 +32,12 @@ export default function MentorsPage() {
       setIsAdmin(u.role === 'admin');
     }
   }, []);
+
+  useEffect(() => {
+    const open = showForm || showAssign || !!selectedMentor;
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [showForm, showAssign, selectedMentor]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -45,15 +55,40 @@ export default function MentorsPage() {
     return data.url || '';
   };
 
+  const handleAssign = async (emp) => {
+    setSaving(true);
+    // Create mentor record from employee data
+    await fetch('/api/mentors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: [emp.name, emp.surname].filter(Boolean).join(' '),
+        position: emp.position || '',
+        department: emp.department || '',
+        phone: emp.phone || '',
+        email: '',
+        bio: '',
+        photoUrl: emp.photoUrl || '',
+      }),
+    });
+    // Update user role to mentor
+    await fetch('/api/users', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: emp._id, oldPhone: emp.phone, role: 'mentor' }),
+    });
+    const updated = await fetch('/api/mentors').then(r => r.json());
+    setMentors(updated);
+    setShowAssign(false);
+    setEmpSearch('');
+    setSaving(false);
+  };
+
   const handleSave = async () => {
     setSaving(true);
     const photoUrl = await uploadImage();
     const payload = { ...form, photoUrl };
-    if (editingId) {
-      await fetch('/api/mentors', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ _id: editingId, ...payload }) });
-    } else {
-      await fetch('/api/mentors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    }
+    await fetch('/api/mentors', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ _id: editingId, ...payload }) });
     const updated = await fetch('/api/mentors').then(r => r.json());
     setMentors(updated);
     setShowForm(false);
@@ -90,9 +125,9 @@ export default function MentorsPage() {
           <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
           {isAdmin && (
-            <button onClick={() => { setShowForm(true); setForm(emptyForm); setEditingId(null); setImagePreview(''); }}
+            <button onClick={() => { setShowAssign(true); setEmpSearch(''); }}
               className="mt-6 rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
-              + Добавить наставника
+              + Назначить наставника
             </button>
           )}
         </div>
@@ -175,13 +210,56 @@ export default function MentorsPage() {
         </div>
       )}
 
-      {/* Create/edit form */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowForm(false)}>
-          <div className="relative w-full max-w-lg rounded-[32px] bg-white shadow-2xl p-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <h2 className="text-xl font-extrabold text-slate-900 mb-6">{editingId ? 'Редактировать' : 'Добавить наставника'}</h2>
+      {/* Assign mentor modal */}
+      {showAssign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowAssign(false)}>
+          <div className="relative w-full max-w-md rounded-[32px] bg-white shadow-2xl p-6 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <h2 className="text-xl font-extrabold text-slate-900 mb-4">Назначить наставника</h2>
+            <input
+              autoFocus
+              placeholder="Поиск сотрудника..."
+              value={empSearch}
+              onChange={e => setEmpSearch(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-300 mb-4"
+            />
+            <div className="overflow-y-auto flex-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden space-y-2">
+              {employees
+                .filter(e => e.role !== 'mentor' && e.role !== 'admin')
+                .filter(e => {
+                  const q = empSearch.toLowerCase();
+                  return !q || [e.name, e.surname, e.position, e.department, e.phone].join(' ').toLowerCase().includes(q);
+                })
+                .map(emp => {
+                  const alreadyMentor = mentors.some(m => m.phone === emp.phone);
+                  return (
+                    <button key={emp._id} disabled={alreadyMentor || saving}
+                      onClick={() => handleAssign(emp)}
+                      className={`w-full flex items-center gap-3 rounded-2xl px-4 py-3 text-left transition ${
+                        alreadyMentor ? 'bg-slate-50 opacity-50 cursor-not-allowed' : 'hover:bg-sky-50 bg-white border border-slate-100'
+                      }`}>
+                      <div className="w-10 h-10 rounded-full bg-sky-100 text-sky-600 font-bold flex items-center justify-center shrink-0">
+                        {(emp.name || '?')[0].toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-800 truncate">{emp.name} {emp.surname}</p>
+                        <p className="text-xs text-slate-400 truncate">{emp.position || '—'} · {emp.department || '—'}</p>
+                      </div>
+                      {alreadyMentor && <span className="ml-auto text-xs text-slate-400 shrink-0">уже наставник</span>}
+                    </button>
+                  );
+                })}
+            </div>
+            <button onClick={() => setShowAssign(false)} className="mt-4 w-full rounded-full bg-slate-100 text-slate-700 font-bold py-3 hover:bg-slate-200 transition">Отмена</button>
+          </div>
+        </div>
+      )}
 
-            {/* Photo upload */}
+      {/* Edit form (KebabMenu only) */}
+      {showForm && editingId && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" onClick={() => setShowForm(false)}>
+          <div className="relative w-full max-w-lg mx-auto my-8 rounded-[32px] bg-white shadow-2xl p-8" onClick={e => e.stopPropagation()}>
+            <h2 className="text-xl font-extrabold text-slate-900 mb-6">Редактировать наставника</h2>
+
             <div className="mb-5 flex flex-col items-center gap-3">
               {imagePreview
                 ? <img src={imagePreview} className="w-28 h-28 rounded-full object-cover shadow" alt="preview" />
@@ -216,7 +294,7 @@ export default function MentorsPage() {
             </div>
 
             <div className="flex gap-3">
-              <button onClick={handleSave} disabled={saving || !form.name}
+              <button onClick={handleSave} disabled={saving}
                 className="flex-1 rounded-full bg-sky-500 text-white font-bold py-3 hover:bg-sky-600 transition disabled:opacity-50">
                 {saving ? 'Сохраняем...' : 'Сохранить'}
               </button>
