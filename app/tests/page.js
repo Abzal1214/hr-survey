@@ -137,8 +137,15 @@ export default function TrainingsPage() {
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-slate-600 mb-1">Отдел (необязательно)</label>
-                      <input value={newTraining.department} onChange={e => setNewTraining(p => ({ ...p, department: e.target.value }))}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Все отделы" />
+                      <select value={newTraining.department} onChange={e => setNewTraining(p => ({ ...p, department: e.target.value }))}
+                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
+                        <option value="">Все отделы</option>
+                        <option value="Аквапарк">Аквапарк</option>
+                        <option value="Ресторан">Ресторан</option>
+                        <option value="SPA">SPA</option>
+                        <option value="Магазин">Магазин</option>
+                        <option value="Офис">Офис</option>
+                      </select>
                     </div>
                   </div>
                   {createMsg && <p className="text-sm text-red-600">{createMsg}</p>}
