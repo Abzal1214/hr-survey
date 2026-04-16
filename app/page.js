@@ -145,15 +145,7 @@ export default function Home() {
           {news.length === 0 ? (
             <div className="rounded-[24px] bg-white/80 p-6 text-slate-500 shadow text-center">Новостей пока нет.</div>
           ) : (
-            <div className="relative px-10">
-              {/* Left button */}
-              {news.length > 1 && (
-                <button onClick={() => goNews(-1)} disabled={newsAnimating}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
-                  ‹
-                </button>
-              )}
-
+            <div className="relative">
               {/* Carousel body */}
               <div className="w-full" ref={carouselRef}>
                 {(() => {
@@ -161,13 +153,46 @@ export default function Home() {
                   const cardW = Math.min(carouselW * 0.72, 600);
                   const centerScale = 1;
                   const sideScale = 0.68;
-                  // Distance from center to side card center = half of center + gap + half of side (in scaled terms)
                   const sideSpacing = cardW * (centerScale / 2 + sideScale / 2) + 14;
                   const offscreenSpacing = sideSpacing * 2;
                   const containerH = 400;
-                  const cardH = containerH; // card height before scaling
+                  const cardH = containerH;
+                  // Outer edge of side card from container center
+                  const sideOuterEdge = sideSpacing + (cardW * sideScale) / 2;
+                  const btnSize = 56; // px
                   return (
                     <div className="relative" style={{ height: containerH }}>
+                      {/* Left button — at outer edge of left side card */}
+                      {news.length > 1 && (
+                        <button onClick={() => goNews(-1)} disabled={newsAnimating}
+                          style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: `calc(50% - ${sideOuterEdge + btnSize / 2 + 6}px)`,
+                            transform: 'translateY(-50%)',
+                            width: btnSize, height: btnSize,
+                            zIndex: 20,
+                          }}
+                          className="rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
+                          ‹
+                        </button>
+                      )}
+                      {/* Right button — at outer edge of right side card */}
+                      {news.length > 1 && (
+                        <button onClick={() => goNews(1)} disabled={newsAnimating}
+                          style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: `calc(50% + ${sideOuterEdge - btnSize / 2 - 6}px)`,
+                            transform: 'translateY(-50%)',
+                            width: btnSize, height: btnSize,
+                            zIndex: 20,
+                          }}
+                          className="rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
+                          ›
+                        </button>
+                      )}
+
                       {[-2, -1, 0, 1, 2].map(offset => {
                         const idx = ((newsIdx + offset) % news.length + news.length) % news.length;
                         const isCenter = offset === 0;
@@ -232,14 +257,6 @@ export default function Home() {
                   );
                 })()}
               </div>
-
-              {/* Right button */}
-              {news.length > 1 && (
-                <button onClick={() => goNews(1)} disabled={newsAnimating}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
-                  ›
-                </button>
-              )}
             </div>
           )}
         </section>
