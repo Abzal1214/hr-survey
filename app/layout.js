@@ -54,6 +54,9 @@ export default function RootLayout({ children }) {
               <Link href="/rewards" className="rounded-full px-4 py-2 transition hover:bg-sky-500 hover:text-white">
                 Награды
               </Link>
+              <Link href="/mentors" className="rounded-full px-4 py-2 transition hover:bg-sky-500 hover:text-white">
+                Наставники
+              </Link>
             </nav>
             <UserMenu />
           </div>
