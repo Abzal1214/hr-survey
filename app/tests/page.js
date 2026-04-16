@@ -95,7 +95,7 @@ export default function TrainingsPage() {
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
         <div className="relative z-10">
           <span className="inline-block rounded-full bg-sky-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Тренинги</span>
-          <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">Очные тренинги</h1>
+          <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">Тренинги</h1>
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Запишитесь на офлайн-тренинги и корпоративные мероприятия.</p>
         </div>
       </div>
