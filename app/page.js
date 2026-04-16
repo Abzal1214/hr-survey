@@ -122,25 +122,13 @@ export default function Home() {
                 <p className="mt-1 text-sm text-white/80">{item.desc}</p>
               </Link>
             ))}
-            {/* Динамическая карточка: кабинет или вход */}
-            <Link href="/admin"
-              className="animate-scale-in hover-lift group relative overflow-hidden rounded-3xl bg-gradient-to-br from-pink-400 to-rose-500 p-6 text-white shadow-xl"
+            {/* Наставники */}
+            <Link href="/mentors"
+              className="animate-scale-in hover-lift group relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-500 to-purple-600 p-6 text-white shadow-xl"
               style={{animationDelay: `${staticLinks.length * 0.08}s`}}>
-              {user ? (
-                <>
-                  <div className="text-4xl mb-3">👋</div>
-                  <p className="text-lg font-bold truncate">{user.name || user.fullName || 'Мой кабинет'}</p>
-                  <p className="mt-1 text-sm text-white/80 flex items-center gap-1">
-                    <GoldCoin size="xs" /> {user.points ?? 0} AQUA COIN
-                  </p>
-                </>
-              ) : (
-                <>
-                  <div className="text-4xl mb-3">👤</div>
-                  <p className="text-lg font-bold">Войти</p>
-                  <p className="mt-1 text-sm text-white/80">Личный кабинет сотрудника</p>
-                </>
-              )}
+              <div className="text-4xl mb-3">🧑‍🏫</div>
+              <p className="text-lg font-bold">Наставники</p>
+              <p className="mt-1 text-sm text-white/80">Опытные сотрудники</p>
             </Link>
           </div>
         </section>
