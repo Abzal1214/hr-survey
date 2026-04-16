@@ -179,7 +179,7 @@ export default function Home() {
                         const item = news[idx];
                         return (
                           <div
-                            key={idx}
+                            key={offset}
                             onClick={() => isSide ? goNews(offset) : isCenter ? setSelectedNews(item) : null}
                             style={{
                               position: 'absolute',
