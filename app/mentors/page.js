@@ -22,6 +22,15 @@ export default function MentorsPage() {
   const [imagePreview, setImagePreview] = useState('');
   const [saving, setSaving] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState(null);
+  const [copiedPhone, setCopiedPhone] = useState('');
+
+  const copyPhone = (phone, e) => {
+    e?.stopPropagation();
+    navigator.clipboard.writeText(phone).then(() => {
+      setCopiedPhone(phone);
+      setTimeout(() => setCopiedPhone(''), 2000);
+    });
+  };
 
   useEffect(() => {
     fetch('/api/mentors').then(r => r.json()).then(setMentors).catch(() => setMentors([]));
@@ -186,7 +195,16 @@ export default function MentorsPage() {
                     )}
                     {mentor.bio && <p className="text-slate-500 text-sm mt-3 line-clamp-2 flex-1">{mentor.bio}</p>}
                     <div className="mt-4 flex flex-col gap-1">
-                      {mentor.phone && <a href={`tel:${mentor.phone}`} onClick={e => e.stopPropagation()} className="text-sm text-slate-600 hover:text-sky-600 transition">📞 {mentor.phone}</a>}
+                      {mentor.phone && (
+                        <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                          <span className="text-emerald-500">📞</span>
+                          <span className="text-sm text-slate-800 font-medium">{mentor.phone}</span>
+                          <button onClick={(e) => copyPhone(mentor.phone, e)} title="Копировать" className="ml-1 text-slate-400 hover:text-emerald-600 transition text-xs">
+                            {copiedPhone === mentor.phone ? '✓' : '⎘'}
+                          </button>
+                          <a href={`tel:${mentor.phone}`} onClick={e => e.stopPropagation()} title="Позвонить" className="text-slate-400 hover:text-emerald-600 transition text-xs">📲</a>
+                        </div>
+                      )}
                       {mentor.email && <a href={`mailto:${mentor.email}`} onClick={e => e.stopPropagation()} className="text-sm text-slate-600 hover:text-sky-600 transition truncate">✉️ {mentor.email}</a>}
                     </div>
                   </div>
@@ -210,8 +228,21 @@ export default function MentorsPage() {
               {selectedMentor.position && <p className="text-sky-600 font-semibold mt-1">{selectedMentor.position}</p>}
               {selectedMentor.department && <span className="mt-2 inline-block rounded-full bg-sky-50 text-sky-500 text-xs font-semibold px-3 py-0.5">{selectedMentor.department}</span>}
               {selectedMentor.bio && <p className="mt-4 text-slate-700 leading-relaxed whitespace-pre-wrap">{selectedMentor.bio}</p>}
-              <div className="mt-5 flex flex-col gap-2">
-                {selectedMentor.phone && <a href={`tel:${selectedMentor.phone}`} className="text-slate-700 hover:text-sky-600 transition">📞 {selectedMentor.phone}</a>}
+              <div className="mt-5 flex flex-col gap-3">
+                {selectedMentor.phone && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-emerald-500 text-xl">📞</span>
+                    <span className="text-slate-800 font-medium">{selectedMentor.phone}</span>
+                    <button onClick={(e) => copyPhone(selectedMentor.phone, e)}
+                      className="ml-1 rounded-full bg-slate-100 hover:bg-emerald-100 text-slate-600 hover:text-emerald-700 px-3 py-1 text-xs font-semibold transition">
+                      {copiedPhone === selectedMentor.phone ? '✓ Скопировано' : '⎘ Копировать'}
+                    </button>
+                    <a href={`tel:${selectedMentor.phone}`}
+                      className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 text-xs font-semibold transition">
+                      📲 Позвонить
+                    </a>
+                  </div>
+                )}
                 {selectedMentor.email && <a href={`mailto:${selectedMentor.email}`} className="text-slate-700 hover:text-sky-600 transition">✉️ {selectedMentor.email}</a>}
               </div>
             </div>
