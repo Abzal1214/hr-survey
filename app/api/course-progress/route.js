@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
+import { connectDB } from '@/lib/mongodb';
 import { CourseProgress } from '@/lib/models';
 
 // GET ?courseId=xxx&phone=xxx  OR  ?phone=xxx (all for user)
