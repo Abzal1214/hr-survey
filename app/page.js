@@ -45,7 +45,7 @@ export default function Home() {
   useEffect(() => {
     if (!newsSectionRef.current) return;
     const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setNewsVisible(true); obs.disconnect(); }
+      setNewsVisible(entry.isIntersecting);
     }, { threshold: 0.1 });
     obs.observe(newsSectionRef.current);
     return () => obs.disconnect();
