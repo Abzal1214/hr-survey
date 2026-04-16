@@ -84,21 +84,30 @@ export default function TrainingsPage() {
     try { return new Date(dateStr).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }); } catch { return dateStr; }
   };
 
-  const isPast = (dateStr) => {
-    if (!dateStr) return false;
-    return new Date(dateStr) < new Date(new Date().setHours(0,0,0,0));
+  const getTrainingDateTime = (t) => {
+    if (!t.date) return null;
+    if (t.time) return new Date(`${t.date}T${t.time}`);
+    return new Date(`${t.date}T23:59:59`);
+  };
+
+  const isPast = (t) => {
+    const dt = getTrainingDateTime(t);
+    if (!dt) return false;
+    return dt < new Date();
   };
 
   const isRegistrationClosed = (t) => {
-    if (!t.registrationDeadline) return isPast(t.date);
-    return new Date(t.registrationDeadline) < new Date();
+    if (t.registrationDeadline) return new Date(t.registrationDeadline) < new Date();
+    // default: closes at training start time
+    const dt = getTrainingDateTime(t);
+    return dt ? dt < new Date() : false;
   };
 
   const renderTraining = (t) => {
     const tid = String(t._id || t.id);
     const signed = isSignedUp(t);
     const left = spotsLeft(t);
-    const past = isPast(t.date);
+    const past = isPast(t);
     const regClosed = isRegistrationClosed(t);
     const full = left <= 0 && !signed;
     return (
@@ -263,8 +272,8 @@ export default function TrainingsPage() {
         {message && <div className="mb-4 rounded-xl bg-sky-50 border border-sky-200 text-sky-700 px-4 py-3 text-sm">{message}</div>}
 
         {(() => {
-          const upcoming = trainings.filter(t => !isPast(t.date));
-          const past = trainings.filter(t => isPast(t.date));
+          const upcoming = trainings.filter(t => !isPast(t));
+          const past = trainings.filter(t => isPast(t));
           return (
             <>
               {upcoming.length === 0 && past.length === 0 ? (
