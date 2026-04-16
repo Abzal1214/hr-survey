@@ -15,6 +15,13 @@ export default function RewardsPage() {
   const [confirmModal, setConfirmModal] = useState(null);
 
   const [printMode, setPrintMode] = useState(false);
+
+  useEffect(() => {
+    if (printMode) {
+      window.print();
+      setPrintMode(false);
+    }
+  }, [printMode]);
   const [showCreate, setShowCreate] = useState(false);
   const [newReward, setNewReward] = useState({ name: '', description: '', cost: '' });
   const [imageFile, setImageFile] = useState(null);
@@ -198,13 +205,7 @@ export default function RewardsPage() {
     } catch { setExchangeError('Ошибка сети. Попробуйте ещё раз.'); }
   };
 
-  const handlePrint = () => {
-    setPrintMode(true);
-    setTimeout(() => {
-      window.print();
-      setTimeout(() => setPrintMode(false), 100);
-    }, 50);
-  };
+  const handlePrint = () => setPrintMode(true);
 
   const handleExchange = () => {
     setConfirmModal({
