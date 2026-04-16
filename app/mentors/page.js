@@ -204,14 +204,14 @@ export default function MentorsPage() {
                             {mentor.phone}
                           </button>
                           {phonePopup === mentor.phone && (
-                            <div className="absolute left-0 top-7 z-20 flex gap-2 rounded-2xl bg-white shadow-xl border border-slate-100 px-3 py-2">
+                        <div className="absolute left-0 bottom-8 z-20 flex gap-2 rounded-2xl bg-white shadow-xl border border-slate-100 px-3 py-2">
                               <button onClick={() => copyPhone(mentor.phone)}
-                                className="flex items-center gap-1 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 px-3 py-1.5 text-xs font-semibold transition">
-                                {copiedPhone === mentor.phone ? '✓ Скопировано' : '📋 Копировать'}
+                                className="rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 px-3 py-1.5 text-xs font-semibold transition">
+                                {copiedPhone === mentor.phone ? 'Скопировано' : 'Копировать'}
                               </button>
                               <a href={`tel:${mentor.phone}`}
-                                className="flex items-center gap-1 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold transition">
-                                📲 Позвонить
+                                className="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold transition">
+                                Позвонить
                               </a>
                             </div>
                           )}
@@ -249,14 +249,14 @@ export default function MentorsPage() {
                       {selectedMentor.phone}
                     </button>
                     {phonePopup === selectedMentor.phone && (
-                      <div className="absolute left-0 top-9 z-20 flex gap-2 rounded-2xl bg-white shadow-xl border border-slate-100 px-3 py-2">
+                      <div className="absolute left-0 bottom-10 z-20 flex gap-2 rounded-2xl bg-white shadow-xl border border-slate-100 px-3 py-2">
                         <button onClick={() => copyPhone(selectedMentor.phone)}
-                          className="flex items-center gap-1 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 px-4 py-2 text-sm font-semibold transition">
-                          {copiedPhone === selectedMentor.phone ? '✓ Скопировано' : '📋 Копировать'}
+                          className="rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 px-4 py-2 text-sm font-semibold transition">
+                          {copiedPhone === selectedMentor.phone ? 'Скопировано' : 'Копировать'}
                         </button>
                         <a href={`tel:${selectedMentor.phone}`}
-                          className="flex items-center gap-1 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 text-sm font-semibold transition">
-                          📲 Позвонить
+                          className="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 text-sm font-semibold transition">
+                          Позвонить
                         </a>
                       </div>
                     )}
