@@ -14,6 +14,7 @@ export default function RewardsPage() {
   const [exchangeError, setExchangeError] = useState('');
   const [confirmModal, setConfirmModal] = useState(null);
 
+  const [printMode, setPrintMode] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [newReward, setNewReward] = useState({ name: '', description: '', cost: '' });
   const [imageFile, setImageFile] = useState(null);
@@ -197,6 +198,14 @@ export default function RewardsPage() {
     } catch { setExchangeError('Ошибка сети. Попробуйте ещё раз.'); }
   };
 
+  const handlePrint = () => {
+    setPrintMode(true);
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => setPrintMode(false), 100);
+    }, 50);
+  };
+
   const handleExchange = () => {
     setConfirmModal({
       title: 'Подтвердить обмен',
@@ -287,6 +296,45 @@ export default function RewardsPage() {
     if (n.includes('рюкзак') || n.includes('сумк')) return '🎒';
     return '🎁';
   };
+
+  if (printMode && coupon) {
+    return (
+      <div style={{fontFamily: 'monospace', background: 'white', padding: '20px'}}>
+        {couponTickets.map((ticket, idx) => (
+          <div key={idx} style={{background: 'white', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden', maxWidth: '480px', margin: '0 auto 24px', pageBreakAfter: idx < couponTickets.length - 1 ? 'always' : 'avoid'}}>
+            <div style={{background: 'linear-gradient(to right, #10b981, #14b8a6)', padding: '24px 32px', textAlign: 'center', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact'}}>
+              <div style={{fontSize: '2.5rem', marginBottom: '8px'}}>🎟️</div>
+              <h2 style={{color: 'white', fontSize: '1.4rem', fontWeight: 900, margin: 0, letterSpacing: '0.05em'}}>AQUA COIN КУПОН</h2>
+              <p style={{color: '#d1fae5', fontSize: '0.875rem', margin: '4px 0 0'}}>Hawaii&amp;Miami · SanRemo</p>
+            </div>
+            <div style={{padding: '24px 32px'}}>
+              <div style={{fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px'}}>Сотрудник</div>
+              <div style={{fontWeight: 700, color: '#1e293b', fontSize: '1rem', marginBottom: '12px'}}>{coupon.userName}</div>
+              <div style={{fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px', marginTop: '12px'}}>Товар</div>
+              <div style={{display: 'flex', alignItems: 'center', gap: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px 16px', marginBottom: '16px', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact'}}>
+                <span style={{fontSize: '1.25rem'}}>{ticket.item?.icon || '🎁'}</span>
+                <span style={{flex: 1, fontWeight: 600, color: '#1e293b'}}>{ticket.item?.name}</span>
+                <span style={{color: '#10b981', fontWeight: 700}}>{ticket.item?.cost} монет</span>
+              </div>
+              <div style={{background: '#f8fafc', border: '2px dashed #6ee7b7', borderRadius: '12px', padding: '12px 16px', textAlign: 'center', marginBottom: '12px', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact'}}>
+                <div style={{fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px'}}>КОД КУПОНА</div>
+                <div style={{fontSize: '1.4rem', fontWeight: 900, color: '#059669', letterSpacing: '0.15em'}}>{ticket.couponCode}</div>
+              </div>
+              <div style={{fontSize: '0.75rem', color: '#94a3b8', textAlign: 'center', marginBottom: '4px'}}>
+                {new Date(ticket.issuedAt || coupon.issuedAt).toLocaleString('ru-RU')}
+              </div>
+              {ticket.count > 1 && (
+                <div style={{fontSize: '0.75rem', color: '#64748b', textAlign: 'center'}}>Купон {ticket.index} из {ticket.count}</div>
+              )}
+            </div>
+            <div style={{background: '#ecfdf5', padding: '16px 32px', textAlign: 'center', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact'}}>
+              <p style={{color: '#065f46', fontSize: '0.875rem', fontWeight: 600, margin: 0}}>📍 Покажи этот купон для получения товара</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -473,9 +521,9 @@ export default function RewardsPage() {
     {coupon && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
         <div className="relative w-full max-w-3xl">
-          <div className="print-area max-h-[78vh] overflow-y-auto space-y-4 pr-1">
+          <div className="max-h-[78vh] overflow-y-auto space-y-4 pr-1">
             {couponTickets.map((ticket, idx) => (
-              <div key={`${ticket.couponCode}-${idx}`} className="print-coupon bg-white rounded-[28px] shadow-2xl overflow-hidden" style={{fontFamily: 'monospace'}}>
+              <div key={`${ticket.couponCode}-${idx}`} className="bg-white rounded-[28px] shadow-2xl overflow-hidden" style={{fontFamily: 'monospace'}}>
                 <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-6 text-center">
                   <div className="text-4xl mb-2">🎟️</div>
                   <h2 className="text-2xl font-extrabold text-white tracking-wide">AQUA COIN КУПОН</h2>
@@ -522,7 +570,7 @@ export default function RewardsPage() {
               className="flex-1 rounded-2xl bg-white/90 text-slate-700 py-3 font-semibold hover:bg-white transition shadow">
               Закрыть
             </button>
-            <button onClick={() => window.print()}
+            <button onClick={handlePrint}
               className="flex-1 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white py-3 font-semibold transition shadow flex items-center justify-center gap-2">
               🖨️ Распечатать
             </button>
@@ -530,6 +578,8 @@ export default function RewardsPage() {
         </div>
       </div>
     )}
+
+    {/* Отдельная зона для печати — вне модального окна, без fixed/relative родителей */}
       {confirmModal && (
         <ConfirmModal
           message={confirmModal.message}
