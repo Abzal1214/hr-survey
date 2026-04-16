@@ -162,7 +162,7 @@ export default function Home() {
           style={{
             opacity: newsVisible ? 1 : 0,
             transform: newsVisible ? 'translateY(0)' : 'translateY(48px)',
-            transition: 'opacity 1.1s ease, transform 1.1s cubic-bezier(.22,.68,0,1.1)',
+            transition: 'opacity 0.7s ease, transform 0.7s cubic-bezier(.22,.68,0,1.1)',
           }}
         >
           <div className="flex items-center justify-between mb-6">
