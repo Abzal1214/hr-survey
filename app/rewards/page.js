@@ -18,8 +18,12 @@ export default function RewardsPage() {
 
   useEffect(() => {
     if (printMode) {
-      window.print();
-      setPrintMode(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.print();
+          setPrintMode(false);
+        });
+      });
     }
   }, [printMode]);
   const [showCreate, setShowCreate] = useState(false);
