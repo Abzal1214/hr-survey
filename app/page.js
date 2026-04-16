@@ -80,26 +80,26 @@ export default function Home() {
   return (
     <div className="min-h-screen text-slate-900">
       {/* Hero */}
-      <section className="relative flex flex-col items-center justify-center text-center px-6 py-24">
+      <section className="relative flex flex-col items-center justify-center text-center px-4 py-16 sm:py-24">
         <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
         <div className="relative z-10">
-          <h1 className="animate-fade-in-up text-5xl sm:text-6xl font-extrabold text-white drop-shadow-lg leading-tight">
+          <h1 className="animate-fade-in-up text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white drop-shadow-lg leading-tight">
             Портал для сотрудников
           </h1>
-          <p className="animate-fade-in-up delay-200 mt-6 max-w-xl mx-auto text-lg text-white/90 leading-relaxed">
+          <p className="animate-fade-in-up delay-200 mt-4 max-w-xl mx-auto text-sm sm:text-lg text-white/90 leading-relaxed">
             Всё необходимое в одном месте: обучение, новости, опросы, тесты и программа лояльности AQUA COIN.
           </p>
-          <div className="animate-fade-in-up delay-400 mt-8 flex flex-wrap justify-center gap-4">
+          <div className="animate-fade-in-up delay-400 mt-6 sm:mt-8 flex flex-wrap justify-center gap-3">
             {user ? (
-              <Link href="/admin" className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-8 py-3 text-base font-bold text-white shadow-xl transition">
+              <Link href="/admin" className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold text-white shadow-xl transition">
                 👋 Мой кабинет
               </Link>
             ) : (
               <>
-                <Link href="/register" className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-8 py-3 text-base font-bold text-white shadow-xl transition">
+                <Link href="/register" className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold text-white shadow-xl transition">
                   🚀 Зарегистрироваться
                 </Link>
-                <Link href="/admin" className="rounded-full bg-white/20 hover:bg-white/30 border border-white/40 px-8 py-3 text-base font-bold text-white shadow-xl transition backdrop-blur-sm">
+                <Link href="/admin" className="rounded-full bg-white/20 hover:bg-white/30 border border-white/40 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-bold text-white shadow-xl transition backdrop-blur-sm">
                   🔐 Войти
                 </Link>
               </>
@@ -108,27 +108,27 @@ export default function Home() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-6xl px-6 pb-16">
+      <main className="mx-auto max-w-6xl px-3 sm:px-6 pb-16">
         {/* Быстрые ссылки */}
         <section className="mt-4">
-          <h2 className="text-2xl font-bold text-white drop-shadow mb-6 text-center">Быстрый доступ</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow mb-4 sm:mb-6 text-center">Быстрый доступ</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             {staticLinks.map((item, i) => (
               <Link key={item.href} href={item.href}
-                className={`animate-scale-in hover-lift group relative overflow-hidden rounded-3xl bg-gradient-to-br ${item.color} p-6 text-white shadow-xl`}
+                className={`animate-scale-in hover-lift group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br ${item.color} p-4 sm:p-6 text-white shadow-xl`}
                 style={{animationDelay: `${i * 0.08}s`}}>
-                <div className="text-4xl mb-3">{item.icon}</div>
-                <p className="text-lg font-bold">{item.label}</p>
-                <p className="mt-1 text-sm text-white/80">{item.desc}</p>
+                <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{item.icon}</div>
+                <p className="text-sm sm:text-lg font-bold">{item.label}</p>
+                <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-white/80">{item.desc}</p>
               </Link>
             ))}
             {/* Наставники */}
             <Link href="/mentors"
-              className="animate-scale-in hover-lift group relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-500 to-purple-600 p-6 text-white shadow-xl"
+              className="animate-scale-in hover-lift group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-violet-500 to-purple-600 p-4 sm:p-6 text-white shadow-xl"
               style={{animationDelay: `${staticLinks.length * 0.08}s`}}>
-              <div className="text-4xl mb-3">🧑‍🏫</div>
-              <p className="text-lg font-bold">Наставники</p>
-              <p className="mt-1 text-sm text-white/80">Опытные сотрудники</p>
+              <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">🧑‍🏫</div>
+              <p className="text-sm sm:text-lg font-bold">Наставники</p>
+              <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-white/80">Опытные сотрудники</p>
             </Link>
           </div>
         </section>

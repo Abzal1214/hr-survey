@@ -21,15 +21,23 @@ export const metadata = {
   },
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html
       lang="ru"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col text-slate-900">
+      <body className="min-h-full flex flex-col text-slate-900 w-full">
+        {/* Background fixed for desktop, scroll for mobile (iOS Safari fix) */}
+        <div className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('/bg.jpg')"}} aria-hidden="true" />
         <header className="no-print sticky top-0 z-50 border-b border-sky-900/40 bg-sky-950/90 backdrop-blur-md">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex flex-col leading-tight">
               <span className="text-xs uppercase tracking-widest text-sky-300 font-medium">🌊 Hawaii&amp;Miami · SanRemo</span>
               <h1 className="text-xl font-bold text-white">Академия сети Аквапарков</h1>
