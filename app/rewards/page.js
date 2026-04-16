@@ -17,8 +17,8 @@ export default function RewardsPage() {
 
   const handlePrint = () => {
     const prevTitle = document.title;
-    const itemName = (couponTickets[0]?.item?.name || 'item').toLowerCase().replace(/\s+/g, '-');
-    document.title = `coupon-${itemName}`;
+    const code = (couponTickets[0]?.couponCode || 'code').toLowerCase().replace(/-/g, '');
+    document.title = `coupon${code}`;
     window.print();
     document.title = prevTitle;
   };
