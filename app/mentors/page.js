@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import KebabMenu from '../components/KebabMenu';
 
 const DEPARTMENTS = ['Все отделы', 'Аквапарк', 'Ресторан', 'SPA', 'Магазин', 'Офис'];
@@ -124,12 +125,20 @@ export default function MentorsPage() {
           <span className="inline-block rounded-full bg-sky-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Команда</span>
           <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
-          {isAdmin && (
-            <button onClick={() => { setShowAssign(true); setEmpSearch(''); }}
-              className="mt-6 rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
-              + Назначить наставника
-            </button>
-          )}
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            {(user?.role === 'mentor' || user?.role === 'admin') && (
+              <Link href="/mentor-dashboard"
+                className="rounded-full bg-amber-500 hover:bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white transition shadow-lg">
+                👨‍🏫 Кабинет наставника
+              </Link>
+            )}
+            {isAdmin && (
+              <button onClick={() => { setShowAssign(true); setEmpSearch(''); }}
+                className="rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
+                + Назначить наставника
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

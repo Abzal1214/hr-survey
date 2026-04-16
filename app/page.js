@@ -91,16 +91,9 @@ export default function Home() {
           </p>
           <div className="animate-fade-in-up delay-400 mt-8 flex flex-wrap justify-center gap-4">
             {user ? (
-              <>
-                <Link href="/admin" className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-8 py-3 text-base font-bold text-white shadow-xl transition">
-                  👋 Мой кабинет
-                </Link>
-                {(user.role === 'mentor' || user.role === 'admin') && (
-                  <Link href="/mentor-dashboard" className="rounded-full bg-amber-500 hover:bg-amber-600 px-8 py-3 text-base font-bold text-white shadow-xl transition">
-                    👨‍🏫 Кабинет наставника
-                  </Link>
-                )}
-              </>
+              <Link href="/admin" className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-8 py-3 text-base font-bold text-white shadow-xl transition">
+                👋 Мой кабинет
+              </Link>
             ) : (
               <>
                 <Link href="/register" className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-8 py-3 text-base font-bold text-white shadow-xl transition">
