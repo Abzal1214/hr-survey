@@ -162,7 +162,7 @@ export default function Home() {
           {news.length === 0 ? (
             <div className="rounded-[24px] bg-white/80 p-6 text-slate-500 shadow text-center">Новостей пока нет.</div>
           ) : (
-            <div className="relative select-none"
+            <div className="relative select-none overflow-hidden"
               onMouseDown={e => onDragStart(e.clientX)}
               onMouseMove={e => onDragMove(e.clientX)}
               onMouseUp={e => onDragEnd(e.clientX)}
