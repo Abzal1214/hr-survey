@@ -16,20 +16,24 @@ export default function Home() {
   const [news, setNews] = useState([]);
   const [user, setUser] = useState(null);
   const [newsIdx, setNewsIdx] = useState(0);
-  const [newsPrevIdx, setNewsPrevIdx] = useState(null);
-  const [newsDir, setNewsDir] = useState(1);
   const [newsAnimating, setNewsAnimating] = useState(false);
   const [selectedNews, setSelectedNews] = useState(null);
+  const carouselRef = useRef(null);
+  const [carouselW, setCarouselW] = useState(800);
 
   const goNews = (dir) => {
     if (newsAnimating || news.length < 2) return;
-    const nextIdx = (newsIdx + dir + news.length) % news.length;
-    setNewsDir(dir);
-    setNewsPrevIdx(newsIdx);
-    setNewsIdx(nextIdx);
     setNewsAnimating(true);
-    setTimeout(() => { setNewsAnimating(false); setNewsPrevIdx(null); }, 400);
+    setNewsIdx(i => (i + dir + news.length) % news.length);
+    setTimeout(() => setNewsAnimating(false), 460);
   };
+
+  useEffect(() => {
+    if (!carouselRef.current) return;
+    const ro = new ResizeObserver(entries => setCarouselW(entries[0].contentRect.width));
+    ro.observe(carouselRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     fetch('/api/news')
@@ -151,117 +155,73 @@ export default function Home() {
               )}
 
               {/* Carousel body */}
-              <div className="flex-1 overflow-hidden">
-                <div className="relative" style={{minHeight: '1px'}}>
-                {/* Exiting slide */}
-                {newsAnimating && newsPrevIdx !== null && (() => {
-                  const exitClass = newsDir > 0 ? 'animate-slide-out-left' : 'animate-slide-out-right';
-                  const prevN = newsPrevIdx;
+              <div className="flex-1 overflow-hidden" ref={carouselRef}>
+                {(() => {
+                  const centerW = Math.min(carouselW * 0.58, 460);
+                  const sideW = Math.min(carouselW * 0.28, 260);
+                  const sideOffset = centerW / 2 + 12 + sideW / 2;
+                  const offscreenOffset = sideOffset + sideW / 2 + 20;
+                  const containerH = 280;
                   return (
-                    <div className={`absolute inset-0 flex gap-4 items-stretch ${exitClass}`} style={{zIndex:1}}>
-
-                  {/* Left small card - prev */}
-                  {news.length > 2 && (() => {
-                    const item = news[(prevN - 1 + news.length) % news.length];
-                    return (
-                      <article className="hidden lg:flex w-56 shrink-0 rounded-[20px] bg-white/80 shadow overflow-hidden flex-col">
-                        {item.imageUrl ? <div className="h-28 overflow-hidden shrink-0"><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div> : <div className="h-1.5 bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" />}
-                        <div className="p-4 flex flex-col justify-center flex-1">
-                          <p className="text-xs font-semibold uppercase tracking-widest text-sky-400 mb-1">{item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}</p>
-                          <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-2">{item.title}</h4>
-                          <p className="text-slate-400 text-xs mt-1 line-clamp-2">{item.description}</p>
-                        </div>
-                      </article>
-                    );
-                  })()}
-                  {/* Center featured card - prev */}
-                  <div className="flex-1">
-                    <article className="h-full rounded-[24px] bg-white/95 shadow-2xl overflow-hidden">
-                      {news[prevN]?.imageUrl ? <div className="h-52 overflow-hidden"><img src={news[prevN].imageUrl} alt={news[prevN].title} className="w-full h-full object-cover" /></div> : <div className="h-3 bg-gradient-to-r from-sky-400 to-blue-500" />}
-                      <div className="p-6">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-2">{news[prevN]?.createdAt ? new Date(news[prevN].createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}</p>
-                        <h3 className="text-xl font-extrabold text-slate-900 leading-snug mb-2">{news[prevN]?.title}</h3>
-                        <p className="text-slate-500 text-sm leading-relaxed line-clamp-3">{news[prevN]?.description}</p>
-                      </div>
-                    </article>
-                  </div>
-                  {/* Right small card - prev */}
-                  {news.length > 1 && (() => {
-                    const item = news[(prevN + 1) % news.length];
-                    return (
-                      <article className="hidden sm:flex w-56 shrink-0 rounded-[20px] bg-white/80 shadow overflow-hidden flex-col">
-                        {item.imageUrl ? <div className="h-28 overflow-hidden shrink-0"><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div> : <div className="h-1.5 bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" />}
-                        <div className="p-4 flex flex-col justify-center flex-1">
-                          <p className="text-xs font-semibold uppercase tracking-widest text-sky-400 mb-1">{item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}</p>
-                          <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-2">{item.title}</h4>
-                          <p className="text-slate-400 text-xs mt-1 line-clamp-2">{item.description}</p>
-                        </div>
-                      </article>
-                    );
-                  })()}
+                    <div className="relative" style={{ height: containerH }}>
+                      {[-2, -1, 0, 1, 2].map(offset => {
+                        const idx = ((newsIdx + offset) % news.length + news.length) % news.length;
+                        const isCenter = offset === 0;
+                        const isSide = Math.abs(offset) === 1;
+                        const isOffscreen = Math.abs(offset) === 2;
+                        const x = isOffscreen ? offset * offscreenOffset : offset * sideOffset;
+                        const w = isCenter ? centerW : sideW;
+                        const item = news[idx];
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => !isOffscreen ? setSelectedNews(item) : null}
+                            style={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              width: w,
+                              opacity: isCenter ? 1 : isSide ? 0.82 : 0,
+                              zIndex: isCenter ? 10 : isSide ? 5 : 0,
+                              pointerEvents: isOffscreen ? 'none' : 'auto',
+                              cursor: isOffscreen ? 'default' : 'pointer',
+                              transition: 'transform 0.46s cubic-bezier(.3,.7,.4,1.1), opacity 0.46s, width 0.46s',
+                              transform: `translate(calc(-50% + ${x}px), -50%)`,
+                            }}
+                          >
+                            {isCenter ? (
+                              <article className="rounded-[24px] bg-white/95 shadow-2xl overflow-hidden hover:shadow-sky-200 transition-shadow" style={{ height: containerH }}>
+                                {item?.imageUrl
+                                  ? <div style={{ height: 150 }} className="overflow-hidden"><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
+                                  : <div className="h-3 bg-gradient-to-r from-sky-400 to-blue-500" />}
+                                <div className="p-5">
+                                  <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-1">
+                                    {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
+                                  </p>
+                                  <h3 className="text-lg font-extrabold text-slate-900 leading-snug mb-1 line-clamp-2">{item?.title}</h3>
+                                  <p className="text-slate-500 text-sm leading-relaxed line-clamp-2">{item?.description}</p>
+                                  <span className="mt-3 inline-block text-xs font-semibold text-sky-600">Читать далее →</span>
+                                </div>
+                              </article>
+                            ) : (
+                              <article className="rounded-[20px] bg-white/85 shadow overflow-hidden flex flex-row" style={{ height: 110 }}>
+                                {item?.imageUrl
+                                  ? <div className="shrink-0 overflow-hidden" style={{ width: 100 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
+                                  : <div className="shrink-0 bg-gradient-to-b from-sky-400 to-blue-500" style={{ width: 6 }} />}
+                                <div className="flex flex-col justify-center p-3 overflow-hidden">
+                                  <p className="text-xs font-semibold text-sky-400 mb-0.5 truncate">
+                                    {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
+                                  </p>
+                                  <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-2">{item?.title}</h4>
+                                </div>
+                              </article>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })()}
-
-                {/* Entering slide */}
-                <div className={`relative flex gap-4 items-stretch ${newsAnimating ? (newsDir > 0 ? 'animate-slide-in-right' : 'animate-slide-in-left') : ''}`} style={{zIndex:2}}>
-
-                  {/* Left small card */}
-                  {news.length > 2 && (() => {
-                    const item = news[(newsIdx - 1 + news.length) % news.length];
-                    return (
-                      <article className="hidden lg:flex w-56 shrink-0 rounded-[20px] bg-white/80 shadow overflow-hidden cursor-pointer hover:shadow-lg hover:bg-white/95 transition-all flex-col" onClick={() => setSelectedNews(item)}>
-                        {item.imageUrl
-                          ? <div className="h-28 overflow-hidden shrink-0"><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
-                          : <div className="h-1.5 bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" />}
-                        <div className="p-4 flex flex-col justify-center flex-1">
-                          <p className="text-xs font-semibold uppercase tracking-widest text-sky-400 mb-1">
-                            {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
-                          </p>
-                          <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-2">{item.title}</h4>
-                          <p className="text-slate-400 text-xs mt-1 line-clamp-2">{item.description}</p>
-                        </div>
-                      </article>
-                    );
-                  })()}
-
-                  {/* Center featured card */}
-                  <div className="flex-1 cursor-pointer group" onClick={() => setSelectedNews(news[newsIdx])}>
-                    <article className="h-full rounded-[24px] bg-white/95 shadow-2xl overflow-hidden hover:shadow-sky-200 transition-all">
-                      {news[newsIdx]?.imageUrl
-                        ? <div className="h-52 overflow-hidden"><img src={news[newsIdx].imageUrl} alt={news[newsIdx].title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /></div>
-                        : <div className="h-3 bg-gradient-to-r from-sky-400 to-blue-500" />}
-                      <div className="p-6">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-2">
-                          {news[newsIdx]?.createdAt ? new Date(news[newsIdx].createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
-                        </p>
-                        <h3 className="text-xl font-extrabold text-slate-900 leading-snug mb-2">{news[newsIdx]?.title}</h3>
-                        <p className="text-slate-500 text-sm leading-relaxed line-clamp-3">{news[newsIdx]?.description}</p>
-                        <span className="mt-4 inline-block text-xs font-semibold text-sky-600">Читать далее →</span>
-                      </div>
-                    </article>
-                  </div>
-
-                  {/* Right small card */}
-                  {news.length > 1 && (() => {
-                    const item = news[(newsIdx + 1) % news.length];
-                    return (
-                      <article className="hidden sm:flex w-56 shrink-0 rounded-[20px] bg-white/80 shadow overflow-hidden cursor-pointer hover:shadow-lg hover:bg-white/95 transition-all flex-col" onClick={() => setSelectedNews(item)}>
-                        {item.imageUrl
-                          ? <div className="h-28 overflow-hidden shrink-0"><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
-                          : <div className="h-1.5 bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" />}
-                        <div className="p-4 flex flex-col justify-center flex-1">
-                          <p className="text-xs font-semibold uppercase tracking-widest text-sky-400 mb-1">
-                            {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
-                          </p>
-                          <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-2">{item.title}</h4>
-                          <p className="text-slate-400 text-xs mt-1 line-clamp-2">{item.description}</p>
-                        </div>
-                      </article>
-                    );
-                  })()}
-                </div>
-                </div>
               </div>
 
               {/* Right button */}
