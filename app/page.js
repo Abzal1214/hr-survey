@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import GoldCoin from './components/GoldCoin';
 
 const staticLinks = [
@@ -15,11 +15,13 @@ const staticLinks = [
 export default function Home() {
   const [news, setNews] = useState([]);
   const [user, setUser] = useState(null);
+  const [newsIdx, setNewsIdx] = useState(0);
+  const [selectedNews, setSelectedNews] = useState(null);
 
   useEffect(() => {
     fetch('/api/news')
       .then((res) => res.json())
-      .then((data) => setNews(data.slice(0, 4)))
+      .then((data) => setNews(data.slice(0, 8)))
       .catch(() => setNews([]));
     try {
       const stored = localStorage.getItem('currentUser');
@@ -123,26 +125,88 @@ export default function Home() {
               Все новости →
             </Link>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {news.length === 0 ? (
-              <div className="rounded-[24px] bg-white/80 p-6 text-slate-500 shadow">Новостей пока нет.</div>
-            ) : (
-              news.map((item) => (
-                <article key={item.id} className="rounded-[24px] bg-white/90 p-6 shadow-lg hover:shadow-xl transition">
-                  {item.imageUrl && (
-                    <img src={item.imageUrl} alt={item.title} className="w-full h-40 object-cover rounded-2xl mb-4" />
-                  )}
-                  <p className="text-xs font-semibold uppercase tracking-widest text-sky-600">
-                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU') : ''}
-                  </p>
-                  <h4 className="mt-2 text-xl font-bold text-slate-900">{item.title}</h4>
-                  <p className="mt-2 text-slate-600 line-clamp-3">{item.description}</p>
-                </article>
-              ))
-            )}
-          </div>
+          {news.length === 0 ? (
+            <div className="rounded-[24px] bg-white/80 p-6 text-slate-500 shadow text-center">Новостей пока нет.</div>
+          ) : (
+            <div className="relative">
+              {/* Carousel */}
+              <div className="flex gap-4 items-stretch">
+                {/* Featured big card */}
+                <div className="flex-shrink-0 w-full sm:w-1/2 cursor-pointer group" onClick={() => setSelectedNews(news[newsIdx])}>
+                  <article className="h-full rounded-[24px] bg-white/95 shadow-2xl overflow-hidden hover:shadow-sky-200 transition-all">
+                    {news[newsIdx]?.imageUrl
+                      ? <div className="h-52 overflow-hidden"><img src={news[newsIdx].imageUrl} alt={news[newsIdx].title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /></div>
+                      : <div className="h-3 bg-gradient-to-r from-sky-400 to-blue-500" />}
+                    <div className="p-6">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-2">
+                        {news[newsIdx]?.createdAt ? new Date(news[newsIdx].createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
+                      </p>
+                      <h3 className="text-xl font-extrabold text-slate-900 leading-snug mb-2">{news[newsIdx]?.title}</h3>
+                      <p className="text-slate-500 text-sm leading-relaxed line-clamp-3">{news[newsIdx]?.description}</p>
+                      <span className="mt-4 inline-block text-xs font-semibold text-sky-600">Читать далее →</span>
+                    </div>
+                  </article>
+                </div>
+
+                {/* Two small side cards */}
+                <div className="hidden sm:flex flex-col gap-4 flex-1">
+                  {[1, 2].map(offset => {
+                    const item = news[(newsIdx + offset) % news.length];
+                    if (!item) return null;
+                    return (
+                      <article key={item._id || item.id} className="flex-1 rounded-[20px] bg-white/95 shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all group" onClick={() => setSelectedNews(item)}>
+                        <div className="flex h-full items-stretch gap-0">
+                          {item.imageUrl && <div className="w-24 shrink-0 overflow-hidden"><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /></div>}
+                          <div className="p-4 flex flex-col justify-center">
+                            <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-1">
+                              {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
+                            </p>
+                            <h4 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">{item.title}</h4>
+                            <p className="text-slate-500 text-xs mt-1 line-clamp-2">{item.description}</p>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Nav buttons */}
+              {news.length > 1 && (
+                <div className="flex items-center justify-center gap-3 mt-5">
+                  <button onClick={() => setNewsIdx(i => (i - 1 + news.length) % news.length)}
+                    className="w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 text-white font-bold text-lg transition backdrop-blur-sm flex items-center justify-center">‹</button>
+                  <div className="flex gap-1.5">
+                    {news.map((_, i) => (
+                      <button key={i} onClick={() => setNewsIdx(i)}
+                        className={`w-2 h-2 rounded-full transition-all ${i === newsIdx ? 'bg-white w-5' : 'bg-white/40 hover:bg-white/60'}`} />
+                    ))}
+                  </div>
+                  <button onClick={() => setNewsIdx(i => (i + 1) % news.length)}
+                    className="w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 text-white font-bold text-lg transition backdrop-blur-sm flex items-center justify-center">›</button>
+                </div>
+              )}
+            </div>
+          )}
         </section>
       </main>
+
+      {/* News modal */}
+      {selectedNews && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setSelectedNews(null)}>
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[32px] bg-white shadow-2xl" onClick={e => e.stopPropagation()}>
+            {selectedNews.imageUrl && <img src={selectedNews.imageUrl} alt={selectedNews.title} className="w-full h-64 object-cover rounded-t-[32px]" />}
+            <div className="p-8">
+              <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-3">
+                {selectedNews.createdAt ? new Date(selectedNews.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : ''}
+              </p>
+              <h2 className="text-2xl font-extrabold text-slate-900 mb-4 leading-tight">{selectedNews.title}</h2>
+              <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">{selectedNews.description}</p>
+            </div>
+            <button onClick={() => setSelectedNews(null)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white font-bold flex items-center justify-center transition">✕</button>
+          </div>
+        </div>
+      )}
 
       <footer className="border-t border-white/20 bg-black/20 backdrop-blur-md py-6 mt-8">
         <div className="mx-auto max-w-6xl px-6 flex flex-col sm:flex-row items-center justify-between text-sm text-white/70 gap-2">
