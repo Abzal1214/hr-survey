@@ -22,6 +22,8 @@ export default function Home() {
   const [carouselW, setCarouselW] = useState(800);
   const dragStart = useRef(null);
   const dragging = useRef(false);
+  const newsSectionRef = useRef(null);
+  const [newsVisible, setNewsVisible] = useState(false);
 
   const goNews = (dir) => {
     if (newsAnimating || news.length < 2) return;
@@ -39,6 +41,15 @@ export default function Home() {
     if (Math.abs(diff) > 40) goNews(diff < 0 ? 1 : -1);
     dragging.current = false;
   };
+
+  useEffect(() => {
+    if (!newsSectionRef.current) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setNewsVisible(true); obs.disconnect(); }
+    }, { threshold: 0.1 });
+    obs.observe(newsSectionRef.current);
+    return () => obs.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!carouselRef.current) return;
@@ -147,7 +158,13 @@ export default function Home() {
         </section>
 
         {/* Последние новости */}
-        <section className="mt-10">
+        <section className="mt-10" ref={newsSectionRef}
+          style={{
+            opacity: newsVisible ? 1 : 0,
+            transform: newsVisible ? 'translateY(0)' : 'translateY(48px)',
+            transition: 'opacity 0.7s ease, transform 0.7s cubic-bezier(.22,.68,0,1.1)',
+          }}
+        >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white drop-shadow">Последние новости</h2>
             <Link href="/news" className="rounded-full bg-white/20 border border-white/40 px-5 py-2 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
