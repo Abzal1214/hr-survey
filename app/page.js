@@ -124,7 +124,7 @@ export default function Home() {
             ))}
             {/* Наставники */}
             <Link href="/mentors"
-              className="animate-scale-in hover-lift group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-violet-500 to-purple-600 p-4 sm:p-6 text-white shadow-xl"
+              className="animate-scale-in hover-lift group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-pink-500 to-rose-600 p-4 sm:p-6 text-white shadow-xl"
               style={{animationDelay: `${staticLinks.length * 0.08}s`}}>
               <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">🧑‍🏫</div>
               <p className="text-sm sm:text-lg font-bold">Наставники</p>
