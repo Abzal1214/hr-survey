@@ -145,17 +145,17 @@ export default function Home() {
           {news.length === 0 ? (
             <div className="rounded-[24px] bg-white/80 p-6 text-slate-500 shadow text-center">Новостей пока нет.</div>
           ) : (
-            <div className="relative flex items-center gap-3">
+            <div className="relative">
               {/* Left button */}
               {news.length > 1 && (
                 <button onClick={() => goNews(-1)} disabled={newsAnimating}
-                  className="shrink-0 w-11 h-11 rounded-full bg-white/30 hover:bg-white/60 text-white font-bold text-2xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg disabled:opacity-50">
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/30 hover:bg-white/60 text-white font-bold text-2xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg disabled:opacity-50">
                   ‹
                 </button>
               )}
 
               {/* Carousel body */}
-              <div className="flex-1 overflow-hidden" ref={carouselRef}>
+              <div className="w-full" ref={carouselRef}>
                 {(() => {
                   // All cards are the same base width, scale drives the size difference
                   const cardW = Math.min(carouselW * 0.72, 600);
@@ -236,7 +236,7 @@ export default function Home() {
               {/* Right button */}
               {news.length > 1 && (
                 <button onClick={() => goNews(1)} disabled={newsAnimating}
-                  className="shrink-0 w-11 h-11 rounded-full bg-white/30 hover:bg-white/60 text-white font-bold text-2xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg disabled:opacity-50">
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/30 hover:bg-white/60 text-white font-bold text-2xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg disabled:opacity-50">
                   ›
                 </button>
               )}
