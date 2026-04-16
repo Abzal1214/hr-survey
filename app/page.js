@@ -145,11 +145,11 @@ export default function Home() {
           {news.length === 0 ? (
             <div className="rounded-[24px] bg-white/80 p-6 text-slate-500 shadow text-center">Новостей пока нет.</div>
           ) : (
-            <div className="relative">
+            <div className="relative px-10">
               {/* Left button */}
               {news.length > 1 && (
                 <button onClick={() => goNews(-1)} disabled={newsAnimating}
-                  className="absolute -left-7 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
                   ‹
                 </button>
               )}
@@ -236,7 +236,7 @@ export default function Home() {
               {/* Right button */}
               {news.length > 1 && (
                 <button onClick={() => goNews(1)} disabled={newsAnimating}
-                  className="absolute -right-7 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
                   ›
                 </button>
               )}
