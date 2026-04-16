@@ -81,18 +81,18 @@ export default function MentorsPage() {
   const filtered = filter === 'Все отделы' ? mentors : mentors.filter(m => m.department === filter);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-sky-400 via-blue-500 to-cyan-400 py-10 px-4">
+    <main className="min-h-screen py-10 px-4">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-white drop-shadow">🧑‍🏫 Наставники</h1>
-            <p className="text-sky-100 mt-1 text-sm">Опытные сотрудники, готовые помочь</p>
+            <h1 className="text-3xl font-extrabold text-slate-900 drop-shadow">🧑‍🏫 Наставники</h1>
+            <p className="text-slate-500 mt-1 text-sm">Опытные сотрудники, готовые помочь</p>
           </div>
           {isAdmin && (
             <button onClick={() => { setShowForm(true); setForm(emptyForm); setEditingId(null); setImagePreview(''); }}
-              className="rounded-full bg-white/20 border border-white/40 px-5 py-2 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
+              className="rounded-full bg-sky-500 text-white px-5 py-2 text-sm font-semibold hover:bg-sky-600 transition">
               + Добавить наставника
             </button>
           )}
@@ -102,7 +102,7 @@ export default function MentorsPage() {
         <div className="flex gap-2 flex-wrap mb-8">
           {DEPARTMENTS.map(d => (
             <button key={d} onClick={() => setFilter(d)}
-              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${filter === d ? 'bg-white text-sky-600 shadow' : 'bg-white/20 text-white hover:bg-white/30'}`}>
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${filter === d ? 'bg-sky-500 text-white shadow' : 'bg-white text-slate-600 border border-slate-200 hover:bg-sky-50'}`}>
               {d}
             </button>
           ))}
