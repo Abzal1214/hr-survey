@@ -50,6 +50,13 @@ export default function MentorsPage() {
     return () => { document.body.style.overflow = ''; };
   }, [showForm, showAssign, selectedMentor]);
 
+  useEffect(() => {
+    if (!phonePopup) return;
+    const handler = () => setPhonePopup('');
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, [phonePopup]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
