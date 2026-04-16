@@ -20,12 +20,24 @@ export default function Home() {
   const [selectedNews, setSelectedNews] = useState(null);
   const carouselRef = useRef(null);
   const [carouselW, setCarouselW] = useState(800);
+  const dragStart = useRef(null);
+  const dragging = useRef(false);
 
   const goNews = (dir) => {
     if (newsAnimating || news.length < 2) return;
     setNewsAnimating(true);
     setNewsIdx(i => (i + dir + news.length) % news.length);
-    setTimeout(() => setNewsAnimating(false), 460);
+    setTimeout(() => setNewsAnimating(false), 520);
+  };
+
+  const onDragStart = (clientX) => { dragStart.current = clientX; dragging.current = false; };
+  const onDragMove = (clientX) => { if (dragStart.current !== null && Math.abs(clientX - dragStart.current) > 8) dragging.current = true; };
+  const onDragEnd = (clientX) => {
+    if (dragStart.current === null) return;
+    const diff = clientX - dragStart.current;
+    dragStart.current = null;
+    if (Math.abs(diff) > 40) goNews(diff < 0 ? 1 : -1);
+    dragging.current = false;
   };
 
   useEffect(() => {
@@ -145,7 +157,15 @@ export default function Home() {
           {news.length === 0 ? (
             <div className="rounded-[24px] bg-white/80 p-6 text-slate-500 shadow text-center">Новостей пока нет.</div>
           ) : (
-            <div className="relative">
+            <div className="relative select-none"
+              onMouseDown={e => onDragStart(e.clientX)}
+              onMouseMove={e => onDragMove(e.clientX)}
+              onMouseUp={e => onDragEnd(e.clientX)}
+              onMouseLeave={e => onDragEnd(e.clientX)}
+              onTouchStart={e => onDragStart(e.touches[0].clientX)}
+              onTouchMove={e => onDragMove(e.touches[0].clientX)}
+              onTouchEnd={e => onDragEnd(e.changedTouches[0].clientX)}
+            >
               {/* Carousel body */}
               <div className="w-full" ref={carouselRef}>
                 {(() => {
@@ -157,42 +177,8 @@ export default function Home() {
                   const offscreenSpacing = sideSpacing * 2;
                   const containerH = 400;
                   const cardH = containerH;
-                  // Outer edge of side card from container center
-                  const sideOuterEdge = sideSpacing + (cardW * sideScale) / 2;
-                  const btnSize = 56; // px
                   return (
                     <div className="relative" style={{ height: containerH }}>
-                      {/* Left button — at outer edge of left side card */}
-                      {news.length > 1 && (
-                        <button onClick={() => goNews(-1)} disabled={newsAnimating}
-                          style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: `calc(50% - ${sideOuterEdge + btnSize / 2 + 6}px)`,
-                            transform: 'translateY(-50%)',
-                            width: btnSize, height: btnSize,
-                            zIndex: 20,
-                          }}
-                          className="rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
-                          ‹
-                        </button>
-                      )}
-                      {/* Right button — at outer edge of right side card */}
-                      {news.length > 1 && (
-                        <button onClick={() => goNews(1)} disabled={newsAnimating}
-                          style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: `calc(50% + ${sideOuterEdge - btnSize / 2 - 6}px)`,
-                            transform: 'translateY(-50%)',
-                            width: btnSize, height: btnSize,
-                            zIndex: 20,
-                          }}
-                          className="rounded-full bg-white/40 hover:bg-white/70 text-white font-bold text-3xl backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl disabled:opacity-50">
-                          ›
-                        </button>
-                      )}
-
                       {[-2, -1, 0, 1, 2].map(offset => {
                         const idx = ((newsIdx + offset) % news.length + news.length) % news.length;
                         const isCenter = offset === 0;
@@ -205,7 +191,11 @@ export default function Home() {
                         return (
                           <div
                             key={offset}
-                            onClick={() => isSide ? goNews(offset) : isCenter ? setSelectedNews(item) : null}
+                            onClick={() => {
+                              if (dragging.current) return;
+                              if (isSide) goNews(offset);
+                              else if (isCenter) setSelectedNews(item);
+                            }}
                             style={{
                               position: 'absolute',
                               top: '50%',
@@ -253,6 +243,17 @@ export default function Home() {
                           </div>
                         );
                       })}
+                      {/* Dot indicators */}
+                      {news.length > 1 && (
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2 z-20" style={{ bottom: -28 }}>
+                          {news.map((_, i) => (
+                            <button key={i} onClick={() => goNews(i - newsIdx)}
+                              className={`rounded-full transition-all duration-300 ${
+                                i === newsIdx ? 'w-6 h-2 bg-white' : 'w-2 h-2 bg-white/40 hover:bg-white/70'
+                              }`} />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })()}
