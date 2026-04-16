@@ -24,10 +24,8 @@ export default function Home() {
     if (newsAnimating) return;
     setNewsDir(dir);
     setNewsAnimating(true);
-    setTimeout(() => {
-      setNewsIdx(i => (i + dir + news.length) % news.length);
-      setNewsAnimating(false);
-    }, 300);
+    setNewsIdx(i => (i + dir + news.length) % news.length);
+    setTimeout(() => setNewsAnimating(false), 350);
   };
 
   useEffect(() => {
@@ -152,8 +150,8 @@ export default function Home() {
               {/* Carousel body */}
               <div className="flex-1 overflow-hidden">
                 <div
-                  className="flex gap-4 items-stretch transition-all duration-300"
-                  style={{ transform: newsAnimating ? `translateX(${newsDir > 0 ? '-4%' : '4%'})` : 'translateX(0)', opacity: newsAnimating ? 0 : 1 }}>
+                  key={newsIdx}
+                  className={`flex gap-4 items-stretch ${newsDir >= 0 ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}>
 
                   {/* Left small card */}
                   {news.length > 2 && (() => {
