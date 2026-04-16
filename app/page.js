@@ -157,11 +157,15 @@ export default function Home() {
               {/* Carousel body */}
               <div className="flex-1 overflow-hidden" ref={carouselRef}>
                 {(() => {
-                  const centerW = Math.min(carouselW * 0.58, 460);
-                  const sideW = Math.min(carouselW * 0.28, 260);
-                  const sideOffset = centerW / 2 + 12 + sideW / 2;
-                  const offscreenOffset = sideOffset + sideW / 2 + 20;
-                  const containerH = 280;
+                  // All cards are the same base width, scale drives the size difference
+                  const cardW = Math.min(carouselW * 0.62, 520);
+                  const centerScale = 1;
+                  const sideScale = 0.62;
+                  // Distance from center to side card center = half of center + gap + half of side (in scaled terms)
+                  const sideSpacing = cardW * (centerScale / 2 + sideScale / 2) + 16;
+                  const offscreenSpacing = sideSpacing * 2;
+                  const containerH = 340;
+                  const cardH = containerH; // card height before scaling
                   return (
                     <div className="relative" style={{ height: containerH }}>
                       {[-2, -1, 0, 1, 2].map(offset => {
@@ -169,50 +173,55 @@ export default function Home() {
                         const isCenter = offset === 0;
                         const isSide = Math.abs(offset) === 1;
                         const isOffscreen = Math.abs(offset) === 2;
-                        const x = isOffscreen ? offset * offscreenOffset : offset * sideOffset;
-                        const w = isCenter ? centerW : sideW;
+                        const scale = isCenter ? centerScale : isSide ? sideScale : sideScale * 0.85;
+                        const x = isOffscreen ? offset * offscreenSpacing : offset * sideSpacing;
+                        const opacity = isCenter ? 1 : isSide ? 0.75 : 0;
                         const item = news[idx];
                         return (
                           <div
                             key={idx}
-                            onClick={() => !isOffscreen ? setSelectedNews(item) : null}
+                            onClick={() => isSide ? goNews(offset) : isCenter ? setSelectedNews(item) : null}
                             style={{
                               position: 'absolute',
                               top: '50%',
                               left: '50%',
-                              width: w,
-                              opacity: isCenter ? 1 : isSide ? 0.82 : 0,
+                              width: cardW,
+                              height: cardH,
+                              opacity,
                               zIndex: isCenter ? 10 : isSide ? 5 : 0,
                               pointerEvents: isOffscreen ? 'none' : 'auto',
-                              cursor: isOffscreen ? 'default' : 'pointer',
-                              transition: 'transform 0.46s cubic-bezier(.3,.7,.4,1.1), opacity 0.46s, width 0.46s',
-                              transform: `translate(calc(-50% + ${x}px), -50%)`,
+                              cursor: isCenter ? 'pointer' : isSide ? 'pointer' : 'default',
+                              transition: 'transform 0.52s cubic-bezier(.22,.68,0,1.2), opacity 0.52s ease',
+                              transform: `translate(calc(-50% + ${x}px), -50%) scale(${scale})`,
+                              transformOrigin: 'center center',
+                              willChange: 'transform, opacity',
                             }}
                           >
                             {isCenter ? (
-                              <article className="rounded-[24px] bg-white/95 shadow-2xl overflow-hidden hover:shadow-sky-200 transition-shadow" style={{ height: containerH }}>
+                              <article className="rounded-[24px] bg-white/95 shadow-2xl overflow-hidden h-full flex flex-col">
                                 {item?.imageUrl
-                                  ? <div style={{ height: 150 }} className="overflow-hidden"><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
+                                  ? <div className="overflow-hidden" style={{ height: 190 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
                                   : <div className="h-3 bg-gradient-to-r from-sky-400 to-blue-500" />}
-                                <div className="p-5">
+                                <div className="p-6 flex flex-col flex-1">
                                   <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-1">
                                     {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
                                   </p>
-                                  <h3 className="text-lg font-extrabold text-slate-900 leading-snug mb-1 line-clamp-2">{item?.title}</h3>
-                                  <p className="text-slate-500 text-sm leading-relaxed line-clamp-2">{item?.description}</p>
+                                  <h3 className="text-xl font-extrabold text-slate-900 leading-snug mb-2 line-clamp-2">{item?.title}</h3>
+                                  <p className="text-slate-500 text-sm leading-relaxed line-clamp-2 flex-1">{item?.description}</p>
                                   <span className="mt-3 inline-block text-xs font-semibold text-sky-600">Читать далее →</span>
                                 </div>
                               </article>
                             ) : (
-                              <article className="rounded-[20px] bg-white/85 shadow overflow-hidden flex flex-row" style={{ height: 110 }}>
+                              <article className="rounded-[20px] bg-white/90 shadow-lg overflow-hidden flex flex-row h-full hover:bg-white/95 transition-colors">
                                 {item?.imageUrl
-                                  ? <div className="shrink-0 overflow-hidden" style={{ width: 100 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
+                                  ? <div className="shrink-0 overflow-hidden" style={{ width: 130 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
                                   : <div className="shrink-0 bg-gradient-to-b from-sky-400 to-blue-500" style={{ width: 6 }} />}
-                                <div className="flex flex-col justify-center p-3 overflow-hidden">
-                                  <p className="text-xs font-semibold text-sky-400 mb-0.5 truncate">
+                                <div className="flex flex-col justify-center p-4 overflow-hidden">
+                                  <p className="text-xs font-semibold text-sky-400 mb-1 truncate">
                                     {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
                                   </p>
-                                  <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-2">{item?.title}</h4>
+                                  <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-4">{item?.title}</h4>
+                                  <p className="text-slate-400 text-xs mt-1 line-clamp-3">{item?.description}</p>
                                 </div>
                               </article>
                             )}
