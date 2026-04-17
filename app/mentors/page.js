@@ -1,3 +1,25 @@
+
+'use client';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import KebabMenu from '../components/KebabMenu';
+export default function MentorsPage() {
+  const [mentors, setMentors] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [empSearch, setEmpSearch] = useState('');
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [filter, setFilter] = useState('Все отделы');
+  const [showAssign, setShowAssign] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [selectedMentor, setSelectedMentor] = useState(null);
+  const [copiedPhone, setCopiedPhone] = useState('');
+  const [phonePopup, setPhonePopup] = useState('');
   const [myMentors, setMyMentors] = useState([]);
   const [myTasks, setMyTasks] = useState([]);
 
@@ -15,10 +37,6 @@
       setMyTasks([]);
     }
   }, [user, mentors]);
-'use client';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import KebabMenu from '../components/KebabMenu';
 
 const DEPARTMENTS = ['Все отделы', 'Аквапарк', 'Ресторан', 'SPA', 'Магазин', 'Офис'];
 
