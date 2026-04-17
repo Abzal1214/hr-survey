@@ -1,17 +1,17 @@
-  const [myMentor, setMyMentor] = useState(null);
+  const [myMentors, setMyMentors] = useState([]);
   const [myTasks, setMyTasks] = useState([]);
 
-  // Найти наставника по department и загрузить задачи для сотрудника
+  // Найти всех наставников по department и загрузить задачи для сотрудника
   useEffect(() => {
     if (user && user.role === 'employee' && user.department) {
-      const mentor = mentors.find(m => m.department === user.department);
-      setMyMentor(mentor || null);
+      const foundMentors = mentors.filter(m => m.department === user.department);
+      setMyMentors(foundMentors);
       fetch(`/api/mentor-tasks?employeePhone=${user.phone}`)
         .then(r => r.json())
         .then(setMyTasks)
         .catch(() => setMyTasks([]));
     } else {
-      setMyMentor(null);
+      setMyMentors([]);
       setMyTasks([]);
     }
   }, [user, mentors]);
@@ -153,17 +153,23 @@ export default function MentorsPage() {
   return (
     <div className="min-h-screen">
       {/* Мой наставник и задачи для сотрудника */}
-      {user?.role === 'employee' && myMentor && (
+      {user?.role === 'employee' && myMentors.length > 0 && (
         <div className="max-w-2xl mx-auto mt-8 mb-8 p-6 rounded-3xl bg-white/90 shadow-lg">
-          <div className="flex items-center gap-5 mb-3">
-            {myMentor.photoUrl
-              ? <img src={myMentor.photoUrl} alt={myMentor.name} className="w-16 h-16 rounded-full object-cover border-2 border-sky-300" />
-              : <div className="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center text-2xl font-bold text-sky-600">👤</div>}
-            <div>
-              <div className="text-sm text-slate-500 mb-1">Мой наставник</div>
-              <div className="font-bold text-lg text-slate-900">{myMentor.name}</div>
-              {myMentor.position && <div className="text-sky-600 text-sm font-semibold">{myMentor.position}</div>}
-              {myMentor.phone && <div className="text-xs text-slate-500 mt-1">📞 {myMentor.phone}</div>}
+          <div className="mb-3">
+            <div className="text-sm text-slate-500 mb-2">Мои наставники отдела</div>
+            <div className="flex flex-wrap gap-5">
+              {myMentors.map(m => (
+                <div key={m._id} className="flex items-center gap-3 mb-2">
+                  {m.photoUrl
+                    ? <img src={m.photoUrl} alt={m.name} className="w-14 h-14 rounded-full object-cover border-2 border-sky-300" />
+                    : <div className="w-14 h-14 rounded-full bg-sky-100 flex items-center justify-center text-xl font-bold text-sky-600">👤</div>}
+                  <div>
+                    <div className="font-bold text-base text-slate-900">{m.name}</div>
+                    {m.position && <div className="text-sky-600 text-xs font-semibold">{m.position}</div>}
+                    {m.phone && <div className="text-xs text-slate-500 mt-0.5">📞 {m.phone}</div>}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
           <div>
