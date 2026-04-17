@@ -9,7 +9,7 @@ export async function GET(request) {
     const dept = searchParams.get('department');
     const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }] } : {};
     const quizzes = await Quiz.find(query).sort({ createdAt: -1 }).lean();
-    return NextResponse.json(quizzes.map(q => ({ ...q, id: q._id })));
+    return NextResponse.json(quizzes.map(q => ({ ...q, id: q._id })), { headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } });
   } catch (error) {
     return NextResponse.json({ error: 'Не удалось загрузить тесты' }, { status: 500 });
   }

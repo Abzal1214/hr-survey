@@ -23,7 +23,7 @@ export async function GET() {
   try {
     await ensureDefaults();
     const tips = await HRTip.find({}).sort({ order: 1, createdAt: 1 }).lean();
-    return NextResponse.json(tips);
+    return NextResponse.json(tips, { headers: { 'Cache-Control': 's-maxage=120, stale-while-revalidate=600' } });
   } catch {
     return NextResponse.json([]);
   }

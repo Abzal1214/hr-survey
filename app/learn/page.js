@@ -23,6 +23,8 @@ export default function LearnPage() {
   const [saving, setSaving] = useState(false);
   const [createMsg, setCreateMsg] = useState('');
   const [message, setMessage] = useState('');
+  const [trainingsPage, setTrainingsPage] = useState(1);
+  const TRAININGS_PAGE_SIZE = 6;
 
   // Курсы
   const [courses, setCourses] = useState([]);
@@ -52,7 +54,7 @@ export default function LearnPage() {
 
   const loadTrainings = (u) => {
     const dept = u && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
-    fetch('/api/trainings' + dept).then(r => r.json()).then(d => setTrainings(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch('/api/trainings' + dept).then(r => r.json()).then(d => { setTrainings(Array.isArray(d) ? d : []); setTrainingsPage(1); }).catch(() => {});
   };
 
   const loadCourses = (u) => {
@@ -321,9 +323,14 @@ export default function LearnPage() {
               <div className="rounded-[24px] bg-white/95 p-10 text-center text-slate-500 shadow">
                 {isAdmin ? 'Нет материалов. Добавьте первый кнопкой выше.' : 'Пока нет материалов.'}
               </div>
-            ) : (
-              <div className="space-y-4">
-                {trainings.map((item) => {
+            ) : (() => {
+              const totalPages = Math.max(1, Math.ceil(trainings.length / TRAININGS_PAGE_SIZE));
+              const curPage = Math.min(trainingsPage, totalPages);
+              const pageItems = trainings.slice((curPage - 1) * TRAININGS_PAGE_SIZE, curPage * TRAININGS_PAGE_SIZE);
+              return (
+                <>
+                  <div className="space-y-4">
+                    {pageItems.map((item) => {
                   const itemId = String(item._id || item.id);
                   return (
                     <div key={itemId} className="rounded-[20px] border-l-4 border-emerald-400 bg-white/95 p-6 shadow-sm">
@@ -376,8 +383,34 @@ export default function LearnPage() {
                     </div>
                   );
                 })}
-              </div>
-            )}
+                  </div>
+                  {totalPages > 1 && (
+                    <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-sm text-white/70">{trainings.length} материалов · стр. {curPage} из {totalPages}</p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => { setTrainingsPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                          disabled={curPage === 1}
+                          className="rounded-xl border border-white/30 bg-white/10 text-white px-4 py-1.5 text-sm font-medium hover:bg-white/20 transition disabled:opacity-40"
+                        >← Назад</button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                          <button
+                            key={p}
+                            onClick={() => { setTrainingsPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                            className={`rounded-xl px-3 py-1.5 text-sm font-semibold transition ${p === curPage ? 'bg-white text-slate-900 shadow' : 'border border-white/30 bg-white/10 text-white hover:bg-white/20'}`}
+                          >{p}</button>
+                        ))}
+                        <button
+                          onClick={() => { setTrainingsPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                          disabled={curPage === totalPages}
+                          className="rounded-xl border border-white/30 bg-white/10 text-white px-4 py-1.5 text-sm font-medium hover:bg-white/20 transition disabled:opacity-40"
+                        >Вперёд →</button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         )}
 

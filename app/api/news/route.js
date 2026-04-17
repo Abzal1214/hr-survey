@@ -6,7 +6,7 @@ export async function GET() {
   try {
     await connectDB();
     const news = await News.find({}).sort({ createdAt: -1 }).lean();
-    return NextResponse.json(news.map(n => ({ ...n, id: n._id })));
+    return NextResponse.json(news.map(n => ({ ...n, id: n._id })), { headers: { 'Cache-Control': 's-maxage=30, stale-while-revalidate=120' } });
   } catch (error) {
     return NextResponse.json({ error: 'Не удалось загрузить новости' }, { status: 500 });
   }

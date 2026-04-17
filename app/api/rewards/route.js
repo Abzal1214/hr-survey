@@ -6,7 +6,7 @@ export async function GET() {
   try {
     await connectDB();
     const rewards = await Reward.find({}).sort({ createdAt: 1 }).lean();
-    return NextResponse.json(rewards.map(r => ({ ...r, id: r._id })));
+    return NextResponse.json(rewards.map(r => ({ ...r, id: r._id })), { headers: { 'Cache-Control': 's-maxage=120, stale-while-revalidate=600' } });
   } catch (error) {
     return NextResponse.json({ error: 'Не удалось загрузить награды' }, { status: 500 });
   }

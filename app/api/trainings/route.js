@@ -13,7 +13,7 @@ export async function GET(request) {
       ...t,
       id: t._id,
       attachments: t.fileUrl ? t.fileUrl.split(',').filter(Boolean) : []
-    })));
+    })), { headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } });
   } catch (error) {
     return NextResponse.json({ error: 'Не удалось загрузить тренинги' }, { status: 500 });
   }
