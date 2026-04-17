@@ -11,7 +11,7 @@ export default function TrainingsPage() {
   const [message, setMessage] = useState('');
 
   const [showCreate, setShowCreate] = useState(false);
-  const [newTraining, setNewTraining] = useState({ title: '', description: '', date: '', time: '', location: '', maxParticipants: 20, department: '', trainer: '', registrationDeadline: '' });
+  const [newTraining, setNewTraining] = useState({ title: '', description: '', date: '', time: '', location: '', maxParticipants: 20, department: '', trainer: '' });
   const [createMsg, setCreateMsg] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -74,7 +74,7 @@ export default function TrainingsPage() {
     const res = await fetch('/api/offline-trainings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newTraining) });
     if (res.ok) {
       setCreateMsg('Тренинг добавлен!');
-      setNewTraining({ title: '', description: '', date: '', time: '', location: '', maxParticipants: 20, department: '' });
+      setNewTraining({ title: '', description: '', date: '', time: '', location: '', maxParticipants: 20, department: '', trainer: '' });
       setShowCreate(false);
       loadTrainings();
     } else { const d = await res.json(); setCreateMsg(d.error || 'Ошибка'); }
@@ -99,8 +99,7 @@ export default function TrainingsPage() {
   };
 
   const isRegistrationClosed = (t) => {
-    if (t.registrationDeadline) return new Date(t.registrationDeadline) < new Date();
-    // default: closes at training start time
+    // always closes at training start time
     const dt = getTrainingDateTime(t);
     return dt ? dt < new Date() : false;
   };
@@ -131,11 +130,6 @@ export default function TrainingsPage() {
               <span className={`flex items-center gap-1.5 font-semibold ${left <= 0 ? 'text-red-500' : left <= 3 ? 'text-orange-500' : 'text-emerald-600'}`}>
                 👥 Мест: {left <= 0 ? 'нет' : left} / {t.maxParticipants}
               </span>
-              {t.registrationDeadline && !past && (
-                <span className={`flex items-center gap-1.5 ${regClosed ? 'text-red-500 font-semibold' : 'text-slate-500'}`}>
-                  ⏳ Запись до: {new Date(t.registrationDeadline).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                </span>
-              )}
             </div>
           </div>
           {isAdmin && (
@@ -236,11 +230,6 @@ export default function TrainingsPage() {
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Место проведения *" />
                   <input value={newTraining.trainer} onChange={e => setNewTraining(p => ({ ...p, trainer: e.target.value }))}
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Ведущий (имя, должность)" />
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Запись открыта до</label>
-                    <input type="datetime-local" value={newTraining.registrationDeadline} onChange={e => setNewTraining(p => ({ ...p, registrationDeadline: e.target.value }))}
-                      className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
-                  </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-slate-600 mb-1">Макс. участников</label>
