@@ -30,7 +30,7 @@ export async function POST(request) {
         alreadyPassed = true;
       } else {
         const user = await User.findOne({ phone });
-        if (user) {
+        if (user && user.role !== 'admin') {
           const quiz = quizId ? await Quiz.findById(quizId).lean() : null;
           bonus = quiz?.coins ?? (score === 100 ? 5 : 3);
           await User.updateOne({ phone }, { $inc: { points: bonus } });

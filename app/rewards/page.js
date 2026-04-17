@@ -142,8 +142,7 @@ export default function RewardsPage() {
   }, []);
 
   let balance = 0;
-  if (user?.role === 'admin') balance = 1000000;
-  else if (user?.points != null) balance = user.points;
+  if (user?.role !== 'admin' && user?.points != null) balance = user.points;
 
   const addToCart = (id) => setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
   const removeFromCart = (id) => setCart((prev) => {
