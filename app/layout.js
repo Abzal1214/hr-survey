@@ -47,7 +47,7 @@ export default function RootLayout({ children }) {
 
             <nav className="hidden flex-1 items-center justify-center gap-3 text-sm text-sky-100 lg:flex">
               <Link href="/" className="nav-link rounded-full px-4 py-2 transition hover:bg-sky-500 hover:text-white">
-                Главная страница
+                Главная
               </Link>
               <Link href="/news" className="rounded-full px-4 py-2 transition hover:bg-sky-500 hover:text-white">
                 Новости
