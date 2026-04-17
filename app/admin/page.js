@@ -113,6 +113,9 @@ export default function Admin() {
   const [staffPageSize, setStaffPageSize] = useState(10);
   const [staffPage, setStaffPage] = useState(1);
   const [staffSearch, setStaffSearch] = useState('');
+  const [coinSearch, setCoinSearch] = useState('');
+  const [coinPage, setCoinPage] = useState(1);
+  const [coinPageSize, setCoinPageSize] = useState(10);
   const employeeFormRef = useRef(null);
   const isProfileSuccessMessage = /успешно|обновлены/i.test(profileMessage);
 
@@ -136,6 +139,21 @@ export default function Admin() {
     setStaffPage(1);
   }, [staffPageSize, usersData.length, staffSearch]);
 
+  useEffect(() => {
+    setCoinPage(1);
+  }, [coinPageSize, usersData.length, coinSearch]);
+
+  const filteredCoins = coinSearch.trim()
+    ? usersData.filter((u) => {
+        const q = coinSearch.trim().toLowerCase();
+        return [[u.name, u.surname].filter(Boolean).join(' '), u.phone, u.department].some((v) => String(v ?? '').toLowerCase().includes(q));
+      })
+    : usersData;
+  const totalCoinPages = Math.max(1, Math.ceil(filteredCoins.length / coinPageSize));
+  const currentCoinPage = Math.min(coinPage, totalCoinPages);
+  const coinStart = (currentCoinPage - 1) * coinPageSize;
+  const coinRows = filteredCoins.slice(coinStart, coinStart + coinPageSize);
+
   const mapDepartment = (user) => {
     if (user.department) return user.department;
     if (user.workplaceType === 'restaurant') return 'Ресторан';
@@ -157,50 +175,8 @@ export default function Admin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/users');
-      if (!response.ok) {
-        throw new Error('Не удалось получить список пользователей');
-      }
-      const users = await response.json();
-      const normalizePhone = (value) => String(value).replace(/\D/g, '');
-      const enteredLogin = loginData.username.trim();
-      const enteredPhone = normalizePhone(enteredLogin);
-      const matchedUser = users.find((user) => {
-        const phoneMatch = enteredPhone && normalizePhone(user.phone) === enteredPhone;
-        const usernameMatch = user.username && user.username.toLowerCase() === enteredLogin.toLowerCase();
-        return (phoneMatch || usernameMatch) && user.password === loginData.password && mapDepartment(user).toLowerCase() === loginData.department.toLowerCase();
-      });
-
-      if (matchedUser) {
-        const user = { ...matchedUser, role: matchedUser.role || 'employee' };
-        setCurrentUser(user);
-        setIsVirtualAdmin(false);
-        if (user.role === 'admin') setShowAdminProfileForm(true);
-        setProfileIdentity({
-          id: String(user._id || user.id || ''),
-          phone: user.phone || '',
-          username: user.username || '',
-        });
-        setIsLoggedIn(true);
-        setProfileForm((prev) => ({
-          ...prev,
-          name: user.name || '',
-          surname: user.surname || '',
-          username: user.username || '',
-          phone: user.phone || '',
-          department: user.department || '',
-          position: user.position || '',
-          currentPassword: '',
-          newPassword: '',
-          confirmNewPassword: '',
-        }));
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        localStorage.setItem('rememberedLogin', JSON.stringify({ username: loginData.username, password: loginData.password, department: loginData.department }));
-        window.dispatchEvent(new Event('userChanged'));
-        if (matchedUser.role === 'admin') {
-          await fetchAdminData();
-        }
-      } else if (loginData.username === 'admin' && loginData.password === 'admin123@') {
+      // Virtual admin bypass (hardcoded)
+      if (loginData.username === 'admin' && loginData.password === 'admin123@') {
         const user = { name: 'Администратор', role: 'admin' };
         setCurrentUser(user);
         setIsVirtualAdmin(true);
@@ -210,11 +186,11 @@ export default function Admin() {
         setProfileForm((prev) => ({
           ...prev,
           name: user.name || '',
-          surname: user.surname || '',
-          username: user.username || '',
-          phone: user.phone || '',
-          department: user.department || '',
-          position: user.position || '',
+          surname: '',
+          username: '',
+          phone: '',
+          department: '',
+          position: '',
           currentPassword: '',
           newPassword: '',
           confirmNewPassword: '',
@@ -223,8 +199,52 @@ export default function Admin() {
         localStorage.setItem('rememberedLogin', JSON.stringify({ username: loginData.username, password: loginData.password, department: loginData.department }));
         window.dispatchEvent(new Event('userChanged'));
         await fetchAdminData();
-      } else {
-        setLoginError('Неверный логин или пароль');
+        return;
+      }
+
+      // Server-side authentication via /api/auth
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: loginData.username.trim(),
+          password: loginData.password,
+          department: loginData.department,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setLoginError(data.error || 'Неверный логин или пароль');
+        return;
+      }
+
+      const user = { ...data.user, role: data.user.role || 'employee' };
+      setCurrentUser(user);
+      setIsVirtualAdmin(false);
+      if (user.role === 'admin') setShowAdminProfileForm(true);
+      setProfileIdentity({
+        id: String(user._id || user.id || ''),
+        phone: user.phone || '',
+        username: user.username || '',
+      });
+      setIsLoggedIn(true);
+      setProfileForm((prev) => ({
+        ...prev,
+        name: user.name || '',
+        surname: user.surname || '',
+        username: user.username || '',
+        phone: user.phone || '',
+        department: user.department || '',
+        position: user.position || '',
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: '',
+      }));
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      localStorage.setItem('rememberedLogin', JSON.stringify({ username: loginData.username, password: loginData.password, department: loginData.department }));
+      window.dispatchEvent(new Event('userChanged'));
+      if (user.role === 'admin') {
+        await fetchAdminData();
       }
     } catch (error) {
       setLoginError('Ошибка входа: ' + error.message);
@@ -307,10 +327,6 @@ export default function Admin() {
         setProfileMessage('Введите старый пароль');
         return;
       }
-      if (profileForm.currentPassword !== (currentUser?.password || '')) {
-        setProfileMessage('Старый пароль неверный');
-        return;
-      }
       if (!profileForm.newPassword || !profileForm.confirmNewPassword) {
         setProfileMessage('Заполните новый пароль и подтверждение');
         return;
@@ -374,6 +390,7 @@ export default function Admin() {
           department: profileForm.department,
           position: currentUser?.role === 'admin' ? undefined : profileForm.position,
           password: showPasswordResetFields ? profileForm.newPassword : undefined,
+          currentPassword: showPasswordResetFields ? profileForm.currentPassword : undefined,
           selfService: true,
         }),
       });
@@ -390,7 +407,6 @@ export default function Admin() {
         phone: profileForm.phone,
         department: profileForm.department,
         position: currentUser?.role === 'admin' ? currentUser.position : profileForm.position,
-        password: showPasswordResetFields ? profileForm.newPassword : currentUser.password,
       };
 
       // Refresh from API to guarantee UI reflects exactly what is stored in DB.
@@ -422,7 +438,7 @@ export default function Admin() {
       localStorage.setItem('currentUser', JSON.stringify(persistedUser));
       localStorage.setItem('rememberedLogin', JSON.stringify({
         username: profileForm.username || profileForm.phone,
-        password: showPasswordResetFields ? profileForm.newPassword : currentUser.password,
+        password: showPasswordResetFields ? profileForm.newPassword : (JSON.parse(localStorage.getItem('rememberedLogin') || '{}').password || ''),
         department: profileForm.department || currentUser.department || currentUser.workplaceType || '',
       }));
       setProfileForm((prev) => ({
@@ -1217,7 +1233,33 @@ export default function Admin() {
             </div>
           )}
           <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2"><GoldCoin size="md" /> AQUA COIN — баллы сотрудников</h2>
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2"><GoldCoin size="md" /> AQUA COIN — баллы сотрудников</h2>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="relative">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m0 0A7 7 0 104.65 4.65a7 7 0 0012 12z" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={coinSearch}
+                    onChange={e => { setCoinSearch(e.target.value); setCoinPage(1); }}
+                    placeholder="Поиск"
+                    className="pl-9 pr-4 py-2 rounded-xl border border-slate-300 text-slate-900 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                  {coinSearch && (
+                    <button onClick={() => setCoinSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">✕</button>
+                  )}
+                </div>
+                <a
+                  href="/api/export"
+                  download="aquacoin-report.csv"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-sky-600 text-white px-5 py-2 font-semibold hover:bg-sky-700 transition text-sm"
+                >
+                  📥 Экспорт CSV
+                </a>
+              </div>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm text-slate-900">
                 <thead className="bg-emerald-100 text-slate-900">
@@ -1229,7 +1271,7 @@ export default function Admin() {
                   </tr>
                 </thead>
                 <tbody>
-                  {usersData.map((user, index) => (
+                  {coinRows.map((user, index) => (
                     <tr key={index} className={index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'}>
                       <td className="p-3 border-b text-slate-900">{[user.name, user.surname].filter(Boolean).join(' ')}</td>
                       <td className="p-3 border-b text-slate-900">{user.phone}</td>
@@ -1239,6 +1281,41 @@ export default function Admin() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <p className="text-slate-500">Показано {coinRows.length} из {filteredCoins.length}</p>
+                <span>· по</span>
+                <select
+                  value={coinPageSize}
+                  onChange={(e) => setCoinPageSize(Number(e.target.value))}
+                  className="rounded-xl border border-slate-300 bg-white px-2 py-1 text-slate-900"
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                </select>
+                <span>сотрудников</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCoinPage((p) => Math.max(1, p - 1))}
+                  disabled={currentCoinPage === 1}
+                  className="rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 disabled:opacity-40"
+                >
+                  Назад
+                </button>
+                <span className="text-sm text-slate-600">{currentCoinPage} / {totalCoinPages}</span>
+                <button
+                  type="button"
+                  onClick={() => setCoinPage((p) => Math.min(totalCoinPages, p + 1))}
+                  disabled={currentCoinPage === totalCoinPages}
+                  className="rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 disabled:opacity-40"
+                >
+                  Вперёд
+                </button>
+              </div>
             </div>
           </div>
         </div>

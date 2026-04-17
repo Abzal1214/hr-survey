@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
 import { User } from '../../../lib/models';
+import bcrypt from 'bcryptjs';
 
 const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
 
@@ -8,7 +9,9 @@ export async function GET() {
   try {
     await connectDB();
     const users = await User.find({}).lean();
-    return NextResponse.json(users);
+    // Strip password from all returned users
+    const safeUsers = users.map(({ password: _pwd, ...u }) => u);
+    return NextResponse.json(safeUsers);
   } catch (error) {
     return NextResponse.json({ error: 'Не удалось загрузить пользователей' }, { status: 500 });
   }
@@ -33,7 +36,8 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Этот логин уже занят' }, { status: 400 });
       }
     }
-    await User.create({ name, surname: surname || '', username: username || '', phone, password, department, position: position || '', points: Number(points), role });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({ name, surname: surname || '', username: username || '', phone, password: hashedPassword, department, position: position || '', points: Number(points), role });
     return NextResponse.json({ message: 'Пользователь зарегистрирован' });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка регистрации' }, { status: 500 });
@@ -75,7 +79,23 @@ export async function PUT(request) {
     if (surname !== undefined) update.surname = surname;
     if (username !== undefined) update.username = username;
     if (phone !== undefined) update.phone = phone;
-    if (password) update.password = password;
+    if (password) {
+      if (selfService) {
+        const { currentPassword } = body;
+        if (!currentPassword) {
+          return NextResponse.json({ error: 'Введите старый пароль' }, { status: 400 });
+        }
+        const storedPwd = String(current.password || '');
+        const isHashed = storedPwd.startsWith('$2');
+        const match = isHashed
+          ? await bcrypt.compare(currentPassword, storedPwd)
+          : storedPwd === currentPassword;
+        if (!match) {
+          return NextResponse.json({ error: 'Старый пароль неверный' }, { status: 400 });
+        }
+      }
+      update.password = await bcrypt.hash(password, 10);
+    }
     if (!selfService) {
       if (department !== undefined) update.department = department;
       if (position !== undefined) update.position = position;

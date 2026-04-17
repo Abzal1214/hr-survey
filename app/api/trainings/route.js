@@ -23,11 +23,11 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { title, description, attachments = [], department = '' } = body;
+    const { title, description, attachments = [], department = '', deadline } = body;
     if (!title || !description) {
       return NextResponse.json({ error: 'Заполните все поля' }, { status: 400 });
     }
-    const training = await Training.create({ title, description, fileUrl: Array.isArray(attachments) ? attachments.join(',') : (attachments || ''), department });
+    const training = await Training.create({ title, description, fileUrl: Array.isArray(attachments) ? attachments.join(',') : (attachments || ''), department, deadline: deadline ? new Date(deadline) : null });
     return NextResponse.json({ ...training.toObject(), id: training._id });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка добавления тренинга' }, { status: 500 });
@@ -38,9 +38,11 @@ export async function PUT(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { id, title, description } = body;
+    const { id, title, description, deadline } = body;
     if (!id) return NextResponse.json({ error: 'ID не указан' }, { status: 400 });
-    const training = await Training.findByIdAndUpdate(id, { title, description }, { new: true });
+    const updateData = { title, description };
+    if (deadline !== undefined) updateData.deadline = deadline ? new Date(deadline) : null;
+    const training = await Training.findByIdAndUpdate(id, updateData, { new: true });
     if (!training) return NextResponse.json({ error: 'Тренинг не найден' }, { status: 404 });
     return NextResponse.json({ ...training.toObject(), id: training._id });
   } catch (error) {

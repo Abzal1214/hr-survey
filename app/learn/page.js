@@ -18,7 +18,7 @@ export default function LearnPage() {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ title: '', description: '' });
   const [showCreate, setShowCreate] = useState(false);
-  const [newTraining, setNewTraining] = useState({ title: '', description: '', department: '' });
+  const [newTraining, setNewTraining] = useState({ title: '', description: '', department: '', deadline: '' });
   const [trainingFiles, setTrainingFiles] = useState([]);
   const [saving, setSaving] = useState(false);
   const [createMsg, setCreateMsg] = useState('');
@@ -126,7 +126,7 @@ export default function LearnPage() {
       } catch {}
     }
     const res = await fetch('/api/trainings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...newTraining, attachments: attachmentUrls }) });
-    if (res.ok) { setCreateMsg('Добавлено!'); setNewTraining({ title: '', description: '', department: '' }); setTrainingFiles([]); setShowCreate(false); loadTrainings(); }
+    if (res.ok) { setCreateMsg('Добавлено!'); setNewTraining({ title: '', description: '', department: '', deadline: '' }); setTrainingFiles([]); setShowCreate(false); loadTrainings(); }
     else { const d = await res.json(); setCreateMsg(d.error || 'Ошибка'); }
     setSaving(false);
   };
@@ -295,6 +295,11 @@ export default function LearnPage() {
                         <option value="Офис">Офис</option>
                       </select>
                       <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Дедлайн (необязательно)</label>
+                        <input type="date" value={newTraining.deadline} onChange={e => setNewTraining(p => ({ ...p, deadline: e.target.value }))}
+                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
+                      </div>
+                      <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Файлы</label>
                         <input type="file" multiple accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                           onChange={e => setTrainingFiles(Array.from(e.target.files || []))}
@@ -328,6 +333,11 @@ export default function LearnPage() {
                             className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm" />
                           <textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
                             className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm min-h-[80px]" />
+                          <div>
+                            <label className="block text-xs font-medium text-slate-600 mb-1">Дедлайн</label>
+                            <input type="date" value={editForm.deadline || ''} onChange={e => setEditForm(p => ({ ...p, deadline: e.target.value }))}
+                              className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm" />
+                          </div>
                           <div className="flex gap-2">
                             <button onClick={() => handleSaveEdit(itemId)} className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer">Сохранить</button>
                             <button onClick={() => setEditingId(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 active:scale-95 transition-all cursor-pointer">Отмена</button>
@@ -337,9 +347,14 @@ export default function LearnPage() {
                         <>
                           <div className="flex items-start justify-between gap-4">
                             <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
-                            {isAdmin && <KebabMenu onEdit={() => { setEditingId(itemId); setEditForm({ title: item.title, description: item.description || '' }); }} onDelete={() => handleDelete(itemId)} />}
+                            {isAdmin && <KebabMenu onEdit={() => { setEditingId(itemId); setEditForm({ title: item.title, description: item.description || '', deadline: item.deadline ? new Date(item.deadline).toISOString().split('T')[0] : '' }); }} onDelete={() => handleDelete(itemId)} />}
                           </div>
                           {item.description && <p className="text-slate-600 mt-2 text-sm">{item.description}</p>}
+                          {item.deadline && (
+                            <p className={`mt-2 text-xs font-semibold inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${new Date(item.deadline) < new Date() ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                              ⏰ Дедлайн: {new Date(item.deadline).toLocaleDateString('ru-RU')}
+                            </p>
+                          )}
                           {item.attachments?.length > 0 && (
                             <div className="mt-4 space-y-2">
                               <p className="text-xs uppercase tracking-widest text-slate-400">Файлы</p>
