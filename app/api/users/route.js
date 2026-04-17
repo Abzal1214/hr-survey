@@ -48,7 +48,7 @@ export async function PUT(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { id, oldPhone, lookupUsername, phone, name, surname, username, password, department, position, points, role, selfService } = body;
+    const { id, oldPhone, lookupUsername, phone, name, surname, username, password, department, position, points, role, selfService, avatar } = body;
     if (!id && !oldPhone && !lookupUsername) {
       return NextResponse.json({ error: 'Не указан пользователь для обновления' }, { status: 400 });
     }
@@ -105,6 +105,7 @@ export async function PUT(request) {
     if (selfService) {
       if (typeof department === 'string') update.department = department;
       if (typeof position === 'string') update.position = position;
+      if (typeof avatar === 'string') update.avatar = avatar;
     }
     await User.updateOne({ _id: current._id }, { $set: update });
     return NextResponse.json({ message: 'Пользователь обновлен' });

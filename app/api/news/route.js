@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
-import { News } from '../../../lib/models';
+import { News, Notification } from '../../../lib/models';
 
 export async function GET() {
   try {
@@ -21,6 +21,14 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Заполните заголовок и описание' }, { status: 400 });
     }
     const post = await News.create({ title, description, imageUrl: body.imageUrl || '' });
+    // Broadcast notification to all employees
+    await Notification.create({
+      phone: '',
+      type: 'news',
+      title: '📰 Новая новость',
+      body: title,
+      link: '/news',
+    });
     return NextResponse.json({ message: 'Новость добавлена', post: { ...post.toObject(), id: post._id } });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка добавления новости' }, { status: 500 });

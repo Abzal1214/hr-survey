@@ -113,11 +113,50 @@ export default function Admin() {
   const [staffPageSize, setStaffPageSize] = useState(10);
   const [staffPage, setStaffPage] = useState(1);
   const [staffSearch, setStaffSearch] = useState('');
+  const [staffSort, setStaffSort] = useState({ key: '', dir: 'asc' });
   const [coinSearch, setCoinSearch] = useState('');
   const [coinPage, setCoinPage] = useState(1);
   const [coinPageSize, setCoinPageSize] = useState(10);
+  const [coinSort, setCoinSort] = useState({ key: 'points', dir: 'desc' });
+  const [rewardRequests, setRewardRequests] = useState([]);
+  const [rewardReqNote, setRewardReqNote] = useState({});
+  const [showRewardReqs, setShowRewardReqs] = useState(false);
   const employeeFormRef = useRef(null);
   const isProfileSuccessMessage = /успешно|обновлены/i.test(profileMessage);
+
+  const sortData = (arr, { key, dir }) => {
+    if (!key) return arr;
+    return [...arr].sort((a, b) => {
+      let av = key === 'fio' ? [a.name, a.surname].filter(Boolean).join(' ') : a[key];
+      let bv = key === 'fio' ? [b.name, b.surname].filter(Boolean).join(' ') : b[key];
+      if (key === 'registeredAt') { av = new Date(av); bv = new Date(bv); }
+      if (key === 'points') { av = Number(av ?? 0); bv = Number(bv ?? 0); }
+      if (av < bv) return dir === 'asc' ? -1 : 1;
+      if (av > bv) return dir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+
+  const toggleSort = (setter, current, key) => {
+    setter(prev => prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' });
+  };
+
+  const SortTh = ({ label, sortKey, current, onToggle }) => {
+    const active = current.key === sortKey;
+    return (
+      <th
+        className="p-3 text-left cursor-pointer select-none hover:bg-slate-200 transition group"
+        onClick={() => onToggle(sortKey)}
+      >
+        <span className="inline-flex items-center gap-1">
+          {label}
+          <span className={`text-xs ${active ? 'text-emerald-600' : 'text-slate-400 opacity-0 group-hover:opacity-100'}`}>
+            {active ? (current.dir === 'asc' ? '↑' : '↓') : '↕'}
+          </span>
+        </span>
+      </th>
+    );
+  };
 
   const filteredStaff = staffSearch.trim()
     ? usersData.filter((u) => {
@@ -133,7 +172,7 @@ export default function Admin() {
   const totalStaffPages = Math.max(1, Math.ceil(filteredStaff.length / staffPageSize));
   const currentStaffPage = Math.min(staffPage, totalStaffPages);
   const staffStart = (currentStaffPage - 1) * staffPageSize;
-  const staffRows = filteredStaff.slice(staffStart, staffStart + staffPageSize);
+  const staffRows = sortData(filteredStaff, staffSort).slice(staffStart, staffStart + staffPageSize);
 
   useEffect(() => {
     setStaffPage(1);
@@ -152,7 +191,7 @@ export default function Admin() {
   const totalCoinPages = Math.max(1, Math.ceil(filteredCoins.length / coinPageSize));
   const currentCoinPage = Math.min(coinPage, totalCoinPages);
   const coinStart = (currentCoinPage - 1) * coinPageSize;
-  const coinRows = filteredCoins.slice(coinStart, coinStart + coinPageSize);
+  const coinRows = sortData(filteredCoins, coinSort).slice(coinStart, coinStart + coinPageSize);
 
   const mapDepartment = (user) => {
     if (user.department) return user.department;
@@ -254,9 +293,10 @@ export default function Admin() {
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const [usersRes, testsRes] = await Promise.all([
+      const [usersRes, testsRes, reqRes] = await Promise.all([
         fetch('/api/users'),
         fetch('/api/quizzes'),
+        fetch('/api/reward-requests?all=1'),
       ]);
 
       if (usersRes.ok && testsRes.ok) {
@@ -269,6 +309,7 @@ export default function Admin() {
       } else {
         throw new Error('Ошибка при загрузке данных');
       }
+      if (reqRes.ok) setRewardRequests(await reqRes.json());
     } catch (error) {
       alert('Ошибка: ' + error.message);
     } finally {
@@ -391,6 +432,7 @@ export default function Admin() {
           position: currentUser?.role === 'admin' ? undefined : profileForm.position,
           password: showPasswordResetFields ? profileForm.newPassword : undefined,
           currentPassword: showPasswordResetFields ? profileForm.currentPassword : undefined,
+          avatar: profileForm.avatar,
           selfService: true,
         }),
       });
@@ -814,6 +856,33 @@ export default function Admin() {
                 </div>
                 <p className="mt-1 text-sm text-slate-500">Нажмите значок редактирования, чтобы изменить поля. Сброс пароля покажет отдельные строки со старым и новым паролем.</p>
                 <form onSubmit={handleProfileSave} className="space-y-4">
+                  {/* Avatar */}
+                  <div className="flex items-center gap-4">
+                    {currentUser.avatar
+                      ? <img src={currentUser.avatar} alt="avatar" className="w-16 h-16 rounded-full object-cover border-2 border-sky-300" />
+                      : <div className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center text-2xl font-bold text-white">{(currentUser.name || '?')[0].toUpperCase()}</div>
+                    }
+                    {profileEditEnabled && (
+                      <label className="cursor-pointer rounded-2xl border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition">
+                        📷 Загрузить фото
+                        <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const fd = new FormData(); fd.append('files', file);
+                          const r = await fetch('/api/files', { method: 'POST', body: fd });
+                          const d = await r.json();
+                          if (r.ok && d.fileUrls?.[0]) {
+                            const url = d.fileUrls[0];
+                            setProfileForm(prev => ({ ...prev, avatar: url }));
+                            const updated = { ...currentUser, avatar: url };
+                            setCurrentUser(updated);
+                            localStorage.setItem('currentUser', JSON.stringify(updated));
+                            window.dispatchEvent(new Event('userChanged'));
+                          }
+                        }} />
+                      </label>
+                    )}
+                  </div>
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                     <input
                       name="name"
@@ -960,6 +1029,114 @@ export default function Admin() {
             </div>
           </div>
 
+          {/* HR Dashboard */}
+          {!loading && usersData.length > 0 && (() => {
+            const DEPARTMENTS = ['Аквапарк', 'Ресторан', 'SPA', 'Магазин', 'Офис'];
+            const deptCounts = DEPARTMENTS.map(d => ({ dept: d, count: usersData.filter(u => (u.department || u.workplaceType || '').toLowerCase().includes(d.toLowerCase())).length }));
+            const maxDept = Math.max(...deptCounts.map(d => d.count), 1);
+            const top5 = [...usersData].sort((a, b) => Number(b.points || 0) - Number(a.points || 0)).slice(0, 5);
+            const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+            return (
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">👥 Сотрудники по отделам</h3>
+                  <div className="space-y-3">
+                    {deptCounts.map(({ dept, count }) => (
+                      <div key={dept}>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-slate-700 font-medium">{dept}</span>
+                          <span className="text-slate-500">{count}</span>
+                        </div>
+                        <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden">
+                          <div className="h-full rounded-full bg-sky-400 transition-all" style={{ width: `${count ? (count / maxDept) * 100 : 0}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">🏆 Топ-5 по AQUA COIN</h3>
+                  <ol className="space-y-3">
+                    {top5.map((u, i) => (
+                      <li key={u._id || u.phone} className="flex items-center gap-3">
+                        <span className="text-xl w-7 text-center">{medals[i]}</span>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-slate-900">{[u.name, u.surname].filter(Boolean).join(' ') || u.phone}</p>
+                          <p className="text-xs text-slate-400">{u.department || u.workplaceType || '—'}</p>
+                        </div>
+                        <span className="font-bold text-emerald-600 text-sm inline-flex items-center gap-1">{Number(u.points || 0)} <GoldCoin size="xs" /></span>
+                      </li>
+                    ))}
+                    {top5.length === 0 && <li className="text-slate-400 text-sm">Нет данных</li>}
+                  </ol>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Reward Requests */}
+          {!loading && (
+            <div className="mt-4 mb-6 bg-white rounded-3xl border border-amber-200 p-6 shadow-sm">
+              <button onClick={() => setShowRewardReqs(p => !p)} className="flex items-center gap-3 w-full text-left">
+                <h3 className="text-xl font-bold text-slate-900 flex-1">🎁 Заявки на призы {rewardRequests.filter(r => r.status === 'pending').length > 0 && <span className="ml-2 inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">{rewardRequests.filter(r => r.status === 'pending').length}</span>}</h3>
+                <span className="text-slate-400 text-sm">{showRewardReqs ? '▲ скрыть' : '▼ показать'}</span>
+              </button>
+              {showRewardReqs && (
+                <div className="mt-4 overflow-x-auto">
+                  {rewardRequests.length === 0 ? (
+                    <p className="text-slate-400 text-sm">Заявок нет.</p>
+                  ) : (
+                    <table className="w-full border-collapse text-sm text-slate-900">
+                      <thead><tr className="bg-amber-50">
+                        <th className="p-3 text-left">Сотрудник</th>
+                        <th className="p-3 text-left">Приз</th>
+                        <th className="p-3 text-left">Монет</th>
+                        <th className="p-3 text-left">Дата</th>
+                        <th className="p-3 text-left">Статус</th>
+                        <th className="p-3 text-left">Действие</th>
+                      </tr></thead>
+                      <tbody>
+                        {rewardRequests.map(req => (
+                          <tr key={String(req._id)} className="border-t border-slate-100 hover:bg-slate-50">
+                            <td className="p-3">
+                              <p className="font-medium">{req.userName || req.phone}</p>
+                              <p className="text-xs text-slate-400">{req.phone} · {req.department}</p>
+                            </td>
+                            <td className="p-3">{req.rewardName}</td>
+                            <td className="p-3 font-bold text-emerald-600">{req.rewardCost}</td>
+                            <td className="p-3 text-xs text-slate-500">{new Date(req.createdAt).toLocaleDateString('ru-RU')}</td>
+                            <td className="p-3">
+                              {req.status === 'approved' && <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-full">✅ Одобрено</span>}
+                              {req.status === 'rejected' && <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">❌ Отклонено</span>}
+                              {req.status === 'pending' && <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded-full">⏳ На рассмотрении</span>}
+                            </td>
+                            <td className="p-3">
+                              {req.status === 'pending' && (
+                                <div className="flex flex-col gap-1 min-w-[160px]">
+                                  <input placeholder="Комментарий" value={rewardReqNote[String(req._id)] || ''} onChange={e => setRewardReqNote(p => ({ ...p, [String(req._id)]: e.target.value }))} className="rounded-lg border border-slate-300 px-2 py-1 text-xs text-slate-900 w-full" />
+                                  <div className="flex gap-1">
+                                    <button onClick={async () => {
+                                      const res = await fetch('/api/reward-requests', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: String(req._id), status: 'approved', note: rewardReqNote[String(req._id)] || '' }) });
+                                      if (res.ok) { const updated = await res.json(); setRewardRequests(prev => prev.map(r => String(r._id) === String(req._id) ? updated : r)); }
+                                    }} className="flex-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold py-1 px-2 transition">✅ Одобрить</button>
+                                    <button onClick={async () => {
+                                      const res = await fetch('/api/reward-requests', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: String(req._id), status: 'rejected', note: rewardReqNote[String(req._id)] || '' }) });
+                                      if (res.ok) { const updated = await res.json(); setRewardRequests(prev => prev.map(r => String(r._id) === String(req._id) ? updated : r)); }
+                                    }} className="flex-1 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-1 px-2 transition">❌ Отклонить</button>
+                                  </div>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {!loading && usersData.length > 0 && (
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -993,12 +1170,12 @@ export default function Admin() {
                 <table className="w-full border-collapse text-sm text-slate-900">
                   <thead className="bg-slate-100 text-slate-900">
                     <tr>
-                      <th className="p-3 text-left">ФИО</th>
-                      <th className="p-3 text-left">Телефон</th>
-                      <th className="p-3 text-left">Отдел</th>
-                      <th className="p-3 text-left">Должность</th>
-                      <th className="p-3 text-left">Роль</th>
-                      <th className="p-3 text-left">Дата регистрации</th>
+                      <SortTh label="ФИО" sortKey="fio" current={staffSort} onToggle={k => toggleSort(setStaffSort, staffSort, k)} />
+                      <SortTh label="Телефон" sortKey="phone" current={staffSort} onToggle={k => toggleSort(setStaffSort, staffSort, k)} />
+                      <SortTh label="Отдел" sortKey="department" current={staffSort} onToggle={k => toggleSort(setStaffSort, staffSort, k)} />
+                      <SortTh label="Должность" sortKey="position" current={staffSort} onToggle={k => toggleSort(setStaffSort, staffSort, k)} />
+                      <SortTh label="Роль" sortKey="role" current={staffSort} onToggle={k => toggleSort(setStaffSort, staffSort, k)} />
+                      <SortTh label="Дата регистрации" sortKey="registeredAt" current={staffSort} onToggle={k => toggleSort(setStaffSort, staffSort, k)} />
                       <th className="p-3 text-left">Действия</th>
                     </tr>
                   </thead>
@@ -1264,10 +1441,10 @@ export default function Admin() {
               <table className="w-full border-collapse text-sm text-slate-900">
                 <thead className="bg-emerald-100 text-slate-900">
                   <tr>
-                    <th className="p-3 text-left">ФИО</th>
-                    <th className="p-3 text-left">Телефон</th>
-                    <th className="p-3 text-left">Отдел</th>
-                    <th className="p-3 text-left">Баллы (AQUA COIN)</th>
+                    <SortTh label="ФИО" sortKey="fio" current={coinSort} onToggle={k => toggleSort(setCoinSort, coinSort, k)} />
+                    <SortTh label="Телефон" sortKey="phone" current={coinSort} onToggle={k => toggleSort(setCoinSort, coinSort, k)} />
+                    <SortTh label="Отдел" sortKey="department" current={coinSort} onToggle={k => toggleSort(setCoinSort, coinSort, k)} />
+                    <SortTh label="Баллы (AQUA COIN)" sortKey="points" current={coinSort} onToggle={k => toggleSort(setCoinSort, coinSort, k)} />
                   </tr>
                 </thead>
                 <tbody>

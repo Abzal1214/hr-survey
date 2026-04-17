@@ -54,7 +54,13 @@ export default function UserMenu() {
 
   const initials = user.name ? user.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() : '?';
   const isAdmin = user.role === 'admin';
-  const coinBalance = isAdmin ? 1000000 : Number(user.points || 0);
+  const coinBalance = isAdmin ? 0 : Number(user.points || 0);
+  const AvatarCircle = ({ size = 'sm' }) => {
+    const dim = size === 'sm' ? 'w-7 h-7 text-xs' : 'w-9 h-9 text-sm';
+    return user.avatar
+      ? <img src={user.avatar} alt={user.name} className={`${dim} rounded-full object-cover border border-white/30`} />
+      : <span className={`${dim} rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white shrink-0`}>{initials}</span>;
+  };
 
   return (
     <div className="relative" ref={ref}>
@@ -62,9 +68,7 @@ export default function UserMenu() {
         onClick={() => setOpen((prev) => !prev)}
         className="flex items-center gap-2 rounded-full bg-white/20 border border-white/40 px-3 py-2 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm"
       >
-        <span className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-white">
-          {initials}
-        </span>
+        <AvatarCircle size="sm" />
         <span className="hidden sm:block max-w-[120px] truncate">{user.name}</span>
         <svg className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -75,9 +79,7 @@ export default function UserMenu() {
         <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white shadow-2xl border border-slate-100 overflow-hidden z-50 animate-scale-in">
           <div className="px-4 py-3 border-b border-slate-100">
             <div className="flex items-center gap-3">
-              <span className="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center text-sm font-bold text-white shrink-0">
-                {initials}
-              </span>
+              <AvatarCircle size="lg" />
               <div className="min-w-0">
                 <p className="font-semibold text-slate-900 truncate">{user.name}</p>
                 <p className="text-xs text-slate-500">{isAdmin ? 'Администратор' : (user.position || user.department || 'Сотрудник')}</p>

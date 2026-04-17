@@ -119,6 +119,7 @@ export default function RewardsPage() {
         setUser(u);
         setIsAdmin(u?.role === 'admin');
         if (!u?.phone) await restoreUserFromRemembered();
+        else await loadMyRequests(u);
       } catch {
         setUser(null);
         setIsAdmin(false);
@@ -280,7 +281,35 @@ export default function RewardsPage() {
     if (res.ok) { setEditingRewardId(null); loadRewards(); }
   };
 
-  const getIcon = (name = '') => {
+  const [requestedIds, setRequestedIds] = useState({});   // rewardId -> status (pending|ok|err)
+  const [myRequests, setMyRequests] = useState([]);
+
+  const loadMyRequests = async (u) => {
+    if (!u?.phone) return;
+    try {
+      const res = await fetch(`/api/reward-requests?phone=${encodeURIComponent(u.phone)}`);
+      if (res.ok) setMyRequests(await res.json());
+    } catch {}
+  };
+
+  const handleRequest = async (item) => {
+    const itemId = String(item._id || item.id);
+    let activeUser = user;
+    if (!activeUser?.phone) activeUser = await restoreUserFromRemembered();
+    if (!activeUser?.phone) { setExchangeError('Войдите в аккаунт'); return; }
+    setRequestedIds(prev => ({ ...prev, [itemId]: 'pending' }));
+    try {
+      const res = await fetch('/api/reward-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: activeUser.phone, userName: [activeUser.name, activeUser.surname].filter(Boolean).join(' ') || activeUser.phone, department: activeUser.department || '', rewardId: itemId, rewardName: item.name, rewardCost: item.cost }),
+      });
+      if (res.ok) {
+        setRequestedIds(prev => ({ ...prev, [itemId]: 'ok' }));
+        await loadMyRequests(activeUser);
+      } else { setRequestedIds(prev => ({ ...prev, [itemId]: 'err' })); }
+    } catch { setRequestedIds(prev => ({ ...prev, [itemId]: 'err' })); }
+  };
     const n = name.toLowerCase();
     if (n.includes('кофе') || n.includes('coffee')) return '☕';
     if (n.includes('чай') || n.includes('tea')) return '🍵';
@@ -442,6 +471,23 @@ export default function RewardsPage() {
                         </button>
                       </div>
                     </div>
+                    {!isAdmin && user?.phone && (() => {
+                      const existing = myRequests.find(r => r.rewardId === itemId);
+                      const reqStatus = requestedIds[itemId];
+                      if (existing) {
+                        const statusLabel = existing.status === 'approved' ? { icon: '✅', text: 'Одобрено', cls: 'bg-emerald-100 text-emerald-700' } : existing.status === 'rejected' ? { icon: '❌', text: 'Отклонено', cls: 'bg-red-100 text-red-600' } : { icon: '⏳', text: 'Заявка отправлена', cls: 'bg-amber-100 text-amber-700' };
+                        return <p className={`mt-2 text-xs font-semibold px-3 py-1.5 rounded-full ${statusLabel.cls}`}>{statusLabel.icon} {statusLabel.text}</p>;
+                      }
+                      return (
+                        <button
+                          onClick={() => handleRequest(item)}
+                          disabled={reqStatus === 'pending' || reqStatus === 'ok'}
+                          className="mt-2 w-full rounded-2xl border border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold py-2 transition disabled:opacity-60"
+                        >
+                          {reqStatus === 'pending' ? '⏳ Отправка...' : reqStatus === 'err' ? '❌ Ошибка, повторить' : '📬 Подать заявку'}
+                        </button>
+                      );
+                    })()}
                   </>
                 )}
               </div>

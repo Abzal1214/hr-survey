@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
-import { Training } from '../../../lib/models';
+import { Training, Notification } from '../../../lib/models';
 
 export async function GET(request) {
   try {
@@ -28,6 +28,9 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Заполните все поля' }, { status: 400 });
     }
     const training = await Training.create({ title, description, fileUrl: Array.isArray(attachments) ? attachments.join(',') : (attachments || ''), department, deadline: deadline ? new Date(deadline) : null });
+    if (deadline) {
+      await Notification.create({ phone: '', type: 'deadline', title: '⏰ Новый материал с дедлайном', body: `«${title}» — до ${new Date(deadline).toLocaleDateString('ru-RU')}`, link: '/learn' });
+    }
     return NextResponse.json({ ...training.toObject(), id: training._id });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка добавления тренинга' }, { status: 500 });

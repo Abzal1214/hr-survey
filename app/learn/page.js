@@ -24,6 +24,7 @@ export default function LearnPage() {
   const [createMsg, setCreateMsg] = useState('');
   const [message, setMessage] = useState('');
   const [trainingsPage, setTrainingsPage] = useState(1);
+  const [trainingsSearch, setTrainingsSearch] = useState('');
   const TRAININGS_PAGE_SIZE = 6;
 
   // Курсы
@@ -319,14 +320,35 @@ export default function LearnPage() {
               </div>
             )}
             {message && <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm">{message}</div>}
-            {trainings.length === 0 ? (
-              <div className="rounded-[24px] bg-white/95 p-10 text-center text-slate-500 shadow">
-                {isAdmin ? 'Нет материалов. Добавьте первый кнопкой выше.' : 'Пока нет материалов.'}
+            {trainings.length > 0 && (
+              <div className="mb-5 relative">
+                <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m0 0A7 7 0 104.65 4.65a7 7 0 0012 12z" />
+                </svg>
+                <input
+                  type="text"
+                  value={trainingsSearch}
+                  onChange={e => { setTrainingsSearch(e.target.value); setTrainingsPage(1); }}
+                  placeholder="Поиск по материалам..."
+                  className="w-full pl-10 pr-10 py-3 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:bg-white/30 transition text-sm"
+                />
+                {trainingsSearch && (
+                  <button onClick={() => { setTrainingsSearch(''); setTrainingsPage(1); }} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/60 hover:text-white text-sm">✕</button>
+                )}
               </div>
-            ) : (() => {
-              const totalPages = Math.max(1, Math.ceil(trainings.length / TRAININGS_PAGE_SIZE));
+            )}
+            {(() => {
+              const filtered = trainingsSearch.trim()
+                ? trainings.filter(t => [t.title, t.description].some(v => String(v || '').toLowerCase().includes(trainingsSearch.trim().toLowerCase())))
+                : trainings;
+              if (filtered.length === 0) return (
+                <div className="rounded-[24px] bg-white/95 p-10 text-center text-slate-500 shadow">
+                  {trainingsSearch ? `Ничего не найдено по запросу «${trainingsSearch}»` : (isAdmin ? 'Нет материалов. Добавьте первый кнопкой выше.' : 'Пока нет материалов.')}
+                </div>
+              );
+              const totalPages = Math.max(1, Math.ceil(filtered.length / TRAININGS_PAGE_SIZE));
               const curPage = Math.min(trainingsPage, totalPages);
-              const pageItems = trainings.slice((curPage - 1) * TRAININGS_PAGE_SIZE, curPage * TRAININGS_PAGE_SIZE);
+              const pageItems = filtered.slice((curPage - 1) * TRAININGS_PAGE_SIZE, curPage * TRAININGS_PAGE_SIZE);
               return (
                 <>
                   <div className="space-y-4">
@@ -386,7 +408,7 @@ export default function LearnPage() {
                   </div>
                   {totalPages > 1 && (
                     <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-                      <p className="text-sm text-white/70">{trainings.length} материалов · стр. {curPage} из {totalPages}</p>
+                      <p className="text-sm text-white/70">{filtered.length} материалов · стр. {curPage} из {totalPages}</p>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => { setTrainingsPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
