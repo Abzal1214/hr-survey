@@ -329,8 +329,8 @@ export default function LearnPage() {
                           <textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
                             className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm min-h-[80px]" />
                           <div className="flex gap-2">
-                            <button onClick={() => handleSaveEdit(itemId)} className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold">Сохранить</button>
-                            <button onClick={() => setEditingId(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold">Отмена</button>
+                            <button onClick={() => handleSaveEdit(itemId)} className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer">Сохранить</button>
+                            <button onClick={() => setEditingId(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 active:scale-95 transition-all cursor-pointer">Отмена</button>
                           </div>
                         </div>
                       ) : (

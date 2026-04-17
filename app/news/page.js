@@ -112,8 +112,8 @@ export default function NewsPage() {
                       <textarea value={highlightForm.itemsText} onChange={e => setHighlightForm(p => ({ ...p, itemsText: e.target.value }))} className="w-full rounded-xl border border-white/40 bg-white/90 p-3 text-slate-900 text-sm min-h-[100px]" placeholder="Каждый пункт с новой строки" />
                       {highlightMsg && <p className="text-sm text-red-100">{highlightMsg}</p>}
                       <div className="flex gap-2">
-                        <button onClick={() => handleSaveHighlight(block.id)} className="rounded-xl bg-white text-slate-900 px-4 py-2 text-sm font-semibold">Сохранить</button>
-                        <button onClick={() => { setEditingHighlightId(null); setHighlightMsg(''); }} className="rounded-xl bg-white/20 text-white px-4 py-2 text-sm font-semibold">Отмена</button>
+                        <button onClick={() => handleSaveHighlight(block.id)} className="rounded-xl bg-white text-slate-900 px-4 py-2 text-sm font-bold shadow hover:bg-slate-100 active:scale-95 transition-all cursor-pointer">Сохранить</button>
+                        <button onClick={() => { setEditingHighlightId(null); setHighlightMsg(''); }} className="rounded-xl bg-white/20 text-white px-4 py-2 text-sm font-semibold hover:bg-white/30 active:scale-95 transition-all cursor-pointer">Отмена</button>
                       </div>
                     </div>
                   ) : (
@@ -185,8 +185,8 @@ export default function NewsPage() {
                         <input value={editForm.title} onChange={e => setEditForm(p => ({ ...p, title: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm" placeholder="Заголовок" />
                         <textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm min-h-[80px]" placeholder="Описание" />
                         <div className="flex gap-2">
-                          <button onClick={() => handleSaveEdit(itemId)} className="rounded-xl bg-sky-600 text-white px-4 py-2 text-sm font-semibold">Сохранить</button>
-                          <button onClick={() => setEditingId(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold">Отмена</button>
+                          <button onClick={() => handleSaveEdit(itemId)} className="rounded-xl bg-sky-600 text-white px-4 py-2 text-sm font-semibold hover:bg-sky-700 active:scale-95 transition-all cursor-pointer">Сохранить</button>
+                          <button onClick={() => setEditingId(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 active:scale-95 transition-all cursor-pointer">Отмена</button>
                         </div>
                       </div>
                     ) : (
