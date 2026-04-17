@@ -143,7 +143,7 @@ export default function MentorsPage() {
           <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            {(user?.role === 'mentor' || user?.role === 'admin') && (
+            {user?.role === 'mentor' && (
               <Link href="/mentor-dashboard"
                 className="rounded-full bg-amber-500 hover:bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white transition shadow-lg">
                 👨‍🏫 Кабинет наставника
