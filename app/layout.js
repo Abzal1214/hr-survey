@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import UserMenu from "./components/UserMenu";
+import MobileNav from "./components/MobileNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,7 @@ export default function RootLayout({ children }) {
       lang="ru"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col text-slate-900 w-full">
+      <body className="min-h-full flex flex-col text-slate-900 w-full pb-16 lg:pb-0">
         {/* Background fixed for desktop, scroll for mobile (iOS Safari fix) */}
         <div className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('/bg.jpg')"}} aria-hidden="true" />
         <header className="no-print sticky top-0 z-50 border-b border-sky-900/40 bg-sky-950/90 backdrop-blur-md">
@@ -70,6 +71,7 @@ export default function RootLayout({ children }) {
           </div>
         </header>
         {children}
+        <MobileNav />
       </body>
     </html>
   );
