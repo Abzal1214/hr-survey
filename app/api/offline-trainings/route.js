@@ -2,9 +2,12 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
 import { OfflineTraining } from '../../../lib/models';
 
-export async function GET() {
+export async function GET(request) {
   await connectDB();
-  const items = await OfflineTraining.find({}).sort({ date: 1 }).lean();
+  const { searchParams } = new URL(request.url);
+  const dept = searchParams.get('department');
+  const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }] } : {};
+  const items = await OfflineTraining.find(query).sort({ date: 1 }).lean();
   return NextResponse.json(items);
 }
 

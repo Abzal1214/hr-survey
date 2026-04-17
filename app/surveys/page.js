@@ -32,7 +32,7 @@ export default function SurveysPage() {
 
   // Admin: create form
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newSurvey, setNewSurvey] = useState({ title: '', description: '' });
+  const [newSurvey, setNewSurvey] = useState({ title: '', description: '', department: '' });
   const [questions, setQuestions] = useState([{ text: '', type: 'text' }]);
   const [saving, setSaving] = useState(false);
 
@@ -54,18 +54,19 @@ export default function SurveysPage() {
       if (u?.role === 'admin') {
         setIsAdmin(true);
         setCurrentUser(u);
-        loadTemplates();
+        loadTemplates(u);
         loadSubmissions();
       } else if (u) {
         setCurrentUser(u);
-        loadTemplates();
+        loadTemplates(u);
       }
     } catch {}
   }, []);
 
-  const loadTemplates = () => {
+  const loadTemplates = (u) => {
+    const dept = u && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
     setLoadingTemplates(true);
-    fetch('/api/surveys')
+    fetch('/api/surveys' + dept)
       .then(r => r.json())
       .then(data => setTemplates(Array.isArray(data) ? data : []))
       .catch(() => setTemplates([]))
@@ -104,7 +105,7 @@ export default function SurveysPage() {
       if (res.ok) {
         const created = await res.json();
         setTemplates(prev => [created, ...prev]);
-        setNewSurvey({ title: '', description: '' });
+        setNewSurvey({ title: '', description: '', department: '' });
         setQuestions([{ text: '', type: 'text' }]);
         setShowAddForm(false);
       } else alert('Ошибка при создании');
@@ -257,6 +258,17 @@ export default function SurveysPage() {
                     <input type="text" value={newSurvey.description}
                       onChange={e => setNewSurvey(p => ({ ...p, description: e.target.value }))}
                       placeholder="Краткое описание..." className={inputCls} />
+                  </label>
+                  <label className={labelCls}>
+                    <span className={spanCls}>Отдел</span>
+                    <select value={newSurvey.department} onChange={e => setNewSurvey(p => ({ ...p, department: e.target.value }))} className={inputCls}>
+                      <option value="">Все отделы</option>
+                      <option value="Аквапарк">Аквапарк</option>
+                      <option value="Ресторан">Ресторан</option>
+                      <option value="SPA">SPA</option>
+                      <option value="Магазин">Магазин</option>
+                      <option value="Офис">Офис</option>
+                    </select>
                   </label>
                   <div>
                     <p className={spanCls + ' mb-3'}>Вопросы</p>

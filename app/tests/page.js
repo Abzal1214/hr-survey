@@ -15,16 +15,18 @@ export default function TrainingsPage() {
   const [createMsg, setCreateMsg] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const loadTrainings = () =>
-    fetch('/api/offline-trainings').then(r => r.json()).then(d => setTrainings(Array.isArray(d) ? d : [])).catch(() => {});
+  const loadTrainings = (u) => {
+    const dept = u && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
+    fetch('/api/offline-trainings' + dept).then(r => r.json()).then(d => setTrainings(Array.isArray(d) ? d : [])).catch(() => {});
+  };
 
   useEffect(() => {
-    loadTrainings();
     try {
       const u = JSON.parse(localStorage.getItem('currentUser') || '{}');
       setCurrentUser(u);
       if (u.role === 'admin') setIsAdmin(true);
-    } catch {}
+      loadTrainings(u);
+    } catch { loadTrainings(); }
   }, []);
 
   const isSignedUp = (training) => {

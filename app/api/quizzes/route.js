@@ -2,10 +2,13 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
 import { Quiz } from '../../../lib/models';
 
-export async function GET() {
+export async function GET(request) {
   try {
     await connectDB();
-    const quizzes = await Quiz.find({}).sort({ createdAt: -1 }).lean();
+    const { searchParams } = new URL(request.url);
+    const dept = searchParams.get('department');
+    const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }] } : {};
+    const quizzes = await Quiz.find(query).sort({ createdAt: -1 }).lean();
     return NextResponse.json(quizzes.map(q => ({ ...q, id: q._id })));
   } catch (error) {
     return NextResponse.json({ error: 'Не удалось загрузить тесты' }, { status: 500 });
@@ -16,11 +19,11 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { title, description, questions, coins } = body;
+    const { title, description, questions, coins, department = '' } = body;
     if (!title || !questions || questions.length === 0) {
       return NextResponse.json({ error: 'Укажите название и хотя бы один вопрос' }, { status: 400 });
     }
-    const quiz = await Quiz.create({ title, description: description || '', coins: coins ?? 3, questions });
+    const quiz = await Quiz.create({ title, description: description || '', coins: coins ?? 3, questions, department });
     return NextResponse.json({ ...quiz.toObject(), id: quiz._id });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка создания теста' }, { status: 500 });

@@ -2,17 +2,20 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import { Course } from '@/lib/models';
 
-export async function GET() {
+export async function GET(request) {
   await connectDB();
-  const courses = await Course.find().sort({ createdAt: -1 });
+  const { searchParams } = new URL(request.url);
+  const dept = searchParams.get('department');
+  const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }] } : {};
+  const courses = await Course.find(query).sort({ createdAt: -1 });
   return NextResponse.json(courses);
 }
 
 export async function POST(req) {
   await connectDB();
-  const { title, description, steps } = await req.json();
+  const { title, description, steps, department = '' } = await req.json();
   if (!title) return NextResponse.json({ error: 'Название обязательно' }, { status: 400 });
-  const course = await Course.create({ title, description, steps: steps || [] });
+  const course = await Course.create({ title, description, steps: steps || [], department });
   return NextResponse.json(course, { status: 201 });
 }
 

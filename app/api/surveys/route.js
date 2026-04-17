@@ -2,10 +2,13 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
 import { SurveyTemplate } from '../../../lib/models';
 
-export async function GET() {
+export async function GET(request) {
   try {
     await connectDB();
-    const data = await SurveyTemplate.find({}).sort({ createdAt: -1 }).lean();
+    const { searchParams } = new URL(request.url);
+    const dept = searchParams.get('department');
+    const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }] } : {};
+    const data = await SurveyTemplate.find(query).sort({ createdAt: -1 }).lean();
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to load surveys' }, { status: 500 });

@@ -2,10 +2,13 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
 import { Training } from '../../../lib/models';
 
-export async function GET() {
+export async function GET(request) {
   try {
     await connectDB();
-    const trainings = await Training.find({}).sort({ createdAt: -1 }).lean();
+    const { searchParams } = new URL(request.url);
+    const dept = searchParams.get('department');
+    const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }] } : {};
+    const trainings = await Training.find(query).sort({ createdAt: -1 }).lean();
     return NextResponse.json(trainings.map(t => ({
       ...t,
       id: t._id,
@@ -20,11 +23,11 @@ export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-    const { title, description, attachments = [] } = body;
+    const { title, description, attachments = [], department = '' } = body;
     if (!title || !description) {
       return NextResponse.json({ error: 'Заполните все поля' }, { status: 400 });
     }
-    const training = await Training.create({ title, description, fileUrl: Array.isArray(attachments) ? attachments.join(',') : (attachments || '') });
+    const training = await Training.create({ title, description, fileUrl: Array.isArray(attachments) ? attachments.join(',') : (attachments || ''), department });
     return NextResponse.json({ ...training.toObject(), id: training._id });
   } catch (error) {
     return NextResponse.json({ error: 'Ошибка добавления тренинга' }, { status: 500 });
