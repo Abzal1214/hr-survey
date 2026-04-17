@@ -209,6 +209,8 @@ export default function Home() {
                           const isOffscreen = Math.abs(offset) === 2;
                           const scale = isCenter ? centerScale : isSide ? sideScale : sideScale * 0.85;
                           const x = isOffscreen ? offset * offscreenSpacing : offset * sideSpacing;
+                          // bottom-align side cards with center card
+                          const yOffset = isCenter ? 0 : containerH * (0.5 - scale / 2);
                           const opacity = isCenter ? 1 : isSide ? 0.92 : 0;
                           const item = news[idx];
                           return (
@@ -230,7 +232,7 @@ export default function Home() {
                                 pointerEvents: isOffscreen ? 'none' : 'auto',
                                 cursor: isCenter ? 'pointer' : isSide ? 'pointer' : 'default',
                                 transition: 'transform 0.52s cubic-bezier(.22,.68,0,1.2), opacity 0.52s ease',
-                                transform: `translate(calc(-50% + ${x}px), -50%) scale(${scale})`,
+                                transform: `translate(calc(-50% + ${x}px), calc(-50% + ${yOffset}px)) scale(${scale})`,
                                 transformOrigin: 'center center',
                                 willChange: 'transform, opacity',
                               }}
