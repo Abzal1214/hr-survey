@@ -18,7 +18,7 @@ export default function LearnPage() {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ title: '', description: '' });
   const [showCreate, setShowCreate] = useState(false);
-  const [newTraining, setNewTraining] = useState({ title: '', description: '', department: '' });
+  const [newTraining, setNewTraining] = useState({ title: '', description: '', department: 'Аквапарк' });
   const [trainingFiles, setTrainingFiles] = useState([]);
   const [saving, setSaving] = useState(false);
   const [createMsg, setCreateMsg] = useState('');
@@ -30,7 +30,7 @@ export default function LearnPage() {
   const [activeCourse, setActiveCourse] = useState(null);
   const [activeCourseProgress, setActiveCourseProgress] = useState({ completedSteps: [] });
   const [showCreateCourse, setShowCreateCourse] = useState(false);
-  const [newCourse, setNewCourse] = useState({ title: '', description: '', department: '', steps: [] });
+  const [newCourse, setNewCourse] = useState({ title: '', description: '', department: 'Аквапарк', steps: [] });
   const [createCourseMsg, setCreateCourseMsg] = useState('');
   const [savingCourse, setSavingCourse] = useState(false);
   // inline quiz inside course
@@ -46,7 +46,7 @@ export default function LearnPage() {
   const [result, setResult] = useState(null);
   const [quizMessage, setQuizMessage] = useState('');
   const [showCreateQuiz, setShowCreateQuiz] = useState(false);
-  const [newQuiz, setNewQuiz] = useState({ title: '', description: '', coins: 3, department: '', questions: [emptyQuestion()] });
+  const [newQuiz, setNewQuiz] = useState({ title: '', description: '', coins: 3, department: 'Аквапарк', questions: [emptyQuestion()] });
   const [createQuizMsg, setCreateQuizMsg] = useState('');
   const [savingQuiz, setSavingQuiz] = useState(false);
 
@@ -126,7 +126,7 @@ export default function LearnPage() {
       } catch {}
     }
     const res = await fetch('/api/trainings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...newTraining, attachments: attachmentUrls }) });
-    if (res.ok) { setCreateMsg('Добавлено!'); setNewTraining({ title: '', description: '', department: '' }); setTrainingFiles([]); setShowCreate(false); loadTrainings(); }
+    if (res.ok) { setCreateMsg('Добавлено!'); setNewTraining({ title: '', description: '', department: 'Аквапарк' }); setTrainingFiles([]); setShowCreate(false); loadTrainings(); }
     else { const d = await res.json(); setCreateMsg(d.error || 'Ошибка'); }
     setSaving(false);
   };
@@ -142,7 +142,7 @@ export default function LearnPage() {
     if (!valid) { setCreateQuizMsg('Заполните все вопросы и отметьте правильные ответы'); return; }
     setSavingQuiz(true);
     const res = await fetch('/api/quizzes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newQuiz) });
-    if (res.ok) { setCreateQuizMsg('Тест создан!'); setNewQuiz({ title: '', description: '', coins: 3, department: '', questions: [emptyQuestion()] }); setShowCreateQuiz(false); loadQuizzes(); }
+    if (res.ok) { setCreateQuizMsg('Тест создан!'); setNewQuiz({ title: '', description: '', coins: 3, department: 'Аквапарк', questions: [emptyQuestion()] }); setShowCreateQuiz(false); loadQuizzes(); }
     else { const d = await res.json(); setCreateQuizMsg(d.error || 'Ошибка'); }
     setSavingQuiz(false);
   };
@@ -287,8 +287,7 @@ export default function LearnPage() {
                         className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900 min-h-[80px]" placeholder="Описание" />
                       <select value={newTraining.department} onChange={e => setNewTraining(p => ({ ...p, department: e.target.value }))}
                         className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
-                        <option value="">Все отделы</option>
-                        <option value="Аквапарк">Аквапарк</option>
+                        <option value="Аквапарк">Аквапарк (все отделы)</option>
                         <option value="Ресторан">Ресторан</option>
                         <option value="SPA">SPA</option>
                         <option value="Магазин">Магазин</option>
@@ -384,8 +383,7 @@ export default function LearnPage() {
                         className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Описание" />
                       <select value={newQuiz.department} onChange={e => setNewQuiz(p => ({ ...p, department: e.target.value }))}
                         className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
-                        <option value="">Все отделы</option>
-                        <option value="Аквапарк">Аквапарк</option>
+                        <option value="Аквапарк">Аквапарк (все отделы)</option>
                         <option value="Ресторан">Ресторан</option>
                         <option value="SPA">SPA</option>
                         <option value="Магазин">Магазин</option>
@@ -546,7 +544,7 @@ function CourseTab({ isAdmin, currentUser, courses, courseProgresses, trainings,
     if (!newCourse.steps.length) { setCreateCourseMsg('Добавьте хотя бы один шаг'); return; }
     setSavingCourse(true);
     const res = await fetch('/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newCourse) });
-    if (res.ok) { setCreateCourseMsg('Курс создан!'); setNewCourse({ title: '', description: '', department: '', steps: [] }); setShowCreateCourse(false); loadCourses(); }
+    if (res.ok) { setCreateCourseMsg('Курс создан!'); setNewCourse({ title: '', description: '', department: 'Аквапарк', steps: [] }); setShowCreateCourse(false); loadCourses(); }
     else { const d = await res.json(); setCreateCourseMsg(d.error || 'Ошибка'); }
     setSavingCourse(false);
   };
@@ -718,8 +716,7 @@ function CourseTab({ isAdmin, currentUser, courses, courseProgresses, trainings,
                   className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900 min-h-[70px]" placeholder="Описание" />
                 <select value={newCourse.department} onChange={e => setNewCourse(p => ({ ...p, department: e.target.value }))}
                   className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
-                  <option value="">Все отделы</option>
-                  <option value="Аквапарк">Аквапарк</option>
+                  <option value="Аквапарк">Аквапарк (все отделы)</option>
                   <option value="Ресторан">Ресторан</option>
                   <option value="SPA">SPA</option>
                   <option value="Магазин">Магазин</option>
