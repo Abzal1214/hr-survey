@@ -2,10 +2,13 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
 import { TestResult, User, Quiz } from '../../../lib/models';
 
-export async function GET() {
+export async function GET(request) {
   try {
     await connectDB();
-    const tests = await TestResult.find({}).sort({ timestamp: -1 }).lean();
+    const { searchParams } = new URL(request.url);
+    const phone = searchParams.get('phone');
+    const filter = phone ? { phone } : {};
+    const tests = await TestResult.find(filter).sort({ timestamp: -1 }).lean();
     return NextResponse.json(tests);
   } catch (error) {
     return NextResponse.json({ error: 'Не удалось загрузить результаты тестов' }, { status: 500 });

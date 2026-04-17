@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import ConfirmModal from '../components/ConfirmModal';
 import KebabMenu from '../components/KebabMenu';
 import GoldCoin from '../components/GoldCoin';
@@ -1428,13 +1429,27 @@ export default function Admin() {
                     <button onClick={() => setCoinSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">✕</button>
                   )}
                 </div>
-                <a
-                  href="/api/export"
-                  download="aquacoin-report.csv"
+                <button
+                  type="button"
+                  onClick={() => {
+                    const wsData = [
+                      ['ФИО', 'Телефон', 'Отдел', 'Баллы (AQUA COIN)'],
+                      ...coinRows.map(u => [
+                        [u.name, u.surname].filter(Boolean).join(' '),
+                        u.phone,
+                        u.department || u.workplaceType || '',
+                        Number(u.points || 0)
+                      ])
+                    ];
+                    const ws = XLSX.utils.aoa_to_sheet(wsData);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'AQUA COIN');
+                    XLSX.writeFile(wb, 'aquacoin-report.xlsx');
+                  }}
                   className="inline-flex items-center gap-2 rounded-2xl bg-sky-600 text-white px-5 py-2 font-semibold hover:bg-sky-700 transition text-sm"
                 >
-                  📥 Экспорт CSV
-                </a>
+                  📥 Экспорт Excel
+                </button>
               </div>
             </div>
             <div className="overflow-x-auto">
