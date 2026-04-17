@@ -102,7 +102,13 @@ export default function Admin() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState('');
   const [adminMessage, setAdminMessage] = useState('');
+  const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
   const [confirmModal, setConfirmModal] = useState(null);
   const [staffPageSize, setStaffPageSize] = useState(10);
   const [staffPage, setStaffPage] = useState(1);
@@ -537,11 +543,12 @@ export default function Admin() {
       });
       const data = await response.json();
       if (response.ok) {
-        setAdminMessage('Данные сотрудника обновлены');
+        setAdminMessage('');
         setSelectedUser(null);
         setSelectedUserId('');
         setEmployeeForm(initialEmployeeForm);
         setShowEmployeeForm(false);
+        showToast('✅ Данные сотрудника успешно сохранены');
         await fetchAdminData();
       } else {
         setAdminMessage(data.error || 'Ошибка обновления сотрудника');
@@ -911,6 +918,12 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.16),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.12),_transparent_30%),linear-gradient(180deg,_#fdf4ff,_#e0f2fe)] p-4">
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-2xl text-sm font-semibold animate-fade-in-up">
+          {toast}
+        </div>
+      )}
       <div className="max-w-7xl mx-auto">
         <div className="bg-gradient-to-br from-emerald-100 via-sky-100 to-yellow-100 backdrop-blur-xl p-8 rounded-[36px] shadow-2xl shadow-slate-200/40 border border-slate-200/80 mb-6">
           <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center mb-6">
