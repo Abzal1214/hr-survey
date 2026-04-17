@@ -220,15 +220,15 @@ export default function TrainingsPage() {
                       <input type="date" value={newTraining.date} onChange={e => setNewTraining(p => ({ ...p, date: e.target.value }))}
                         className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
                     </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">Время начала *</label>
-                      <input type="time" value={newTraining.time} onChange={e => setNewTraining(p => ({ ...p, time: e.target.value }))}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">Время окончания</label>
-                      <input type="time" value={newTraining.endTime} onChange={e => setNewTraining(p => ({ ...p, endTime: e.target.value }))}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
+                    <div className="col-span-2">
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">Время *</label>
+                      <div className="flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-2">
+                        <input type="time" value={newTraining.time} onChange={e => setNewTraining(p => ({ ...p, time: e.target.value }))}
+                          className="flex-1 bg-transparent text-slate-900 focus:outline-none" />
+                        <span className="text-slate-400 font-semibold">→</span>
+                        <input type="time" value={newTraining.endTime} onChange={e => setNewTraining(p => ({ ...p, endTime: e.target.value }))}
+                          className="flex-1 bg-transparent text-slate-900 focus:outline-none" />
+                      </div>
                     </div>
                   </div>
                   <input value={newTraining.location} onChange={e => setNewTraining(p => ({ ...p, location: e.target.value }))}
