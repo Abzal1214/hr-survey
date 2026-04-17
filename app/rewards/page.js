@@ -326,6 +326,27 @@ export default function RewardsPage() {
     return '🎁';
   };
 
+  const renderRequestBtn = (itemId, item) => {
+    const existing = myRequests.find(r => r.rewardId === itemId);
+    const reqStatus = requestedIds[itemId];
+    if (existing) {
+      const s = existing.status;
+      const icon = s === 'approved' ? '✅' : s === 'rejected' ? '❌' : '⏳';
+      const text = s === 'approved' ? 'Одобрено' : s === 'rejected' ? 'Отклонено' : 'Заявка отправлена';
+      const cls = s === 'approved' ? 'bg-emerald-100 text-emerald-700' : s === 'rejected' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700';
+      return <p className={`mt-2 text-xs font-semibold px-3 py-1.5 rounded-full ${cls}`}>{icon} {text}</p>;
+    }
+    return (
+      <button
+        onClick={() => handleRequest(item)}
+        disabled={reqStatus === 'pending' || reqStatus === 'ok'}
+        className="mt-2 w-full rounded-2xl border border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold py-2 transition disabled:opacity-60"
+      >
+        {reqStatus === 'pending' ? '⏳ Отправка...' : reqStatus === 'err' ? '❌ Ошибка, повторить' : '📬 Подать заявку'}
+      </button>
+    );
+  };
+
   const CouponContent = () => couponTickets.map((ticket, idx) => (
     <div key={idx} id={`coupon-${idx}`} style={{background:'white',border:'1px solid #e2e8f0',borderRadius:'16px',overflow:'hidden',maxWidth:'480px',margin:'0 auto 24px',pageBreakAfter: idx < couponTickets.length - 1 ? 'always' : 'avoid'}}>
       <div style={{background:'linear-gradient(to right,#10b981,#14b8a6)',padding:'24px 32px',textAlign:'center',WebkitPrintColorAdjust:'exact',printColorAdjust:'exact'}}>
@@ -471,23 +492,7 @@ export default function RewardsPage() {
                         </button>
                       </div>
                     </div>
-                    {!isAdmin && user?.phone && (() => {
-                      const existing = myRequests.find(r => r.rewardId === itemId);
-                      const reqStatus = requestedIds[itemId];
-                      if (existing) {
-                        const statusLabel = existing.status === 'approved' ? { icon: '✅', text: 'Одобрено', cls: 'bg-emerald-100 text-emerald-700' } : existing.status === 'rejected' ? { icon: '❌', text: 'Отклонено', cls: 'bg-red-100 text-red-600' } : { icon: '⏳', text: 'Заявка отправлена', cls: 'bg-amber-100 text-amber-700' };
-                        return <p className={`mt-2 text-xs font-semibold px-3 py-1.5 rounded-full ${statusLabel.cls}`}>{statusLabel.icon} {statusLabel.text}</p>;
-                      }
-                      return (
-                        <button
-                          onClick={() => handleRequest(item)}
-                          disabled={reqStatus === 'pending' || reqStatus === 'ok'}
-                          className="mt-2 w-full rounded-2xl border border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold py-2 transition disabled:opacity-60"
-                        >
-                          {reqStatus === 'pending' ? '⏳ Отправка...' : reqStatus === 'err' ? '❌ Ошибка, повторить' : '📬 Подать заявку'}
-                        </button>
-                      );
-                    })()}
+                    {!isAdmin && user?.phone && renderRequestBtn(itemId, item)}
                   </>
                 )}
               </div>
