@@ -1,5 +1,5 @@
 import { connectDB } from '@/lib/mongodb';
-import { MentorTask } from '@/lib/models';
+import { MentorTask, Notification } from '@/lib/models';
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
@@ -18,6 +18,15 @@ export async function POST(req) {
   await connectDB();
   const data = await req.json();
   const task = await MentorTask.create(data);
+  if (data.employeePhone) {
+    await Notification.create({
+      phone: data.employeePhone,
+      type: 'info',
+      title: '📋 Новая задача от наставника',
+      body: data.title || 'Вам назначена новая задача',
+      link: '/mentors',
+    });
+  }
   return NextResponse.json(task);
 }
 
