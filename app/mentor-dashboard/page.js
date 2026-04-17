@@ -111,8 +111,8 @@ export default function MentorDashboard() {
         {/* Left — employee list */}
         <aside className="lg:w-72 shrink-0">
           <div className="relative mb-4 inline-block">
-            <div className="absolute inset-0 rounded bg-white/60 backdrop-blur-sm" />
-            <h2 className="relative text-lg drop-shadow px-3 py-1">
+            <div className="absolute inset-0 rounded bg-white/80 backdrop-blur-sm" />
+            <h2 className="relative text-lg drop-shadow px-3 py-1 text-black">
               <span className="font-bold">Сотрудники</span> отдела
             </h2>
           </div>
