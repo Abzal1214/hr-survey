@@ -122,13 +122,13 @@ export default function Home() {
                 <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-white/80">{item.desc}</p>
               </Link>
             ))}
-            {/* Наставники */}
-            <Link href={user?.role === 'mentor' ? '/mentor-dashboard' : '/mentors'}
-              className="animate-scale-in hover-lift group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-pink-500 to-rose-600 p-4 sm:p-6 text-white shadow-xl"
+            {/* Полезные советы */}
+            <Link href="/tips"
+              className="animate-scale-in hover-lift group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 p-4 sm:p-6 text-white shadow-xl"
               style={{animationDelay: `${staticLinks.length * 0.08}s`}}>
-              <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">🧑‍🏫</div>
-              <p className="text-sm sm:text-lg font-bold">{user?.role === 'mentor' ? 'Кабинет наставника' : 'Наставники'}</p>
-              <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-white/80">{user?.role === 'mentor' ? 'Мои сотрудники и задачи' : 'Опытные сотрудники'}</p>
+              <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">💡</div>
+              <p className="text-sm sm:text-lg font-bold">Полезные советы</p>
+              <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-white/80">Больничный, отпуск, документы</p>
             </Link>
           </div>
         </section>
