@@ -1,3 +1,19 @@
+  const [myMentor, setMyMentor] = useState(null);
+  const [myTasks, setMyTasks] = useState([]);
+
+  // Найти наставника и загрузить задачи для сотрудника
+  useEffect(() => {
+    if (user && user.role === 'employee') {
+      // Поиск наставника по department (можно доработать под другую логику)
+      const mentor = mentors.find(m => m.department === user.department);
+      setMyMentor(mentor || null);
+      // Загрузить задачи
+      fetch(`/api/mentor-tasks?employeePhone=${user.phone}`)
+        .then(r => r.json())
+        .then(setMyTasks)
+        .catch(() => setMyTasks([]));
+    }
+  }, [user, mentors]);
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -135,6 +151,37 @@ export default function MentorsPage() {
 
   return (
     <div className="min-h-screen">
+      {/* Мой наставник и задачи для сотрудника */}
+      {user?.role === 'employee' && myMentor && (
+        <div className="max-w-2xl mx-auto mt-8 mb-8 p-6 rounded-3xl bg-white/90 shadow-lg">
+          <div className="flex items-center gap-5 mb-3">
+            {myMentor.photoUrl
+              ? <img src={myMentor.photoUrl} alt={myMentor.name} className="w-16 h-16 rounded-full object-cover border-2 border-sky-300" />
+              : <div className="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center text-2xl font-bold text-sky-600">👤</div>}
+            <div>
+              <div className="text-sm text-slate-500 mb-1">Мой наставник</div>
+              <div className="font-bold text-lg text-slate-900">{myMentor.name}</div>
+              {myMentor.position && <div className="text-sky-600 text-sm font-semibold">{myMentor.position}</div>}
+              {myMentor.phone && <div className="text-xs text-slate-500 mt-1">📞 {myMentor.phone}</div>}
+            </div>
+          </div>
+          <div>
+            <div className="font-semibold text-slate-700 mb-2">Задачи от наставника:</div>
+            {myTasks.length === 0 ? (
+              <div className="text-slate-400 text-sm">Нет задач от наставника.</div>
+            ) : (
+              <ul className="space-y-2">
+                {myTasks.map(task => (
+                  <li key={task._id} className="rounded-xl bg-sky-50 px-4 py-2 flex items-center gap-2">
+                    <span className={task.completed ? 'line-through text-slate-400' : 'text-slate-800'}>📋 {task.title}</span>
+                    {task.completed && <span className="ml-2 text-xs text-emerald-600">✔ Выполнено</span>}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
       {/* Hero */}
       <div className="relative flex flex-col items-center justify-center text-center px-6 py-16">
         <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />

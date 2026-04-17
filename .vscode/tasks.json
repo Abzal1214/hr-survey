@@ -1,0 +1,20 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Auto Git Commit & Push",
+			"type": "shell",
+			"command": "git add . && git commit -am 'auto: save all changes' && git push",
+			"problemMatcher": [],
+			"runOptions": {
+				"runOn": "folderOpen"
+			}
+		},
+		{
+			"label": "Auto Git Commit & Push",
+			"type": "shell",
+			"command": "git add . && git commit -am \"auto: save all changes\" && git push",
+			"problemMatcher": []
+		}
+	]
+}
