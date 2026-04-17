@@ -6,7 +6,7 @@ export async function GET(request) {
   await connectDB();
   const { searchParams } = new URL(request.url);
   const dept = searchParams.get('department');
-  const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }] } : {};
+  const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }, { department: 'Аквапарк' }] } : {};
   const items = await OfflineTraining.find(query).sort({ date: 1 }).lean();
   return NextResponse.json(items);
 }

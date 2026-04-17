@@ -7,7 +7,7 @@ export async function GET(request) {
     await connectDB();
     const { searchParams } = new URL(request.url);
     const dept = searchParams.get('department');
-    const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }] } : {};
+    const query = dept ? { $or: [{ department: dept }, { department: '' }, { department: null }, { department: 'Аквапарк' }] } : {};
     const quizzes = await Quiz.find(query).sort({ createdAt: -1 }).lean();
     return NextResponse.json(quizzes.map(q => ({ ...q, id: q._id })));
   } catch (error) {
