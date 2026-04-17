@@ -310,6 +310,8 @@ export default function RewardsPage() {
       } else { setRequestedIds(prev => ({ ...prev, [itemId]: 'err' })); }
     } catch { setRequestedIds(prev => ({ ...prev, [itemId]: 'err' })); }
   };
+
+  const getIcon = (name = '') => {
     const n = name.toLowerCase();
     if (n.includes('кофе') || n.includes('coffee')) return '☕';
     if (n.includes('чай') || n.includes('tea')) return '🍵';
