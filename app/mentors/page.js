@@ -23,7 +23,6 @@ export default function MentorsPage() {
   const [saving, setSaving] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [copiedPhone, setCopiedPhone] = useState('');
-  const [phonePopup, setPhonePopup] = useState('');
   const [myMentors, setMyMentors] = useState([]);
   const [myTasks, setMyTasks] = useState([]);
 
@@ -41,7 +40,6 @@ export default function MentorsPage() {
       setMyTasks([]);
     }
   }, [user, mentors]);
-  const [phonePopup, setPhonePopup] = useState('');
 
   const copyPhone = (phone) => {
     navigator.clipboard.writeText(phone).then(() => {
