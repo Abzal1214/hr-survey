@@ -162,108 +162,126 @@ export default function Home() {
           {news.length === 0 ? (
             <div className="rounded-[24px] bg-white/80 p-6 text-slate-500 shadow text-center">Новостей пока нет.</div>
           ) : (
-            <div className="relative select-none overflow-hidden"
-              onMouseDown={e => onDragStart(e.clientX)}
-              onMouseMove={e => onDragMove(e.clientX)}
-              onMouseUp={e => onDragEnd(e.clientX)}
-              onMouseLeave={e => onDragEnd(e.clientX)}
-              onTouchStart={e => onDragStart(e.touches[0].clientX)}
-              onTouchMove={e => onDragMove(e.touches[0].clientX)}
-              onTouchEnd={e => onDragEnd(e.changedTouches[0].clientX)}
-            >
-              {/* Carousel body */}
-              <div className="w-full" ref={carouselRef}>
-                {(() => {
-                  // All cards are the same base width, scale drives the size difference
-                  const cardW = Math.min(carouselW * 0.72, 600);
-                  const centerScale = 1;
-                  const sideScale = 0.68;
-                  const sideSpacing = cardW * (centerScale / 2 + sideScale / 2) + 14;
-                  const offscreenSpacing = sideSpacing * 2;
-                  const containerH = 400;
-                  const cardH = containerH;
-                  return (
-                    <div className="relative" style={{ height: containerH }}>
-                      {[-2, -1, 0, 1, 2].map(offset => {
-                        const idx = ((newsIdx + offset) % news.length + news.length) % news.length;
-                        const isCenter = offset === 0;
-                        const isSide = Math.abs(offset) === 1;
-                        const isOffscreen = Math.abs(offset) === 2;
-                        const scale = isCenter ? centerScale : isSide ? sideScale : sideScale * 0.85;
-                        const x = isOffscreen ? offset * offscreenSpacing : offset * sideSpacing;
-                        const opacity = isCenter ? 1 : isSide ? 0.92 : 0;
-                        const item = news[idx];
-                        return (
-                          <div
-                            key={offset}
-                            onClick={() => {
-                              if (dragging.current) return;
-                              if (isSide) goNews(offset);
-                              else if (isCenter) setSelectedNews(item);
-                            }}
-                            style={{
-                              position: 'absolute',
-                              top: '50%',
-                              left: '50%',
-                              width: cardW,
-                              height: cardH,
-                              opacity,
-                              zIndex: isCenter ? 10 : isSide ? 5 : 0,
-                              pointerEvents: isOffscreen ? 'none' : 'auto',
-                              cursor: isCenter ? 'pointer' : isSide ? 'pointer' : 'default',
-                              transition: 'transform 0.52s cubic-bezier(.22,.68,0,1.2), opacity 0.52s ease',
-                              transform: `translate(calc(-50% + ${x}px), -50%) scale(${scale})`,
-                              transformOrigin: 'center center',
-                              willChange: 'transform, opacity',
-                            }}
-                          >
-                            {isCenter ? (
-                              <article className="rounded-[24px] bg-white/95 shadow-2xl overflow-hidden h-full flex flex-col">
-                                {item?.imageUrl
-                                  ? <div className="overflow-hidden" style={{ height: 220 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
-                                  : <div className="h-3 bg-gradient-to-r from-sky-400 to-blue-500" />}
-                                <div className="p-6 flex flex-col flex-1">
-                                  <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-1">
-                                    {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
-                                  </p>
-                                  <h3 className="text-xl font-extrabold text-slate-900 leading-snug mb-2 line-clamp-2">{item?.title}</h3>
-                                  <p className="text-slate-500 text-sm leading-relaxed line-clamp-2 flex-1">{item?.description}</p>
-                                  <span className="mt-3 inline-block text-xs font-semibold text-sky-600">Читать далее →</span>
-                                </div>
-                              </article>
-                            ) : (
-                              <article className="rounded-[24px] bg-white/95 shadow-lg overflow-hidden flex flex-col h-full hover:bg-white/98 transition-colors">
-                                {item?.imageUrl
-                                  ? <div className="overflow-hidden shrink-0" style={{ height: 200 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
-                                  : <div className="bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" style={{ height: 4 }} />}
-                                <div className="flex flex-col justify-center p-4 overflow-hidden flex-1">
-                                  <p className="text-xs font-semibold text-sky-400 mb-1 truncate">
-                                    {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
-                                  </p>
-                                  <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-3">{item?.title}</h4>
-                                  <p className="text-slate-400 text-xs mt-1 line-clamp-2">{item?.description}</p>
-                                </div>
-                              </article>
-                            )}
-                          </div>
-                        );
-                      })}
-                      {/* Dot indicators */}
-                      {news.length > 1 && (
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2 z-20" style={{ bottom: -28 }}>
-                          {news.map((_, i) => (
-                            <button key={i} onClick={() => goNews(i - newsIdx)}
-                              className={`rounded-full transition-all duration-300 ${
-                                i === newsIdx ? 'w-6 h-2 bg-white' : 'w-2 h-2 bg-white/40 hover:bg-white/70'
-                              }`} />
-                          ))}
-                        </div>
-                      )}
+            <>
+              {/* Mobile: simple list, max 3, no animation */}
+              <div className="flex flex-col gap-3 sm:hidden">
+                {news.slice(0, 3).map(item => (
+                  <article key={item._id} className="rounded-2xl bg-white/95 shadow overflow-hidden flex gap-3 cursor-pointer active:opacity-80" onClick={() => setSelectedNews(item)}>
+                    {item.imageUrl
+                      ? <img src={item.imageUrl} alt={item.title} className="w-20 h-20 object-cover shrink-0" />
+                      : <div className="w-1.5 shrink-0 bg-gradient-to-b from-sky-400 to-blue-500 rounded-l-2xl" />}
+                    <div className="py-3 pr-3 flex flex-col justify-center min-w-0">
+                      <p className="text-xs font-semibold text-sky-500 mb-0.5">
+                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
+                      </p>
+                      <h3 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">{item.title}</h3>
+                      <p className="text-slate-500 text-xs mt-0.5 line-clamp-1">{item.description}</p>
                     </div>
-                  );
-                })()}
+                  </article>
+                ))}
               </div>
-            </div>
+
+              {/* Desktop: carousel */}
+              <div className="hidden sm:block relative select-none overflow-hidden"
+                onMouseDown={e => onDragStart(e.clientX)}
+                onMouseMove={e => onDragMove(e.clientX)}
+                onMouseUp={e => onDragEnd(e.clientX)}
+                onMouseLeave={e => onDragEnd(e.clientX)}
+                onTouchStart={e => onDragStart(e.touches[0].clientX)}
+                onTouchMove={e => onDragMove(e.touches[0].clientX)}
+                onTouchEnd={e => onDragEnd(e.changedTouches[0].clientX)}
+              >
+                <div className="w-full" ref={carouselRef}>
+                  {(() => {
+                    const cardW = Math.min(carouselW * 0.72, 600);
+                    const centerScale = 1;
+                    const sideScale = 0.68;
+                    const sideSpacing = cardW * (centerScale / 2 + sideScale / 2) + 14;
+                    const offscreenSpacing = sideSpacing * 2;
+                    const containerH = 400;
+                    const cardH = containerH;
+                    return (
+                      <div className="relative" style={{ height: containerH }}>
+                        {[-2, -1, 0, 1, 2].map(offset => {
+                          const idx = ((newsIdx + offset) % news.length + news.length) % news.length;
+                          const isCenter = offset === 0;
+                          const isSide = Math.abs(offset) === 1;
+                          const isOffscreen = Math.abs(offset) === 2;
+                          const scale = isCenter ? centerScale : isSide ? sideScale : sideScale * 0.85;
+                          const x = isOffscreen ? offset * offscreenSpacing : offset * sideSpacing;
+                          const opacity = isCenter ? 1 : isSide ? 0.92 : 0;
+                          const item = news[idx];
+                          return (
+                            <div
+                              key={offset}
+                              onClick={() => {
+                                if (dragging.current) return;
+                                if (isSide) goNews(offset);
+                                else if (isCenter) setSelectedNews(item);
+                              }}
+                              style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                width: cardW,
+                                height: cardH,
+                                opacity,
+                                zIndex: isCenter ? 10 : isSide ? 5 : 0,
+                                pointerEvents: isOffscreen ? 'none' : 'auto',
+                                cursor: isCenter ? 'pointer' : isSide ? 'pointer' : 'default',
+                                transition: 'transform 0.52s cubic-bezier(.22,.68,0,1.2), opacity 0.52s ease',
+                                transform: `translate(calc(-50% + ${x}px), -50%) scale(${scale})`,
+                                transformOrigin: 'center center',
+                                willChange: 'transform, opacity',
+                              }}
+                            >
+                              {isCenter ? (
+                                <article className="rounded-[24px] bg-white/95 shadow-2xl overflow-hidden h-full flex flex-col">
+                                  {item?.imageUrl
+                                    ? <div className="overflow-hidden" style={{ height: 220 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
+                                    : <div className="h-3 bg-gradient-to-r from-sky-400 to-blue-500" />}
+                                  <div className="p-6 flex flex-col flex-1">
+                                    <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-1">
+                                      {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
+                                    </p>
+                                    <h3 className="text-xl font-extrabold text-slate-900 leading-snug mb-2 line-clamp-2">{item?.title}</h3>
+                                    <p className="text-slate-500 text-sm leading-relaxed line-clamp-2 flex-1">{item?.description}</p>
+                                    <span className="mt-3 inline-block text-xs font-semibold text-sky-600">Читать далее →</span>
+                                  </div>
+                                </article>
+                              ) : (
+                                <article className="rounded-[24px] bg-white/95 shadow-lg overflow-hidden flex flex-col h-full hover:bg-white/98 transition-colors">
+                                  {item?.imageUrl
+                                    ? <div className="overflow-hidden shrink-0" style={{ height: 200 }}><img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" /></div>
+                                    : <div className="bg-gradient-to-r from-sky-400 to-blue-500 shrink-0" style={{ height: 4 }} />}
+                                  <div className="flex flex-col justify-center p-4 overflow-hidden flex-1">
+                                    <p className="text-xs font-semibold text-sky-400 mb-1 truncate">
+                                      {item?.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
+                                    </p>
+                                    <h4 className="font-bold text-slate-700 text-sm leading-snug line-clamp-3">{item?.title}</h4>
+                                    <p className="text-slate-400 text-xs mt-1 line-clamp-2">{item?.description}</p>
+                                  </div>
+                                </article>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {news.length > 1 && (
+                          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2 z-20" style={{ bottom: -28 }}>
+                            {news.map((_, i) => (
+                              <button key={i} onClick={() => goNews(i - newsIdx)}
+                                className={`rounded-full transition-all duration-300 ${
+                                  i === newsIdx ? 'w-6 h-2 bg-white' : 'w-2 h-2 bg-white/40 hover:bg-white/70'
+                                }`} />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </>
           )}
         </section>
       </main>
