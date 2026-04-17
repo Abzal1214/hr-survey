@@ -182,7 +182,7 @@ export default function Home() {
               </div>
 
               {/* Desktop: carousel */}
-              <div className="hidden sm:block relative select-none overflow-hidden"
+              <div className="hidden sm:block relative select-none"
                 onMouseDown={e => onDragStart(e.clientX)}
                 onMouseMove={e => onDragMove(e.clientX)}
                 onMouseUp={e => onDragEnd(e.clientX)}
