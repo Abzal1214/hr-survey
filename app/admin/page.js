@@ -755,8 +755,8 @@ export default function Admin() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="rounded-[28px] bg-emerald-50 p-6 border border-emerald-100 shadow-sm">
-                <p className="text-sm font-semibold uppercase tracking-[0.35em] text-emerald-700">Имя</p>
-                <p className="mt-4 text-2xl font-bold text-slate-900">{currentUser.name}</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.35em] text-emerald-700">ФИО</p>
+                <p className="mt-4 text-2xl font-bold text-slate-900">{[currentUser.name, currentUser.surname].filter(Boolean).join(' ')}</p>
               </div>
               <div className="rounded-[28px] bg-sky-50 p-6 border border-sky-100 shadow-sm">
                 <p className="text-sm font-semibold uppercase tracking-[0.35em] text-sky-700">Телефон</p>
@@ -977,7 +977,7 @@ export default function Admin() {
                 <table className="w-full border-collapse text-sm text-slate-900">
                   <thead className="bg-slate-100 text-slate-900">
                     <tr>
-                      <th className="p-3 text-left">Имя</th>
+                      <th className="p-3 text-left">ФИО</th>
                       <th className="p-3 text-left">Телефон</th>
                       <th className="p-3 text-left">Отдел</th>
                       <th className="p-3 text-left">Должность</th>
@@ -989,7 +989,7 @@ export default function Admin() {
                   <tbody>
                     {staffRows.map((user, index) => (
                       <tr key={index} className={index % 2 === 0 ? 'bg-slate-50' : 'bg-white'}>
-                        <td className="p-3 border-b text-slate-900">{user.name}</td>
+                        <td className="p-3 border-b text-slate-900">{[user.name, user.surname].filter(Boolean).join(' ')}</td>
                         <td className="p-3 border-b text-slate-900">{user.phone}</td>
                         <td className="p-3 border-b text-slate-900">{user.department || '—'}</td>
                         <td className="p-3 border-b text-slate-900">{user.position}</td>
@@ -1222,7 +1222,7 @@ export default function Admin() {
               <table className="w-full border-collapse text-sm text-slate-900">
                 <thead className="bg-emerald-100 text-slate-900">
                   <tr>
-                    <th className="p-3 text-left">Имя</th>
+                    <th className="p-3 text-left">ФИО</th>
                     <th className="p-3 text-left">Телефон</th>
                     <th className="p-3 text-left">Отдел</th>
                     <th className="p-3 text-left">Баллы (AQUA COIN)</th>
@@ -1231,7 +1231,7 @@ export default function Admin() {
                 <tbody>
                   {usersData.map((user, index) => (
                     <tr key={index} className={index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'}>
-                      <td className="p-3 border-b text-slate-900">{user.name}</td>
+                      <td className="p-3 border-b text-slate-900">{[user.name, user.surname].filter(Boolean).join(' ')}</td>
                       <td className="p-3 border-b text-slate-900">{user.phone}</td>
                       <td className="p-3 border-b text-slate-900">{mapDepartment(user)}</td>
                       <td className="p-3 border-b text-slate-900 font-bold text-emerald-700">{user.points ?? 0}</td>
