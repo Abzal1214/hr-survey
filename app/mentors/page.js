@@ -1,17 +1,18 @@
   const [myMentor, setMyMentor] = useState(null);
   const [myTasks, setMyTasks] = useState([]);
 
-  // Найти наставника и загрузить задачи для сотрудника
+  // Найти наставника по department и загрузить задачи для сотрудника
   useEffect(() => {
-    if (user && user.role === 'employee') {
-      // Поиск наставника по department (можно доработать под другую логику)
+    if (user && user.role === 'employee' && user.department) {
       const mentor = mentors.find(m => m.department === user.department);
       setMyMentor(mentor || null);
-      // Загрузить задачи
       fetch(`/api/mentor-tasks?employeePhone=${user.phone}`)
         .then(r => r.json())
         .then(setMyTasks)
         .catch(() => setMyTasks([]));
+    } else {
+      setMyMentor(null);
+      setMyTasks([]);
     }
   }, [user, mentors]);
 'use client';
