@@ -11,7 +11,7 @@ export default function TrainingsPage() {
   const [message, setMessage] = useState('');
 
   const [showCreate, setShowCreate] = useState(false);
-  const [newTraining, setNewTraining] = useState({ title: '', description: '', date: '', time: '', location: '', maxParticipants: 20, department: '', trainer: '' });
+  const [newTraining, setNewTraining] = useState({ title: '', description: '', date: '', time: '', endTime: '', location: '', maxParticipants: 20, department: '', trainer: '' });
   const [createMsg, setCreateMsg] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -74,7 +74,7 @@ export default function TrainingsPage() {
     const res = await fetch('/api/offline-trainings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newTraining) });
     if (res.ok) {
       setCreateMsg('Тренинг добавлен!');
-      setNewTraining({ title: '', description: '', date: '', time: '', location: '', maxParticipants: 20, department: '', trainer: '' });
+      setNewTraining({ title: '', description: '', date: '', time: '', endTime: '', location: '', maxParticipants: 20, department: '', trainer: '' });
       setShowCreate(false);
       loadTrainings();
     } else { const d = await res.json(); setCreateMsg(d.error || 'Ошибка'); }
@@ -124,7 +124,7 @@ export default function TrainingsPage() {
             {t.description && <p className="text-slate-600 text-sm mb-3">{t.description}</p>}
             <div className="flex flex-wrap gap-4 text-sm text-slate-600">
               <span className="flex items-center gap-1.5">📅 {formatDate(t.date)}</span>
-              <span className="flex items-center gap-1.5">🕐 {t.time}</span>
+              <span className="flex items-center gap-1.5">🕐 {t.time}{t.endTime ? ` – ${t.endTime}` : ''}</span>
               <span className="flex items-center gap-1.5">📍 {t.location}</span>
               {t.trainer && <span className="flex items-center gap-1.5">👤 {t.trainer}</span>}
               <span className={`flex items-center gap-1.5 font-semibold ${left <= 0 ? 'text-red-500' : left <= 3 ? 'text-orange-500' : 'text-emerald-600'}`}>
@@ -214,15 +214,20 @@ export default function TrainingsPage() {
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название *" />
                   <textarea value={newTraining.description} onChange={e => setNewTraining(p => ({ ...p, description: e.target.value }))}
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900 min-h-[80px]" placeholder="Описание" />
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-slate-600 mb-1">Дата *</label>
                       <input type="date" value={newTraining.date} onChange={e => setNewTraining(p => ({ ...p, date: e.target.value }))}
                         className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">Время *</label>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">Время начала *</label>
                       <input type="time" value={newTraining.time} onChange={e => setNewTraining(p => ({ ...p, time: e.target.value }))}
+                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">Время окончания</label>
+                      <input type="time" value={newTraining.endTime} onChange={e => setNewTraining(p => ({ ...p, endTime: e.target.value }))}
                         className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
                     </div>
                   </div>

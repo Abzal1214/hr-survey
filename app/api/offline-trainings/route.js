@@ -14,11 +14,11 @@ export async function GET(request) {
 export async function POST(request) {
   await connectDB();
   const body = await request.json();
-  const { title, description, date, time, location, maxParticipants, department, trainer, registrationDeadline } = body;
+  const { title, description, date, time, endTime, location, maxParticipants, department, trainer, registrationDeadline } = body;
   if (!title || !date || !time || !location) {
     return NextResponse.json({ error: 'Заполните все обязательные поля' }, { status: 400 });
   }
-  const item = await OfflineTraining.create({ title, description, date, time, location, maxParticipants: maxParticipants || 20, department: department || '', trainer: trainer || '', registrationDeadline: registrationDeadline || '', signups: [] });
+  const item = await OfflineTraining.create({ title, description, date, time, endTime: endTime || '', location, maxParticipants: maxParticipants || 20, department: department || '', trainer: trainer || '', registrationDeadline: registrationDeadline || '', signups: [] });
   return NextResponse.json(item);
 }
 
