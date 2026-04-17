@@ -40,6 +40,7 @@ const initialEmployeeForm = {
 export default function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '', department: '' });
+  const [loginError, setLoginError] = useState('');
   const [departmentPositions, setDepartmentPositions] = useState(DEFAULT_POSITIONS);
   const [newPositionInput, setNewPositionInput] = useState({ dept: '', value: '', show: false, context: '' });
   const [currentUser, setCurrentUser] = useState(null);
@@ -139,6 +140,7 @@ export default function Admin() {
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData(prev => ({ ...prev, [name]: value }));
+    setLoginError('');
   };
 
   const handleProfileFormChange = (e) => {
@@ -216,10 +218,10 @@ export default function Admin() {
         window.dispatchEvent(new Event('userChanged'));
         await fetchAdminData();
       } else {
-        alert('Неверный логин или пароль');
+        setLoginError('Неверный логин или пароль');
       }
     } catch (error) {
-      alert('Ошибка входа: ' + error.message);
+      setLoginError('Ошибка входа: ' + error.message);
     }
   };
 
@@ -650,7 +652,11 @@ export default function Admin() {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4" autoComplete="on">
-              <div>
+              {loginError && (
+                <div className="rounded-2xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm font-medium">
+                  {loginError}
+                </div>
+              )}              <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Телефон / логин</label>
                 <input
                   type="text"
