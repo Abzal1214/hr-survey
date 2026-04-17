@@ -112,7 +112,7 @@ export default function MentorDashboard() {
         <aside className="lg:w-72 shrink-0">
           <div className="relative mb-4 inline-block">
             <div className="absolute inset-0 rounded bg-white/60 backdrop-blur-sm" />
-            <h2 className="relative text-lg font-extrabold text-black drop-shadow px-3 py-1">Сотрудники отдела</h2>
+            <h2 className="relative text-lg font-normal text-black drop-shadow px-3 py-1">Сотрудники отдела</h2>
           </div>
           {employees.length === 0 ? (
             <div className="rounded-2xl bg-white/80 p-6 text-center text-slate-400 shadow text-sm">Нет сотрудников в вашем отделе.</div>
