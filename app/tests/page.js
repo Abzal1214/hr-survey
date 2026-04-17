@@ -11,7 +11,7 @@ export default function TrainingsPage() {
   const [message, setMessage] = useState('');
 
   const [showCreate, setShowCreate] = useState(false);
-  const [newTraining, setNewTraining] = useState({ title: '', description: '', date: '', time: '', endTime: '', location: '', maxParticipants: 20, department: 'Аквапарк', trainer: '' });
+  const [newTraining, setNewTraining] = useState({ title: '', description: '', date: '', time: '', endTime: '', location: '', maxParticipants: 20, department: '', trainer: '' });
   const [createMsg, setCreateMsg] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -74,7 +74,7 @@ export default function TrainingsPage() {
     const res = await fetch('/api/offline-trainings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newTraining) });
     if (res.ok) {
       setCreateMsg('Тренинг добавлен!');
-      setNewTraining({ title: '', description: '', date: '', time: '', endTime: '', location: '', maxParticipants: 20, department: 'Аквапарк', trainer: '' });
+      setNewTraining({ title: '', description: '', date: '', time: '', endTime: '', location: '', maxParticipants: 20, department: '', trainer: '' });
       setShowCreate(false);
       loadTrainings();
     } else { const d = await res.json(); setCreateMsg(d.error || 'Ошибка'); }
@@ -245,7 +245,8 @@ export default function TrainingsPage() {
                       <label className="block text-xs font-semibold text-slate-600 mb-1">Отдел (необязательно)</label>
                       <select value={newTraining.department} onChange={e => setNewTraining(p => ({ ...p, department: e.target.value }))}
                         className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
-                        <option value="Аквапарк">Аквапарк (все отделы)</option>
+                        <option value="">Все отделы</option>
+                        <option value="Аквапарк">Аквапарк</option>
                         <option value="Ресторан">Ресторан</option>
                         <option value="SPA">SPA</option>
                         <option value="Магазин">Магазин</option>

@@ -32,7 +32,7 @@ export default function SurveysPage() {
 
   // Admin: create form
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newSurvey, setNewSurvey] = useState({ title: '', description: '', department: 'Аквапарк' });
+  const [newSurvey, setNewSurvey] = useState({ title: '', description: '', department: '' });
   const [questions, setQuestions] = useState([{ text: '', type: 'text' }]);
   const [saving, setSaving] = useState(false);
 
@@ -105,7 +105,7 @@ export default function SurveysPage() {
       if (res.ok) {
         const created = await res.json();
         setTemplates(prev => [created, ...prev]);
-        setNewSurvey({ title: '', description: '', department: 'Аквапарк' });
+        setNewSurvey({ title: '', description: '', department: '' });
         setQuestions([{ text: '', type: 'text' }]);
         setShowAddForm(false);
       } else alert('Ошибка при создании');
@@ -262,7 +262,8 @@ export default function SurveysPage() {
                   <label className={labelCls}>
                     <span className={spanCls}>Отдел</span>
                     <select value={newSurvey.department} onChange={e => setNewSurvey(p => ({ ...p, department: e.target.value }))} className={inputCls}>
-                      <option value="Аквапарк">Аквапарк (все отделы)</option>
+                      <option value="">Все отделы</option>
+                      <option value="Аквапарк">Аквапарк</option>
                       <option value="Ресторан">Ресторан</option>
                       <option value="SPA">SPA</option>
                       <option value="Магазин">Магазин</option>
