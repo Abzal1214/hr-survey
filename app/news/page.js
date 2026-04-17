@@ -179,7 +179,7 @@ export default function NewsPage() {
               {news.map((item) => {
                 const itemId = String(item._id || item.id);
                 return (
-                  <article key={itemId} className="group rounded-[20px] bg-white/95 shadow-lg hover:shadow-2xl transition-all overflow-hidden cursor-pointer" onClick={() => !editingId && setSelectedNews(item)}>
+                  <article key={itemId} className="group relative rounded-[20px] bg-white/95 shadow-lg hover:shadow-2xl transition-all overflow-hidden cursor-pointer" onClick={() => !editingId && setSelectedNews(item)}>
                     {editingId === itemId ? (
                       <div className="p-5 space-y-3" onClick={e => e.stopPropagation()}>
                         <input value={editForm.title} onChange={e => setEditForm(p => ({ ...p, title: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm" placeholder="Заголовок" />
@@ -200,16 +200,17 @@ export default function NewsPage() {
                             <p className="text-xs font-semibold uppercase tracking-widest text-sky-500">
                               {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : ''}
                             </p>
-                            {isAdmin && (
-                              <div onClick={e => e.stopPropagation()}>
-                                <KebabMenu onEdit={() => { setEditingId(itemId); setEditForm({ title: item.title, description: item.description }); }} onDelete={() => handleDelete(itemId)} />
-                              </div>
-                            )}
                           </div>
                           <h3 className="text-base font-bold text-slate-900 leading-snug mb-2 line-clamp-2">{item.title}</h3>
                           <p className="text-slate-500 text-sm leading-relaxed line-clamp-3">{item.description}</p>
                           <span className="mt-4 inline-block text-xs font-semibold text-sky-600 group-hover:text-sky-700 transition">Читать далее →</span>
                         </div>
+                        {isAdmin && (
+                          <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
+                            <button onClick={() => { setEditingId(itemId); setEditForm({ title: item.title, description: item.description }); }} className="w-8 h-8 rounded-full bg-white/80 hover:bg-white text-slate-700 text-xs font-bold flex items-center justify-center shadow transition">✎</button>
+                            <button onClick={() => handleDelete(itemId)} className="w-8 h-8 rounded-full bg-red-500/80 hover:bg-red-600 text-white text-xs font-bold flex items-center justify-center shadow transition">✕</button>
+                          </div>
+                        )}
                       </>
                     )}
                   </article>
