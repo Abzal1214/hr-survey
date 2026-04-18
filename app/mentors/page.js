@@ -151,8 +151,31 @@ export default function MentorsPage() {
   const filtered = filter === 'Все отделы' ? mentors : mentors.filter(m => m.department === filter);
 
   return (
-    <div className="min-h-screen">
 
+    <div className="min-h-screen">
+      {/* Hero */}
+      <div className="relative flex flex-col items-center justify-center text-center px-6 py-16">
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
+        <div className="relative z-10">
+          <span className="inline-block rounded-full bg-sky-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Команда</span>
+          <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
+          <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            {user?.role === 'mentor' && (
+              <Link href="/mentor-dashboard"
+                className="rounded-full bg-amber-500 hover:bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white transition shadow-lg">
+                👨‍🏫 Кабинет наставника
+              </Link>
+            )}
+            {isAdmin && (
+              <button onClick={() => { setShowAssign(true); setEmpSearch(''); }}
+                className="rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
+                + Назначить наставника
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Мой наставник и задачи для сотрудника */}
       {user?.role === 'employee' && myMentors.length > 0 && (
@@ -190,29 +213,6 @@ export default function MentorsPage() {
           </div>
         </div>
       )}
-      {/* Hero */}
-      <div className="relative flex flex-col items-center justify-center text-center px-6 py-16">
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
-        <div className="relative z-10">
-          <span className="inline-block rounded-full bg-sky-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Команда</span>
-          <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
-          <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            {user?.role === 'mentor' && (
-              <Link href="/mentor-dashboard"
-                className="rounded-full bg-amber-500 hover:bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white transition shadow-lg">
-                👨‍🏫 Кабинет наставника
-              </Link>
-            )}
-            {isAdmin && (
-              <button onClick={() => { setShowAssign(true); setEmpSearch(''); }}
-                className="rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
-                + Назначить наставника
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
 
       <div className="max-w-6xl mx-auto px-4 py-10">
 
