@@ -156,11 +156,16 @@ export default function MentorsPage() {
                 return (
                   <button
                     key={d}
-                    onClick={() => hasMentor && setFilter(d)}
-                    disabled={!hasMentor}
+                    onClick={() => {
+                      if (hasMentor) {
+                        setFilter(d);
+                      } else {
+                        alert('В этом отделе нет наставников');
+                        setFilter(d);
+                      }
+                    }}
                     className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all flex items-center gap-1
-                      ${isSelected && hasMentor ? "bg-sky-500 text-white shadow" : ""}
-                      ${!hasMentor ? "bg-gray-200 text-gray-400 border border-gray-200 cursor-not-allowed" : "bg-white/80 text-slate-600 border border-slate-200 hover:bg-sky-50"}
+                      ${isSelected ? "bg-sky-500 text-white shadow" : "bg-white/80 text-slate-600 border border-slate-200 hover:bg-sky-50"}
                     `}
                   >
                     {!hasMentor && <span title="Нет наставников">🚫</span>}
