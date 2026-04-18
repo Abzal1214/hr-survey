@@ -8,6 +8,23 @@ const DEPARTMENTS = ['Все отделы', 'Аквапарк', 'Рестора�
 const emptyForm = { name: '', position: '', department: '', phone: '', email: '', bio: '', photoUrl: '' };
 
 export default function MentorsPage() {
+    // Инициализация пользователя и роли из localStorage
+    useEffect(() => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          setIsAdmin(parsedUser.role === 'admin');
+        } else {
+          setUser(null);
+          setIsAdmin(false);
+        }
+      } catch {
+        setUser(null);
+        setIsAdmin(false);
+      }
+    }, []);
   const [mentors, setMentors] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [empSearch, setEmpSearch] = useState('');
