@@ -186,7 +186,7 @@ export default function MentorsPage() {
                       >
                         {/* Бейдж 'Мой наставник' если отдел совпадает */}
                         {user?.role === "employee" && user?.department === mentor.department && (
-                          <span className="absolute top-3 left-3 z-10 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                          <span className="absolute top-3 right-3 z-20 bg-white border-2 border-emerald-500 text-emerald-700 text-sm font-extrabold px-4 py-1.5 rounded-full shadow-lg tracking-wide" style={{letterSpacing: '0.03em'}}>
                             Мой наставник
                           </span>
                         )}
