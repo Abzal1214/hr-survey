@@ -271,18 +271,6 @@ export default function MentorsPage() {
                 </div>
               )}
             </div>
-                          {phonePopup === mentor.phone && (
-                        <div className="absolute left-0 bottom-8 z-20 flex gap-2 rounded-2xl bg-white shadow-xl border border-slate-100 px-3 py-2">
-                              <button onClick={() => copyPhone(mentor.phone)}
-                                className="rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 px-3 py-1.5 text-xs font-semibold transition">
-                                {copiedPhone === mentor.phone ? 'Скопировано' : 'Копировать'}
-                              </button>
-                              <a href={`tel:${mentor.phone}`}
-                                className="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold transition">
-                                Позвонить
-                              </a>
-                            </div>
-                          )}
                         </div>
                       )}
                       {mentor.email && <a href={`mailto:${mentor.email}`} onClick={e => e.stopPropagation()} className="text-sm text-slate-600 hover:text-sky-600 transition truncate">✉️ {mentor.email}</a>}
