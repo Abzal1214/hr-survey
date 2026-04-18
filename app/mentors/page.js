@@ -52,6 +52,39 @@ export default function MentorsPage() {
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
         </div>
       </div>
+
+      {/* Мой наставник и задачи для сотрудника */}
+      {user?.role === 'employee' && myMentors.length > 0 && (
+        <div className="max-w-2xl mx-auto -mt-12 mb-8 bg-white/70 rounded-xl shadow border border-sky-100 backdrop-blur-md p-4 flex flex-col gap-2">
+          <div className="flex items-center gap-4">
+            {myMentors[0]?.photoUrl
+              ? <img src={myMentors[0].photoUrl} alt={myMentors[0].name} className="w-12 h-12 rounded-full object-cover border-2 border-sky-300" />
+              : <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-xl font-bold text-sky-600">👤</div>}
+            <div className="flex flex-col">
+              <span className="font-bold text-slate-900 leading-tight">{myMentors[0].name}</span>
+              {myMentors[0].position && <span className="text-sky-600 text-xs font-medium leading-tight">{myMentors[0].position}</span>}
+              {myMentors[0].department && <span className="text-xs text-slate-400 mt-0.5">{myMentors[0].department}</span>}
+              {myMentors[0].phone && <span className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><span className='text-rose-500'>📞</span>{myMentors[0].phone}</span>}
+            </div>
+          </div>
+          <div className="mt-2">
+            <div className="font-semibold text-slate-700 mb-1">Задачи от наставника</div>
+            {myTasks.length === 0 ? (
+              <div className="text-slate-400 text-sm">Нет задач от наставника.</div>
+            ) : (
+              <ul className="space-y-1">
+                {myTasks.map(task => (
+                  <li key={task._id} className="rounded bg-sky-50 px-3 py-1 flex items-center gap-2 border border-sky-100 text-sm">
+                    <span className={task.completed ? 'line-through text-slate-400' : 'text-slate-800'}>📝 {task.title}</span>
+                    {task.completed && <span className="ml-2 text-xs text-emerald-600">✔</span>}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto px-2 py-6">
         <div className="flex gap-2 flex-wrap mb-6 justify-center">
           {DEPARTMENTS.map(d => (
