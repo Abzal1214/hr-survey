@@ -60,6 +60,10 @@ export default function MentorsPage() {
 
   return (
     <div className="min-h-screen">
+      {/* DEBUG: mentors API response */}
+      <div style={{position:'fixed',bottom:0,left:0,zIndex:9999,background:'#fff',fontSize:12,padding:8,border:'1px solid #f00',maxWidth:600}}>
+        <b>API mentors:</b> {JSON.stringify(mentors)}
+      </div>
       {/* ...весь существующий JSX... */}
       {/* DEBUG: временный вывод для отладки */}
       <div className="fixed bottom-0 left-0 bg-white/90 text-xs p-2 z-[9999] max-w-lg border border-rose-200 rounded">
