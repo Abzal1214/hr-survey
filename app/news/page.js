@@ -225,7 +225,16 @@ export default function NewsPage() {
       {selectedNews && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setSelectedNews(null)}>
           <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[32px] bg-white shadow-2xl" onClick={e => e.stopPropagation()}>
-            {selectedNews.imageUrl && <img src={selectedNews.imageUrl} alt={selectedNews.title} className="w-full h-64 object-cover rounded-t-[32px]" />}
+            {selectedNews.imageUrl && (
+              <div className="w-full flex justify-center items-center bg-white rounded-t-[32px] p-4" style={{minHeight: 200}}>
+                <img
+                  src={selectedNews.imageUrl}
+                  alt={selectedNews.title}
+                  className="max-w-full max-h-[50vh] object-contain"
+                  style={{ display: 'block', margin: '0 auto' }}
+                />
+              </div>
+            )}
             <div className="p-8">
               <p className="text-xs font-semibold uppercase tracking-widest text-sky-500 mb-3">
                 {selectedNews.createdAt ? new Date(selectedNews.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : ''}
