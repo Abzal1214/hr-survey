@@ -235,22 +235,37 @@ export default function MentorsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {filtered.filter(m => !(user?.role === 'employee' && myMentors.some(mm => mm._id === m._id))).map(mentor => (
                     <div key={mentor._id} className="relative group">
-                      {isAdmin && (
-                        <div className="absolute top-3 right-3 z-10">
-                          <KebabMenu onEdit={() => handleEdit(mentor)} onDelete={() => handleDelete(mentor._id)} />
+                      <article>
+                        {isAdmin && (
+                          <div className="absolute top-3 right-3 z-10">
+                            <KebabMenu onEdit={() => handleEdit(mentor)} onDelete={() => handleDelete(mentor._id)} />
+                          </div>
+                        )}
+                        <div className="flex items-center gap-4 bg-white/80 rounded-xl p-4 shadow group-hover:shadow-lg border border-sky-100 transition-all">
+                          {mentor.photoUrl
+                            ? <img src={mentor.photoUrl} alt={mentor.name} className="w-12 h-12 rounded-full object-cover border-2 border-sky-300" />
+                            : <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-xl font-bold text-sky-600">👤</div>}
+                          <div className="flex flex-col">
+                            <span className="font-bold text-slate-900 leading-tight">{mentor.name}</span>
+                            {mentor.position && <span className="text-sky-600 text-xs font-medium leading-tight">{mentor.position}</span>}
+                            {mentor.department && <span className="text-xs text-slate-400 mt-0.5">{mentor.department}</span>}
+                            {mentor.phone && <span className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><span className='text-rose-500'>📞</span>{mentor.phone}</span>}
+                            {mentor.email && <a href={`mailto:${mentor.email}`} onClick={e => e.stopPropagation()} className="text-sm text-slate-600 hover:text-sky-600 transition truncate">✉️ {mentor.email}</a>}
+                          </div>
                         </div>
-                      )}
-                      <div className="flex items-center gap-4 bg-white/80 rounded-xl p-4 shadow group-hover:shadow-lg border border-sky-100 transition-all">
-                        {mentor.photoUrl
-                          ? <img src={mentor.photoUrl} alt={mentor.name} className="w-12 h-12 rounded-full object-cover border-2 border-sky-300" />
-                          : <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-xl font-bold text-sky-600">👤</div>}
-                        <div className="flex flex-col">
-                          <span className="font-bold text-slate-900 leading-tight">{mentor.name}</span>
-                          {mentor.position && <span className="text-sky-600 text-xs font-medium leading-tight">{mentor.position}</span>}
-                          {mentor.department && <span className="text-xs text-slate-400 mt-0.5">{mentor.department}</span>}
-                          {mentor.phone && <span className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><span className='text-rose-500'>📞</span>{mentor.phone}</span>}
-                        </div>
-                      </div>
+                        {phonePopup === mentor.phone && (
+                          <div className="absolute left-0 bottom-8 z-20 flex gap-2 rounded-2xl bg-white shadow-xl border border-slate-100 px-3 py-2">
+                            <button onClick={() => copyPhone(mentor.phone)}
+                              className="rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 px-3 py-1.5 text-xs font-semibold transition">
+                              {copiedPhone === mentor.phone ? 'Скопировано' : 'Копировать'}
+                            </button>
+                            <a href={`tel:${mentor.phone}`}
+                              className="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold transition">
+                              Позвонить
+                            </a>
+                          </div>
+                        )}
+                      </article>
                     </div>
                   ))}
                 </div>
