@@ -271,15 +271,9 @@ export default function MentorsPage() {
                 </div>
               )}
             </div>
-                        </div>
-                      )}
-                    </article>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+          )}
+        </div>
+      )}
       </div>
 
       {/* Modal detail */}
