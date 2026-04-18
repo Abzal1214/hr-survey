@@ -143,7 +143,7 @@ export default function MentorsPage() {
           </div>
         ) : (
           <div className="max-w-2xl mx-auto -mt-12 mb-8 bg-white/70 rounded-xl shadow border border-sky-100 backdrop-blur-md p-4 text-center text-slate-400">
-            У вас пока нет назначенного наставника.
+            Наставник не назначен
           </div>
         )
       ) : (
