@@ -154,12 +154,12 @@ export default function MentorsPage() {
     <div className="min-h-screen">
       {/* Мой наставник и задачи для сотрудника */}
       {user?.role === 'employee' && myMentors.length > 0 && (
-        <div className="max-w-3xl mx-auto mt-10 mb-10 p-0 rounded-3xl bg-white/80 shadow-2xl backdrop-blur-md border border-sky-100">
-          <div className="px-8 pt-7 pb-4">
-            <div className="text-base font-semibold text-slate-600 mb-4">Мои наставники отдела</div>
-            <div className="flex flex-wrap gap-4">
+        <div className="max-w-4xl mx-auto mt-10 mb-10 p-0 rounded-2xl bg-white/95 shadow-xl border border-sky-100 flex flex-col gap-0">
+          <div className="px-8 pt-7 pb-2">
+            <div className="text-lg font-bold text-slate-700 mb-4">Мои наставники отдела</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {myMentors.map(m => (
-                <div key={m._id} className="flex items-center gap-4 bg-sky-50/80 rounded-2xl px-4 py-3 shadow-sm border border-sky-100 min-w-[220px]">
+                <div key={m._id} className="flex items-center gap-4 bg-sky-50 rounded-xl px-4 py-3 shadow-sm border border-sky-100">
                   {m.photoUrl
                     ? <img src={m.photoUrl} alt={m.name} className="w-12 h-12 rounded-full object-cover border-2 border-sky-300" />
                     : <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-xl font-bold text-sky-600">👤</div>}
@@ -172,14 +172,14 @@ export default function MentorsPage() {
               ))}
             </div>
           </div>
-          <div className="px-8 pb-7">
-            <div className="font-semibold text-slate-700 mb-2 mt-2">Задачи от наставника:</div>
+          <div className="px-8 pt-2 pb-7 border-t border-sky-100 mt-4">
+            <div className="font-semibold text-slate-700 mb-2">Задачи от наставника</div>
             {myTasks.length === 0 ? (
               <div className="text-slate-400 text-sm">Нет задач от наставника.</div>
             ) : (
               <ul className="space-y-2">
                 {myTasks.map(task => (
-                  <li key={task._id} className="rounded-xl bg-sky-100/80 px-4 py-2 flex items-center gap-2 border border-sky-200">
+                  <li key={task._id} className="rounded-xl bg-sky-100 px-4 py-2 flex items-center gap-2 border border-sky-200">
                     <span className={task.completed ? 'line-through text-slate-400' : 'text-slate-800'}>📝 {task.title}</span>
                     {task.completed && <span className="ml-2 text-xs text-emerald-600">✔ Выполнено</span>}
                   </li>
