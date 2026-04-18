@@ -71,7 +71,7 @@ export default function MentorsPage() {
           </p>
           {isAdmin && (
             <button
-              onClick={() => alert("Назначение наставника (реализуйте модалку)")]
+              onClick={() => alert("Назначение наставника (реализуйте модалку)")}
               className="mt-6 rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm"
             >
               + Назначить наставника
@@ -172,8 +172,8 @@ export default function MentorsPage() {
                   {isAdmin && (
                     <div className="absolute top-3 right-3 z-10">
                       <KebabMenu
-                        onEdit={() => alert("Редактировать наставника (реализуйте модалку)")]
-                        onDelete={() => alert("Удалить наставника (реализуйте удаление)")]
+                        onEdit={() => alert("Редактировать наставника (реализуйте модалку)")}
+                        onDelete={() => alert("Удалить наставника (реализуйте удаление)")}
                       />
                     </div>
                   )}
