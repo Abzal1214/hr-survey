@@ -184,6 +184,12 @@ export default function MentorsPage() {
                         key={mentor._id}
                         className="relative group bg-white/80 rounded-xl p-4 shadow border border-sky-100 flex flex-col items-center"
                       >
+                        {/* Бейдж 'Мой наставник' если отдел совпадает */}
+                        {user?.role === "employee" && user?.department === mentor.department && (
+                          <span className="absolute top-3 left-3 z-10 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                            Мой наставник
+                          </span>
+                        )}
                         {isAdmin && (
                           <div className="absolute top-3 right-3 z-10">
                             <KebabMenu
