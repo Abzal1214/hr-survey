@@ -160,111 +160,102 @@ export default function MentorsPage() {
           <span className="inline-block rounded-full bg-sky-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Команда</span>
           <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            {user?.role === 'mentor' && (
-              <Link href="/mentor-dashboard"
-                className="rounded-full bg-amber-500 hover:bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white transition shadow-lg">
-                👨‍🏫 Кабинет наставника
-              </Link>
-            )}
-            {isAdmin && (
-              <button onClick={() => { setShowAssign(true); setEmpSearch(''); }}
-                className="rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
-                + Назначить наставника
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+          <div className="min-h-screen">
+            {/* Hero */}
+            <div className="relative flex flex-col items-center justify-center text-center px-6 py-16">
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
+              <div className="relative z-10">
+                <span className="inline-block rounded-full bg-sky-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Команда</span>
+                <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
+                <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
+                <div className="mt-6 flex flex-wrap justify-center gap-3">
+                  {user?.role === 'mentor' && (
+                    <Link href="/mentor-dashboard"
+                      className="rounded-full bg-amber-500 hover:bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white transition shadow-lg">
+                      👨‍🏫 Кабинет наставника
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <button onClick={() => { setShowAssign(true); setEmpSearch(''); }}
+                      className="rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
+                      + Назначить наставника
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
 
-      {/* Мой наставник и задачи для сотрудника */}
-      {user?.role === 'employee' && myMentors.length > 0 && (
-        <div className="max-w-4xl mx-auto mt-10 mb-10 p-0 rounded-2xl bg-white/95 shadow-xl border border-sky-100 flex flex-col gap-0">
-          <div className="px-8 pt-7 pb-2 border-b border-sky-100">
-            <div className="font-semibold text-slate-700 mb-2">Задачи от наставника</div>
-            {myTasks.length === 0 ? (
-              <div className="text-slate-400 text-sm">Нет задач от наставника.</div>
-            ) : (
-              <ul className="space-y-2">
-                {myTasks.map(task => (
-                  <li key={task._id} className="rounded-xl bg-sky-100 px-4 py-2 flex items-center gap-2 border border-sky-200">
-                    <span className={task.completed ? 'line-through text-slate-400' : 'text-slate-800'}>📝 {task.title}</span>
-                    {task.completed && <span className="ml-2 text-xs text-emerald-600">✔ Выполнено</span>}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <div className="px-8 pt-7 pb-7">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {myMentors.map(m => (
-                <div key={m._id} className="flex items-center gap-4 bg-sky-50 rounded-xl px-4 py-3 shadow-sm border border-sky-100">
-                  {m.photoUrl
-                    ? <img src={m.photoUrl} alt={m.name} className="w-12 h-12 rounded-full object-cover border-2 border-sky-300" />
+            {/* Мой наставник и задачи для сотрудника */}
+            {user?.role === 'employee' && myMentors.length > 0 && (
+              <div className="max-w-2xl mx-auto -mt-12 mb-8 bg-white/70 rounded-xl shadow border border-sky-100 backdrop-blur-md p-4 flex flex-col gap-2">
+                <div className="flex items-center gap-4">
+                  {myMentors[0]?.photoUrl
+                    ? <img src={myMentors[0].photoUrl} alt={myMentors[0].name} className="w-12 h-12 rounded-full object-cover border-2 border-sky-300" />
                     : <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-xl font-bold text-sky-600">👤</div>}
-                  <div className="flex flex-col justify-center">
-                    <span className="font-bold text-slate-900 leading-tight">{m.name}</span>
-                    {m.position && <span className="text-sky-600 text-xs font-medium leading-tight">{m.position}</span>}
-                    {m.phone && <span className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><span className='text-rose-500'>📞</span>{m.phone}</span>}
+                  <div className="flex flex-col">
+                    <span className="font-bold text-slate-900 leading-tight">{myMentors[0].name}</span>
+                    {myMentors[0].position && <span className="text-sky-600 text-xs font-medium leading-tight">{myMentors[0].position}</span>}
+                    {myMentors[0].department && <span className="text-xs text-slate-400 mt-0.5">{myMentors[0].department}</span>}
+                    {myMentors[0].phone && <span className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><span className='text-rose-500'>📞</span>{myMentors[0].phone}</span>}
                   </div>
                 </div>
-              ))}
+                <div className="mt-2">
+                  <div className="font-semibold text-slate-700 mb-1">Задачи от наставника</div>
+                  {myTasks.length === 0 ? (
+                    <div className="text-slate-400 text-sm">Нет задач от наставника.</div>
+                  ) : (
+                    <ul className="space-y-1">
+                      {myTasks.map(task => (
+                        <li key={task._id} className="rounded bg-sky-50 px-3 py-1 flex items-center gap-2 border border-sky-100 text-sm">
+                          <span className={task.completed ? 'line-through text-slate-400' : 'text-slate-800'}>📝 {task.title}</span>
+                          {task.completed && <span className="ml-2 text-xs text-emerald-600">✔</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="max-w-5xl mx-auto px-2 py-6">
+              {/* Dept filter */}
+              <div className="flex gap-2 flex-wrap mb-6 justify-center">
+                {DEPARTMENTS.map(d => (
+                  <button key={d} onClick={() => setFilter(d)}
+                    className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${filter === d ? 'bg-sky-500 text-white shadow' : 'bg-white/80 text-slate-600 border border-slate-200 hover:bg-sky-50'}`}>
+                    {d}
+                  </button>
+                ))}
+              </div>
+
+              {/* Grid */}
+              {filtered.filter(m => !(user?.role === 'employee' && myMentors.some(mm => mm._id === m._id))).length === 0 ? (
+                <div className="rounded-xl bg-white/70 p-8 text-center text-slate-500 shadow">Наставников пока нет.</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {filtered.filter(m => !(user?.role === 'employee' && myMentors.some(mm => mm._id === m._id))).map(mentor => (
+                    <div key={mentor._id} className="relative group">
+                      {isAdmin && (
+                        <div className="absolute top-3 right-3 z-10">
+                          <KebabMenu onEdit={() => handleEdit(mentor)} onDelete={() => handleDelete(mentor._id)} />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-4 bg-white/80 rounded-xl p-4 shadow group-hover:shadow-lg border border-sky-100 transition-all">
+                        {mentor.photoUrl
+                          ? <img src={mentor.photoUrl} alt={mentor.name} className="w-12 h-12 rounded-full object-cover border-2 border-sky-300" />
+                          : <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-xl font-bold text-sky-600">👤</div>}
+                        <div className="flex flex-col">
+                          <span className="font-bold text-slate-900 leading-tight">{mentor.name}</span>
+                          {mentor.position && <span className="text-sky-600 text-xs font-medium leading-tight">{mentor.position}</span>}
+                          {mentor.department && <span className="text-xs text-slate-400 mt-0.5">{mentor.department}</span>}
+                          {mentor.phone && <span className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><span className='text-rose-500'>📞</span>{mentor.phone}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        </div>
-      )}
-
-      <div className="max-w-6xl mx-auto px-4 py-10">
-
-        {/* Header - empty now, button moved to hero */}
-        <div className="mb-0" />
-
-        {/* Dept filter */}
-        <div className="flex gap-2 flex-wrap mb-8">
-          {DEPARTMENTS.map(d => (
-            <button key={d} onClick={() => setFilter(d)}
-              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${filter === d ? 'bg-sky-500 text-white shadow' : 'bg-white text-slate-600 border border-slate-200 hover:bg-sky-50'}`}>
-              {d}
-            </button>
-          ))}
-        </div>
-
-        {/* Grid */}
-        {filtered.length === 0 ? (
-          <div className="rounded-[24px] bg-white/80 p-10 text-center text-slate-500 shadow">Наставников пока нет.</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filtered.map(mentor => (
-              <div key={mentor._id} className="relative group">
-                {isAdmin && (
-                  <div className="absolute top-3 right-3 z-10">
-                    <KebabMenu
-                      onEdit={() => handleEdit(mentor)}
-                      onDelete={() => handleDelete(mentor._id)}
-                    />
-                  </div>
-                )}
-                <article
-                  onClick={() => setSelectedMentor(mentor)}
-                  className="cursor-pointer rounded-[24px] bg-white/95 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all overflow-hidden flex flex-col">
-                  {mentor.photoUrl
-                    ? <div className="h-52 overflow-hidden"><img src={mentor.photoUrl} alt={mentor.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /></div>
-                    : <div className="h-52 bg-gradient-to-br from-sky-100 to-blue-200 flex items-center justify-center text-6xl">👤</div>}
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-extrabold text-slate-900 text-lg leading-snug">{mentor.name}</h3>
-                    {mentor.position && <p className="text-sky-600 text-sm font-semibold mt-0.5">{mentor.position}</p>}
-                    {mentor.department && (
-                      <span className="mt-2 self-start rounded-full bg-sky-50 text-sky-500 text-xs font-semibold px-3 py-0.5">{mentor.department}</span>
-                    )}
-                    {mentor.bio && <p className="text-slate-500 text-sm mt-3 line-clamp-2 flex-1">{mentor.bio}</p>}
-                    <div className="mt-4 flex flex-col gap-1">
-                      {mentor.phone && (
-                        <div className="relative" onClick={e => e.stopPropagation()}>
-                          <button onClick={() => setPhonePopup(phonePopup === mentor.phone ? '' : mentor.phone)}
-                            className="flex items-center gap-1.5 text-sm font-medium text-slate-800 hover:text-emerald-600 transition">
-                            <span className="text-emerald-500">📞</span>
-                            {mentor.phone}
-                          </button>
                           {phonePopup === mentor.phone && (
                         <div className="absolute left-0 bottom-8 z-20 flex gap-2 rounded-2xl bg-white shadow-xl border border-slate-100 px-3 py-2">
                               <button onClick={() => copyPhone(mentor.phone)}
