@@ -186,7 +186,7 @@ export default function MentorsPage() {
                         </li>
                       ))}
                     </ul>
-                  )
+                  )}
                 </div>
               </div>
             )}
