@@ -150,19 +150,24 @@ export default function MentorsPage() {
         <>
           <div className="max-w-5xl mx-auto px-2 py-6">
             <div className="flex gap-2 flex-wrap mb-6 justify-center">
-              {DEPARTMENTS.map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setFilter(d)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
-                    filter === d
-                      ? "bg-sky-500 text-white shadow"
-                      : "bg-white/80 text-slate-600 border border-slate-200 hover:bg-sky-50"
-                  }`}
-                >
-                  {d}
-                </button>
-              ))}
+              {DEPARTMENTS.map((d) => {
+                const hasMentor = d === "Все отделы" ? true : mentors.some((m) => m.department === d);
+                const isSelected = filter === d;
+                return (
+                  <button
+                    key={d}
+                    onClick={() => hasMentor && setFilter(d)}
+                    disabled={!hasMentor}
+                    className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all flex items-center gap-1
+                      ${isSelected && hasMentor ? "bg-sky-500 text-white shadow" : ""}
+                      ${!hasMentor ? "bg-gray-200 text-gray-400 border border-gray-200 cursor-not-allowed" : "bg-white/80 text-slate-600 border border-slate-200 hover:bg-sky-50"}
+                    `}
+                  >
+                    {!hasMentor && <span title="Нет наставников">🚫</span>}
+                    {d}
+                  </button>
+                );
+              })}
             </div>
             {mentors.length === 0 ? (
               <div className="rounded-xl bg-white/70 p-8 text-center text-slate-500 shadow">
