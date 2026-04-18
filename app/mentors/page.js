@@ -155,7 +155,22 @@ export default function MentorsPage() {
       {/* Мой наставник и задачи для сотрудника */}
       {user?.role === 'employee' && myMentors.length > 0 && (
         <div className="max-w-4xl mx-auto mt-10 mb-10 p-0 rounded-2xl bg-white/95 shadow-xl border border-sky-100 flex flex-col gap-0">
-          <div className="px-8 pt-7 pb-2">
+          <div className="px-8 pt-7 pb-2 border-b border-sky-100">
+            <div className="font-semibold text-slate-700 mb-2">Задачи от наставника</div>
+            {myTasks.length === 0 ? (
+              <div className="text-slate-400 text-sm">Нет задач от наставника.</div>
+            ) : (
+              <ul className="space-y-2">
+                {myTasks.map(task => (
+                  <li key={task._id} className="rounded-xl bg-sky-100 px-4 py-2 flex items-center gap-2 border border-sky-200">
+                    <span className={task.completed ? 'line-through text-slate-400' : 'text-slate-800'}>📝 {task.title}</span>
+                    {task.completed && <span className="ml-2 text-xs text-emerald-600">✔ Выполнено</span>}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="px-8 pt-7 pb-7">
             <div className="text-lg font-bold text-slate-700 mb-4">Мои наставники отдела</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {myMentors.map(m => (
@@ -171,21 +186,6 @@ export default function MentorsPage() {
                 </div>
               ))}
             </div>
-          </div>
-          <div className="px-8 pt-2 pb-7 border-t border-sky-100 mt-4">
-            <div className="font-semibold text-slate-700 mb-2">Задачи от наставника</div>
-            {myTasks.length === 0 ? (
-              <div className="text-slate-400 text-sm">Нет задач от наставника.</div>
-            ) : (
-              <ul className="space-y-2">
-                {myTasks.map(task => (
-                  <li key={task._id} className="rounded-xl bg-sky-100 px-4 py-2 flex items-center gap-2 border border-sky-200">
-                    <span className={task.completed ? 'line-through text-slate-400' : 'text-slate-800'}>📝 {task.title}</span>
-                    {task.completed && <span className="ml-2 text-xs text-emerald-600">✔ Выполнено</span>}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         </div>
       )}
