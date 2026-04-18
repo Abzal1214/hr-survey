@@ -1,9 +1,3 @@
-"use client";
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import KebabMenu from '../components/KebabMenu';
-
-// ...existing code...
 
 "use client";
 import { useEffect, useState } from 'react';
