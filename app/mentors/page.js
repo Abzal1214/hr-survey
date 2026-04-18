@@ -70,7 +70,7 @@ export default function MentorsPage() {
         <div><b>isAdmin:</b> {String(isAdmin)}</div>
         <div><b>mentors:</b> {JSON.stringify(mentors)}</div>
       </div>
-      {/* ...весь существующий JSX ниже... */
+      {/* ...весь существующий JSX ниже... */}
       <div className="relative flex flex-col items-center justify-center text-center px-6 py-16">
         <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
         <div className="relative z-10">
