@@ -241,7 +241,7 @@ export default function MentorsPage() {
                         )}
                       </article>
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
