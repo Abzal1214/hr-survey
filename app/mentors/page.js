@@ -175,6 +175,11 @@ export default function MentorsPage() {
           </div>
         </div>
       )}
+      <div className="fixed bottom-0 left-0 bg-white/90 text-xs p-2 z-[9999] max-w-lg border border-rose-200 rounded">
+        <div><b>user:</b> {JSON.stringify(user)}</div>
+        <div><b>isAdmin:</b> {String(isAdmin)}</div>
+        <div><b>mentors:</b> {JSON.stringify(mentors)}</div>
+      </div>
     </div>
   );
 }
