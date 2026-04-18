@@ -23,15 +23,7 @@ export default function MentorsPage() {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
           setIsAdmin(parsedUser.role === 'admin');
-        } else {
-          setUser(null);
-          setIsAdmin(false);
-        }
-      } catch {
-        setUser(null);
-        setIsAdmin(false);
-      }
-    }, []);
+            // ...ничего не добавлять здесь, основной return ниже...
   const [mentors, setMentors] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [empSearch, setEmpSearch] = useState('');
