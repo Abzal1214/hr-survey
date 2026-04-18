@@ -154,33 +154,33 @@ export default function MentorsPage() {
     <div className="min-h-screen">
       {/* Мой наставник и задачи для сотрудника */}
       {user?.role === 'employee' && myMentors.length > 0 && (
-        <div className="max-w-2xl mx-auto mt-8 mb-8 p-6 rounded-3xl bg-white/90 shadow-lg">
-          <div className="mb-3">
-            <div className="text-sm text-slate-500 mb-2">Мои наставники отдела</div>
-            <div className="flex flex-wrap gap-5">
+        <div className="max-w-3xl mx-auto mt-10 mb-10 p-0 rounded-3xl bg-white/80 shadow-2xl backdrop-blur-md border border-sky-100">
+          <div className="px-8 pt-7 pb-4">
+            <div className="text-base font-semibold text-slate-600 mb-4">Мои наставники отдела</div>
+            <div className="flex flex-wrap gap-4">
               {myMentors.map(m => (
-                <div key={m._id} className="flex items-center gap-3 mb-2">
+                <div key={m._id} className="flex items-center gap-4 bg-sky-50/80 rounded-2xl px-4 py-3 shadow-sm border border-sky-100 min-w-[220px]">
                   {m.photoUrl
-                    ? <img src={m.photoUrl} alt={m.name} className="w-14 h-14 rounded-full object-cover border-2 border-sky-300" />
-                    : <div className="w-14 h-14 rounded-full bg-sky-100 flex items-center justify-center text-xl font-bold text-sky-600">👤</div>}
-                  <div>
-                    <div className="font-bold text-base text-slate-900">{m.name}</div>
-                    {m.position && <div className="text-sky-600 text-xs font-semibold">{m.position}</div>}
-                    {m.phone && <div className="text-xs text-slate-500 mt-0.5">📞 {m.phone}</div>}
+                    ? <img src={m.photoUrl} alt={m.name} className="w-12 h-12 rounded-full object-cover border-2 border-sky-300" />
+                    : <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-xl font-bold text-sky-600">👤</div>}
+                  <div className="flex flex-col justify-center">
+                    <span className="font-bold text-slate-900 leading-tight">{m.name}</span>
+                    {m.position && <span className="text-sky-600 text-xs font-medium leading-tight">{m.position}</span>}
+                    {m.phone && <span className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><span className='text-rose-500'>📞</span>{m.phone}</span>}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div>
-            <div className="font-semibold text-slate-700 mb-2">Задачи от наставника:</div>
+          <div className="px-8 pb-7">
+            <div className="font-semibold text-slate-700 mb-2 mt-2">Задачи от наставника:</div>
             {myTasks.length === 0 ? (
               <div className="text-slate-400 text-sm">Нет задач от наставника.</div>
             ) : (
               <ul className="space-y-2">
                 {myTasks.map(task => (
-                  <li key={task._id} className="rounded-xl bg-sky-50 px-4 py-2 flex items-center gap-2">
-                    <span className={task.completed ? 'line-through text-slate-400' : 'text-slate-800'}>📋 {task.title}</span>
+                  <li key={task._id} className="rounded-xl bg-sky-100/80 px-4 py-2 flex items-center gap-2 border border-sky-200">
+                    <span className={task.completed ? 'line-through text-slate-400' : 'text-slate-800'}>📝 {task.title}</span>
                     {task.completed && <span className="ml-2 text-xs text-emerald-600">✔ Выполнено</span>}
                   </li>
                 ))}
