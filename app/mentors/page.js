@@ -156,19 +156,11 @@ export default function MentorsPage() {
                 return (
                   <button
                     key={d}
-                    onClick={() => {
-                      if (hasMentor) {
-                        setFilter(d);
-                      } else {
-                        alert('В этом отделе нет наставников');
-                        setFilter(d);
-                      }
-                    }}
+                    onClick={() => setFilter(d)}
                     className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all flex items-center gap-1
                       ${isSelected ? "bg-sky-500 text-white shadow" : "bg-white/80 text-slate-600 border border-slate-200 hover:bg-sky-50"}
                     `}
                   >
-                    {!hasMentor && <span title="Нет наставников">🚫</span>}
                     {d}
                   </button>
                 );
@@ -179,67 +171,73 @@ export default function MentorsPage() {
                 Наставников пока нет.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {mentors
-                  .filter((m) => filter === "Все отделы" || m.department === filter)
-                  .map((mentor) => (
-                    <div
-                      key={mentor._id}
-                      className="relative group bg-white/80 rounded-xl p-4 shadow border border-sky-100 flex flex-col items-center"
-                    >
-                      {isAdmin && (
-                        <div className="absolute top-3 right-3 z-10">
-                          <KebabMenu
-                            onEdit={() => alert("Редактировать наставника (реализуйте модалку)")}
-                            onDelete={() => alert("Удалить наставника (реализуйте удаление)")}
-                          />
-                        </div>
-                      )}
-                      {mentor.photoUrl ? (
-                        <img
-                          src={mentor.photoUrl}
-                          alt={mentor.name}
-                          className="w-20 h-20 rounded-full object-cover border-2 border-sky-300 mb-3"
-                        />
-                      ) : (
-                        <div className="w-20 h-20 rounded-full bg-sky-100 flex items-center justify-center text-3xl font-bold text-sky-600 mb-3">
-                          👤
-                        </div>
-                      )}
-                      <span className="font-bold text-slate-900 leading-tight text-lg mb-1">
-                        {mentor.name}
-                      </span>
-                      {mentor.position && (
-                        <span className="text-sky-600 text-xs font-medium leading-tight mb-1">
-                          {mentor.position}
-                        </span>
-                      )}
-                      {mentor.department && (
-                        <span className="text-xs text-slate-400 mb-1">{mentor.department}</span>
-                      )}
-                      {mentor.phone && (
-                        <span className="text-xs text-slate-500 flex items-center gap-1 mb-1">
-                          <span className="text-rose-500">📞</span>
-                          {mentor.phone}
-                        </span>
-                      )}
-                      {mentor.email && (
-                        <a
-                          href={`mailto:${mentor.email}`}
-                          className="text-sm text-slate-600 hover:text-sky-600 transition truncate mb-1"
-                        >
-                          ✉️ {mentor.email}
-                        </a>
-                      )}
-                      <button
-                        className="mt-2 text-sky-500 hover:underline text-xs"
-                        onClick={() => setSelectedMentor(mentor)}
+              (filter !== "Все отделы" && mentors.filter((m) => m.department === filter).length === 0) ? (
+                <div className="rounded-xl bg-white/70 p-8 text-center text-slate-500 shadow">
+                  В этом отделе нет наставников
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {mentors
+                    .filter((m) => filter === "Все отделы" || m.department === filter)
+                    .map((mentor) => (
+                      <div
+                        key={mentor._id}
+                        className="relative group bg-white/80 rounded-xl p-4 shadow border border-sky-100 flex flex-col items-center"
                       >
-                        Подробнее
-                      </button>
-                    </div>
-                  ))}
-              </div>
+                        {isAdmin && (
+                          <div className="absolute top-3 right-3 z-10">
+                            <KebabMenu
+                              onEdit={() => alert("Редактировать наставника (реализуйте модалку)")}
+                              onDelete={() => alert("Удалить наставника (реализуйте удаление)")}
+                            />
+                          </div>
+                        )}
+                        {mentor.photoUrl ? (
+                          <img
+                            src={mentor.photoUrl}
+                            alt={mentor.name}
+                            className="w-20 h-20 rounded-full object-cover border-2 border-sky-300 mb-3"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 rounded-full bg-sky-100 flex items-center justify-center text-3xl font-bold text-sky-600 mb-3">
+                            👤
+                          </div>
+                        )}
+                        <span className="font-bold text-slate-900 leading-tight text-lg mb-1">
+                          {mentor.name}
+                        </span>
+                        {mentor.position && (
+                          <span className="text-sky-600 text-xs font-medium leading-tight mb-1">
+                            {mentor.position}
+                          </span>
+                        )}
+                        {mentor.department && (
+                          <span className="text-xs text-slate-400 mb-1">{mentor.department}</span>
+                        )}
+                        {mentor.phone && (
+                          <span className="text-xs text-slate-500 flex items-center gap-1 mb-1">
+                            <span className="text-rose-500">📞</span>
+                            {mentor.phone}
+                          </span>
+                        )}
+                        {mentor.email && (
+                          <a
+                            href={`mailto:${mentor.email}`}
+                            className="text-sm text-slate-600 hover:text-sky-600 transition truncate mb-1"
+                          >
+                            ✉️ {mentor.email}
+                          </a>
+                        )}
+                        <button
+                          className="mt-2 text-sky-500 hover:underline text-xs"
+                          onClick={() => setSelectedMentor(mentor)}
+                        >
+                          Подробнее
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )
             )}
           </div>
           {selectedMentor && (
