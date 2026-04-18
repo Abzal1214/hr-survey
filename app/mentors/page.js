@@ -274,7 +274,6 @@ export default function MentorsPage() {
           )}
         </div>
       )}
-      </div>
 
       {/* Modal detail */}
       {selectedMentor && (
