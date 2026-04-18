@@ -86,7 +86,6 @@ export default function MentorsPage() {
         </div>
       </div>
 
-      {/* Мой наставник и задачи для сотрудника */}
       {user?.role === 'employee' && myMentors.length > 0 && (
         <div className="max-w-2xl mx-auto -mt-12 mb-8 bg-white/70 rounded-xl shadow border border-sky-100 backdrop-blur-md p-4 flex flex-col gap-2">
           <div className="flex items-center gap-4">
