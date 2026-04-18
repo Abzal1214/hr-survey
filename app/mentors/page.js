@@ -56,7 +56,9 @@ export default function MentorsPage() {
   }, [user, mentors]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-emerald-50">
+    <div className="min-h-screen relative">
+      {/* Фоновое изображение */}
+      <div className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('/bg.jpg')"}} aria-hidden="true" />
       <div className="relative flex flex-col items-center justify-center text-center px-6 py-16">
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
         <div className="relative z-10">
@@ -69,7 +71,7 @@ export default function MentorsPage() {
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">
             Опытные сотрудники, готовые помочь
           </p>
-          {isAdmin && (
+          {(user?.role === "admin" || isAdmin) && (
             <button
               onClick={() => alert("Назначение наставника (реализуйте модалку)")}
               className="mt-6 rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm"
