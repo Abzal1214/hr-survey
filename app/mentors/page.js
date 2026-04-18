@@ -8,6 +8,13 @@ const DEPARTMENTS = ['Все отделы', 'Аквапарк', 'Рестора�
 const emptyForm = { name: '', position: '', department: '', phone: '', email: '', bio: '', photoUrl: '' };
 
 export default function MentorsPage() {
+      // Загрузка наставников из API
+      useEffect(() => {
+        fetch('/api/mentors')
+          .then(r => r.json())
+          .then(setMentors)
+          .catch(() => setMentors([]));
+      }, []);
     // Инициализация пользователя и роли из localStorage
     useEffect(() => {
       try {
@@ -60,6 +67,12 @@ export default function MentorsPage() {
   }, [user, mentors]);
 
   return (
+        {/* DEBUG: временный вывод для отладки */}
+        <div className="fixed bottom-0 left-0 bg-white/90 text-xs p-2 z-[9999] max-w-lg border border-rose-200 rounded">
+          <div><b>user:</b> {JSON.stringify(user)}</div>
+          <div><b>isAdmin:</b> {String(isAdmin)}</div>
+          <div><b>mentors:</b> {JSON.stringify(mentors)}</div>
+        </div>
     <div className="min-h-screen">
       <div className="relative flex flex-col items-center justify-center text-center px-6 py-16">
         <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
