@@ -50,6 +50,12 @@ export default function MentorsPage() {
           <span className="inline-block rounded-full bg-sky-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Команда</span>
           <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">🧑‍🏫 Наставники</h1>
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Опытные сотрудники, готовые помочь</p>
+          {isAdmin && (
+            <button onClick={() => setShowAssign(true)}
+              className="mt-6 rounded-full bg-white/20 border border-white/40 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition backdrop-blur-sm">
+              + Назначить наставника
+            </button>
+          )}
         </div>
       </div>
 
@@ -100,6 +106,11 @@ export default function MentorsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {mentors.filter(m => filter === 'Все отделы' || m.department === filter).map(mentor => (
               <div key={mentor._id} className="relative group bg-white/80 rounded-xl p-4 shadow border border-sky-100 flex flex-col items-center">
+                {isAdmin && (
+                  <div className="absolute top-3 right-3 z-10">
+                    <KebabMenu onEdit={() => handleEdit(mentor)} onDelete={() => handleDelete(mentor._id)} />
+                  </div>
+                )}
                 {mentor.photoUrl
                   ? <img src={mentor.photoUrl} alt={mentor.name} className="w-20 h-20 rounded-full object-cover border-2 border-sky-300 mb-3" />
                   : <div className="w-20 h-20 rounded-full bg-sky-100 flex items-center justify-center text-3xl font-bold text-sky-600 mb-3">👤</div>}
