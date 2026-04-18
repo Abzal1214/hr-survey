@@ -273,12 +273,11 @@ export default function MentorsPage() {
             </div>
                         </div>
                       )}
-                      {mentor.email && <a href={`mailto:${mentor.email}`} onClick={e => e.stopPropagation()} className="text-sm text-slate-600 hover:text-sky-600 transition truncate">✉️ {mentor.email}</a>}
-                    </div>
+                    </article>
                   </div>
-                </article>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
