@@ -1081,19 +1081,25 @@ export default function Admin() {
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 {/* Фильтр по аквапарку */}
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-semibold text-slate-700">Аквапарк:</span>
-                  <button
-                    className={`px-3 py-1 rounded-full text-sm font-medium border transition ${waterparkFilter === 'all' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}`}
-                    onClick={() => setWaterparkFilter('all')}
-                  >Все</button>
-                  <button
-                    className={`px-3 py-1 rounded-full text-sm font-medium border transition ${waterparkFilter === 'Hawaii&Miami' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}`}
-                    onClick={() => setWaterparkFilter('Hawaii&Miami')}
-                  >Hawaii&Miami</button>
-                  <button
-                    className={`px-3 py-1 rounded-full text-sm font-medium border transition ${waterparkFilter === 'SanRemo' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}`}
-                    onClick={() => setWaterparkFilter('SanRemo')}
-                  >SanRemo</button>
+                  <span className="text-base font-semibold text-slate-700 mr-2">Аквапарк:</span>
+                  {[
+                    { label: 'Все', value: 'all' },
+                    { label: 'Hawaii&Miami', value: 'Hawaii&Miami' },
+                    { label: 'SanRemo', value: 'SanRemo' },
+                  ].map(({ label, value }) => (
+                    <button
+                      key={value}
+                      className={`px-4 py-1.5 rounded-full text-sm font-medium border transition
+                        ${waterparkFilter === value
+                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-md'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}
+                        focus:outline-none focus:ring-2 focus:ring-emerald-400`}
+                      onClick={() => setWaterparkFilter(value)}
+                      type="button"
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
                 <h2 className="text-2xl font-bold text-slate-900">Зарегистрированные сотрудники</h2>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
