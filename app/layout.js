@@ -75,7 +75,8 @@ export default function RootLayout({ children }) {
           </div>
         </header>
         {children}
-        <MobileNav />
+        {/* MobileNav отключён для мобильных браузеров */}
+        {/* <MobileNav /> */}
       </body>
     </html>
   );

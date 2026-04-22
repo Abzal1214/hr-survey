@@ -10,6 +10,7 @@ export default function RegisterPage() {
     phone: '',
     password: '',
     department: '',
+    workplaceType: '', // Новый выбор аквапарка
   });
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -56,6 +57,13 @@ export default function RegisterPage() {
       return;
     }
     if (formData.password.length < 6) {
+      setMessage('Пароль должен быть не меньше 6 символов');
+      return;
+    }
+    if (!formData.workplaceType) {
+      setMessage('Выберите аквапарк');
+      return;
+    }
       setMessage('Пароль должен быть не меньше 6 символов');
       return;
     }
@@ -119,6 +127,14 @@ export default function RegisterPage() {
               <label className="block text-sm font-semibold text-slate-800 mb-2">Пароль <span className="text-red-500">*</span></label>
               <input type="password" name="password" value={formData.password} onChange={handleChange} required
                 className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Минимум 6 символов" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-800 mb-2">Аквапарк <span className="text-red-500">*</span></label>
+              <select name="workplaceType" value={formData.workplaceType} onChange={handleChange} required className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
+                <option value="">Выберите аквапарк</option>
+                <option value="Hawaii&Miami">Hawaii&Miami</option>
+                <option value="SanRemo">SanRemo</option>
+              </select>
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-800 mb-2">Отдел <span className="text-red-500">*</span></label>

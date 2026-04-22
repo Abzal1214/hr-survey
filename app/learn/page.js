@@ -54,12 +54,12 @@ export default function LearnPage() {
   const [savingQuiz, setSavingQuiz] = useState(false);
 
   const loadTrainings = (u) => {
-    const dept = u && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
+    const dept = u && u.role && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
     fetch('/api/trainings' + dept).then(r => r.json()).then(d => { setTrainings(Array.isArray(d) ? d : []); setTrainingsPage(1); }).catch(() => {});
   };
 
   const loadCourses = (u) => {
-    const dept = u && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
+    const dept = u && u.role && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
     fetch('/api/courses' + dept).then(r => r.json()).then(d => setCourses(Array.isArray(d) ? d : [])).catch(() => {});
   };
 
@@ -73,7 +73,7 @@ export default function LearnPage() {
   };
 
   const loadQuizzes = (u) => {
-    const dept = u && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
+    const dept = u && u.role && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
     fetch('/api/quizzes' + dept).then(r => r.json()).then(d => setQuizzes(Array.isArray(d) ? d : [])).catch(() => {});
   };
 

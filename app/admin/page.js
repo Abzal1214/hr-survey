@@ -33,6 +33,7 @@ const initialEmployeeForm = {
   phone: '',
   password: '',
   department: '',
+  workplaceType: '', // Новый выбор аквапарка
   position: '',
   points: 0,
   role: 'employee',
@@ -1300,6 +1301,19 @@ export default function Admin() {
                     className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
                     placeholder={selectedUser ? 'Оставьте пустым, чтобы не менять' : 'Минимум 6 символов'}
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Аквапарк</label>
+                  <select
+                    name="workplaceType"
+                    value={employeeForm.workplaceType}
+                    onChange={handleEmployeeFormChange}
+                    className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900"
+                  >
+                    <option value="">Выберите аквапарк</option>
+                    <option value="Hawaii&Miami">Hawaii&Miami</option>
+                    <option value="SanRemo">SanRemo</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Отдел</label>
