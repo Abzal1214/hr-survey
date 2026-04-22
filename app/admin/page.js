@@ -161,7 +161,8 @@ export default function Admin() {
 
   const filteredStaff = usersData.filter((u) => {
     if (waterparkFilter === 'all') return true;
-    return u.workplaceType === waterparkFilter;
+    // Показываем только сотрудников с выбранным workplaceType
+    return (u.workplaceType || '') === waterparkFilter;
   }).filter((u) => {
     if (!staffSearch.trim()) return true;
     const q = staffSearch.trim().toLowerCase();
@@ -1079,7 +1080,7 @@ export default function Admin() {
           {!loading && usersData.length > 0 && (
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                {/* Фильтр по аквапарку */}
+                <h2 className="text-2xl font-bold text-slate-900 mb-2 sm:mb-0">Зарегистрированные сотрудники</h2>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-base font-semibold text-slate-700 mr-2">Аквапарк:</span>
                   {[
@@ -1101,7 +1102,6 @@ export default function Admin() {
                     </button>
                   ))}
                 </div>
-                <h2 className="text-2xl font-bold text-slate-900">Зарегистрированные сотрудники</h2>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <div className="relative">
                     <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
