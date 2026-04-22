@@ -1078,68 +1078,6 @@ export default function Admin() {
             );
           })()}
 
-          {/* Reward Requests */}
-          {!loading && (
-            <div className="mt-4 mb-6 bg-white rounded-3xl border border-amber-200 p-6 shadow-sm">
-              <button onClick={() => setShowRewardReqs(p => !p)} className="flex items-center gap-3 w-full text-left">
-                <h3 className="text-xl font-bold text-slate-900 flex-1">🎁 Заявки на призы {rewardRequests.filter(r => r.status === 'pending').length > 0 && <span className="ml-2 inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">{rewardRequests.filter(r => r.status === 'pending').length}</span>}</h3>
-                <span className="text-slate-400 text-sm">{showRewardReqs ? '▲ скрыть' : '▼ показать'}</span>
-              </button>
-              {showRewardReqs && (
-                <div className="mt-4 overflow-x-auto">
-                  {rewardRequests.length === 0 ? (
-                    <p className="text-slate-400 text-sm">Заявок нет.</p>
-                  ) : (
-                    <table className="w-full border-collapse text-sm text-slate-900">
-                      <thead><tr className="bg-amber-50">
-                        <th className="p-3 text-left">Сотрудник</th>
-                        <th className="p-3 text-left">Приз</th>
-                        <th className="p-3 text-left">Монет</th>
-                        <th className="p-3 text-left">Дата</th>
-                        <th className="p-3 text-left">Статус</th>
-                        <th className="p-3 text-left">Действие</th>
-                      </tr></thead>
-                      <tbody>
-                        {rewardRequests.map(req => (
-                          <tr key={String(req._id)} className="border-t border-slate-100 hover:bg-slate-50">
-                            <td className="p-3">
-                              <p className="font-medium">{req.userName || req.phone}</p>
-                              <p className="text-xs text-slate-400">{req.phone} · {req.department}</p>
-                            </td>
-                            <td className="p-3">{req.rewardName}</td>
-                            <td className="p-3 font-bold text-emerald-600">{req.rewardCost}</td>
-                            <td className="p-3 text-xs text-slate-500">{new Date(req.createdAt).toLocaleDateString('ru-RU')}</td>
-                            <td className="p-3">
-                              {req.status === 'approved' && <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-full">✅ Одобрено</span>}
-                              {req.status === 'rejected' && <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">❌ Отклонено</span>}
-                              {req.status === 'pending' && <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded-full">⏳ На рассмотрении</span>}
-                            </td>
-                            <td className="p-3">
-                              {req.status === 'pending' && (
-                                <div className="flex flex-col gap-1 min-w-[160px]">
-                                  <input placeholder="Комментарий" value={rewardReqNote[String(req._id)] || ''} onChange={e => setRewardReqNote(p => ({ ...p, [String(req._id)]: e.target.value }))} className="rounded-lg border border-slate-300 px-2 py-1 text-xs text-slate-900 w-full" />
-                                  <div className="flex gap-1">
-                                    <button onClick={async () => {
-                                      const res = await fetch('/api/reward-requests', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: String(req._id), status: 'approved', note: rewardReqNote[String(req._id)] || '' }) });
-                                      if (res.ok) { const updated = await res.json(); setRewardRequests(prev => prev.map(r => String(r._id) === String(req._id) ? updated : r)); }
-                                    }} className="flex-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold py-1 px-2 transition">✅ Одобрить</button>
-                                    <button onClick={async () => {
-                                      const res = await fetch('/api/reward-requests', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: String(req._id), status: 'rejected', note: rewardReqNote[String(req._id)] || '' }) });
-                                      if (res.ok) { const updated = await res.json(); setRewardRequests(prev => prev.map(r => String(r._id) === String(req._id) ? updated : r)); }
-                                    }} className="flex-1 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold py-1 px-2 transition">❌ Отклонить</button>
-                                  </div>
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
 
           {!loading && usersData.length > 0 && (
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
