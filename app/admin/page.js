@@ -120,9 +120,6 @@ export default function Admin() {
   const [coinPage, setCoinPage] = useState(1);
   const [coinPageSize, setCoinPageSize] = useState(10);
   const [coinSort, setCoinSort] = useState({ key: 'points', dir: 'desc' });
-  const [rewardRequests, setRewardRequests] = useState([]);
-  const [rewardReqNote, setRewardReqNote] = useState({});
-  const [showRewardReqs, setShowRewardReqs] = useState(false);
   const employeeFormRef = useRef(null);
   const isProfileSuccessMessage = /успешно|обновлены/i.test(profileMessage);
 
@@ -297,10 +294,9 @@ export default function Admin() {
   const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const [usersRes, testsRes, reqRes] = await Promise.all([
+      const [usersRes, testsRes] = await Promise.all([
         fetch('/api/users'),
         fetch('/api/quizzes'),
-        fetch('/api/reward-requests?all=1'),
       ]);
 
       if (usersRes.ok && testsRes.ok) {
@@ -313,7 +309,6 @@ export default function Admin() {
       } else {
         throw new Error('Ошибка при загрузке данных');
       }
-      if (reqRes.ok) setRewardRequests(await reqRes.json());
     } catch (error) {
       alert('Ошибка: ' + error.message);
     } finally {
