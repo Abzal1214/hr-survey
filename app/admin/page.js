@@ -1,3 +1,5 @@
+// ...existing code...
+export default function Admin() {
   const [waterparkFilter, setWaterparkFilter] = useState('all');
 'use client';
 
