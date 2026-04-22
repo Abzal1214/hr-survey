@@ -41,6 +41,8 @@ const initialEmployeeForm = {
 
 export default function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Фильтр по аквапарку
+  const [waterparkFilter, setWaterparkFilter] = useState('all');
   const [loginData, setLoginData] = useState({ username: '', password: '', department: '' });
   const [loginError, setLoginError] = useState('');
   const [departmentPositions, setDepartmentPositions] = useState(DEFAULT_POSITIONS);
