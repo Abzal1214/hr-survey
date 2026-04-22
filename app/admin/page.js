@@ -1,3 +1,4 @@
+  const [waterparkFilter, setWaterparkFilter] = useState('all');
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -160,16 +161,18 @@ export default function Admin() {
     );
   };
 
-  const filteredStaff = staffSearch.trim()
-    ? usersData.filter((u) => {
-        const q = staffSearch.trim().toLowerCase();
-        return [
-          u.name, u.surname, u.phone, u.username,
-          u.department, u.position, u.points,
-          new Date(u.registeredAt).toLocaleDateString('ru-RU'),
-        ].some((v) => String(v ?? '').toLowerCase().includes(q));
-      })
-    : usersData;
+  const filteredStaff = usersData.filter((u) => {
+    if (waterparkFilter === 'all') return true;
+    return u.workplaceType === waterparkFilter;
+  }).filter((u) => {
+    if (!staffSearch.trim()) return true;
+    const q = staffSearch.trim().toLowerCase();
+    return [
+      u.name, u.surname, u.phone, u.username,
+      u.department, u.position, u.points,
+      new Date(u.registeredAt).toLocaleDateString('ru-RU'),
+    ].some((v) => String(v ?? '').toLowerCase().includes(q));
+  });
 
   const totalStaffPages = Math.max(1, Math.ceil(filteredStaff.length / staffPageSize));
   const currentStaffPage = Math.min(staffPage, totalStaffPages);
@@ -1142,6 +1145,22 @@ export default function Admin() {
           {!loading && usersData.length > 0 && (
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                {/* Фильтр по аквапарку */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-semibold text-slate-700">Аквапарк:</span>
+                  <button
+                    className={`px-3 py-1 rounded-full text-sm font-medium border transition ${waterparkFilter === 'all' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}`}
+                    onClick={() => setWaterparkFilter('all')}
+                  >Все</button>
+                  <button
+                    className={`px-3 py-1 rounded-full text-sm font-medium border transition ${waterparkFilter === 'Hawaii&Miami' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}`}
+                    onClick={() => setWaterparkFilter('Hawaii&Miami')}
+                  >Hawaii&Miami</button>
+                  <button
+                    className={`px-3 py-1 rounded-full text-sm font-medium border transition ${waterparkFilter === 'SanRemo' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}`}
+                    onClick={() => setWaterparkFilter('SanRemo')}
+                  >SanRemo</button>
+                </div>
                 <h2 className="text-2xl font-bold text-slate-900">Зарегистрированные сотрудники</h2>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <div className="relative">
