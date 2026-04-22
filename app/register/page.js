@@ -64,9 +64,6 @@ export default function RegisterPage() {
       setMessage('Выберите аквапарк');
       return;
     }
-      setMessage('Пароль должен быть не меньше 6 символов');
-      return;
-    }
     try {
       const response = await fetch('/api/users', {
         method: 'POST',
