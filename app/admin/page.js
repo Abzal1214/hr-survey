@@ -1,7 +1,4 @@
-// ...existing code...
-export default function Admin() {
-  const [waterparkFilter, setWaterparkFilter] = useState('all');
-'use client';
+"use client";
 
 import { useState, useEffect, useRef } from 'react';
 import * as XLSX from 'xlsx';
