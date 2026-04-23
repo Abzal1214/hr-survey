@@ -159,10 +159,10 @@ export default function Admin() {
     );
   };
 
+  const normalize = (str) => String(str || '').replace(/\s+/g, '').toLowerCase();
   const filteredStaff = usersData.filter((u) => {
-    if (waterparkFilter === 'all') return true;
-    // Показываем только сотрудников с выбранным workplaceType
-    return (u.workplaceType || '') === waterparkFilter;
+    // Показываем только сотрудников с выбранным workplaceType (без учёта регистра и пробелов)
+    return normalize(u.workplaceType) === normalize(waterparkFilter);
   }).filter((u) => {
     if (!staffSearch.trim()) return true;
     const q = staffSearch.trim().toLowerCase();
