@@ -1,3 +1,11 @@
+  // ВРЕМЕННО: выводим всех сотрудников в консоль для отладки
+  useEffect(() => {
+    if (usersData && usersData.length) {
+      console.log('usersData:', usersData);
+    } else {
+      console.log('usersData пустой или не загружен');
+    }
+  }, [usersData]);
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -1080,6 +1088,13 @@ export default function Admin() {
           {!loading && usersData.length > 0 && (
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                              {filteredStaff.length === 0 && (
+                                <div className="text-center text-red-500 font-semibold my-4">
+                                  Нет сотрудников для выбранного фильтра.<br/>
+                                  Проверьте поле workplaceType у сотрудников в базе.<br/>
+                                  Для отладки смотрите консоль браузера.
+                                </div>
+                              )}
                 <h2 className="text-2xl font-bold text-slate-900 mb-2 sm:mb-0">Зарегистрированные сотрудники</h2>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-base font-semibold text-slate-700 mr-2">Аквапарк:</span>
