@@ -1129,7 +1129,7 @@ export default function Admin() {
               </div>
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <p className="text-slate-500">Показано {staffRows.length} из {filteredStaff.length}</p>
+                  <p className="text-slate-500">Показано {staffRows.length} сотрудников</p>
                   <span>· по</span>
                   <select
                     value={staffPageSize}
