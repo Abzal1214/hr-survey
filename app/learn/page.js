@@ -522,7 +522,15 @@ export default function LearnPage() {
                           className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
                           {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
                         </button>
-                        {isAdmin && <button onClick={() => handleDeleteQuiz(qid)} className="rounded-2xl bg-red-100 text-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-200 transition">🗑</button>}
+                        {isAdmin && (
+                          <KebabMenu
+                            onEdit={() => alert('Редактирование теста пока не реализовано на этой странице')}
+                            onDelete={() => handleDeleteQuiz(qid)}
+                            onToggleActive={() => alert('Активация/деактивация теста пока не реализована на этой странице')}
+                            onView={() => alert('Просмотр теста пока не реализован на этой странице')}
+                            isActive={quiz.isActive}
+                          />
+                        )}
                       </div>
                     </div>
                   );
