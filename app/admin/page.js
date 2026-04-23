@@ -1088,7 +1088,11 @@ export default function Admin() {
                                 <div className="text-center text-red-500 font-semibold my-4">
                                   Нет сотрудников для выбранного фильтра.<br/>
                                   Проверьте поле workplaceType у сотрудников в базе.<br/>
-                                  Для отладки смотрите консоль браузера.
+                                  Для отладки смотрите консоль браузера.<br/>
+                                  <div className="mt-4 p-2 bg-slate-100 rounded text-xs text-left max-w-2xl mx-auto overflow-x-auto">
+                                    <b>usersData:</b>
+                                    <pre>{JSON.stringify(usersData, null, 2)}</pre>
+                                  </div>
                                 </div>
                               )}
                 <h2 className="text-2xl font-bold text-slate-900 mb-2 sm:mb-0">Зарегистрированные сотрудники</h2>
