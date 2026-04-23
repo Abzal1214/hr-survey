@@ -214,31 +214,31 @@ export default function TipsPage() {
               <div className="flex gap-3">
                 <div className="w-24">
                   <label className="block text-xs font-semibold text-slate-500 mb-1">Иконка</label>
-                  <input value={form.icon} onChange={e => setForm(p => ({ ...p, icon: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-center text-xl" maxLength={4} />
+                  <input name="icon" value={form.icon} onChange={e => setForm(p => ({ ...p, icon: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-center text-xl" maxLength={4} />
                 </div>
                 <div className="flex-1">
                   <label className="block text-xs font-semibold text-slate-500 mb-1">Название *</label>
-                  <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900" placeholder="Название совета" />
+                  <input name="title" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900" placeholder="Название совета" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Цвет карточки</label>
-                <select value={form.color} onChange={e => setForm(p => ({ ...p, color: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900">
+                <select name="color" value={form.color} onChange={e => setForm(p => ({ ...p, color: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900">
                   {COLOR_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
                 <div className={`mt-2 h-6 rounded-lg bg-gradient-to-r ${form.color}`} />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Шаги * (каждый с новой строки)</label>
-                <textarea value={form.stepsText} onChange={e => setForm(p => ({ ...p, stepsText: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900 min-h-[100px] text-sm" placeholder={'Шаг 1\nШаг 2\nШаг 3'} />
+                <textarea name="stepsText" value={form.stepsText} onChange={e => setForm(p => ({ ...p, stepsText: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900 min-h-[100px] text-sm" placeholder={'Шаг 1\nШаг 2\nШаг 3'} />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Документы (каждый с новой строки)</label>
-                <textarea value={form.docsText} onChange={e => setForm(p => ({ ...p, docsText: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900 min-h-[70px] text-sm" placeholder={'Паспорт\nСНИЛС'} />
+                <textarea name="docsText" value={form.docsText} onChange={e => setForm(p => ({ ...p, docsText: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900 min-h-[70px] text-sm" placeholder={'Паспорт\nСНИЛС'} />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1">Заметка / совет</label>
-                <input value={form.note} onChange={e => setForm(p => ({ ...p, note: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900 text-sm" placeholder="Дополнительная информация..." />
+                <input name="note" value={form.note} onChange={e => setForm(p => ({ ...p, note: e.target.value }))} className="w-full rounded-xl border border-slate-300 p-2.5 text-slate-900 text-sm" placeholder="Дополнительная информация..." />
               </div>
               {formMsg && <p className="text-sm text-red-600">{formMsg}</p>}
               <div className="flex gap-3 pt-2">
