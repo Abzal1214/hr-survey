@@ -385,32 +385,31 @@ export default function LearnPage() {
                   {totalPages > 1 && (
                     <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                       <p className="text-sm text-white/70">{filtered.length} материалов · стр. {curPage} из {totalPages}</p>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => { setTrainingsPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                          disabled={curPage === 1}
-                          className="rounded-xl border border-white/30 bg-white/10 text-white px-4 py-1.5 text-sm font-medium hover:bg-white/20 transition disabled:opacity-40"
-                        >← Назад</button>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                          <button
-                            key={p}
-                            onClick={() => { setTrainingsPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                            className={`rounded-xl px-3 py-1.5 text-sm font-semibold transition ${p === curPage ? 'bg-white text-slate-900 shadow' : 'border border-white/30 bg-white/10 text-white hover:bg-white/20'}`}
-                          >{p}</button>
-                        ))}
-                        <button
-                          onClick={() => { setTrainingsPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                          disabled={curPage === totalPages}
-                          className="rounded-xl border border-white/30 bg-white/10 text-white px-4 py-1.5 text-sm font-medium hover:bg-white/20 transition disabled:opacity-40"
-                        >Вперёд →</button>
+                      <div className="flex items-center gap-2 mt-auto">
+                        <button onClick={() => startQuiz(quiz)}
+                          className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
+                          {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
+                        </button>
+                        {isAdmin && (
+                          <KebabMenu
+                            onEdit={() => {
+                              setShowCreateQuiz(false);
+                              setCreateQuizMsg('');
+                              setEditQuiz({ ...quiz, id: qid });
+                            }}
+                            onDelete={() => handleDeleteQuiz(qid)}
+                            onToggleActive={async () => {
+                              await fetch('/api/quizzes', {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
+                              });
+                              loadQuizzes(currentUser);
+                            }}
+                            isActive={quiz.isActive}
+                          />
+                        )}
                       </div>
-                    </div>
-                  )}
-                </>
-              );
-            })()}
-          </div>
-        )}
 
         {tab === 'tests' && (
           <div>
