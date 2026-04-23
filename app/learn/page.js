@@ -518,17 +518,18 @@ export default function LearnPage() {
                         {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
                       </div>
                       <div className="flex items-center gap-2 mt-auto">
-                        <button onClick={() => startQuiz(quiz)}
-                          className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
-                          {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
-                        </button>
-                        {isAdmin && (
+                        {isAdmin ? (
                           <KebabMenu
                             onEdit={() => alert('Редактирование теста пока не реализовано на этой странице')}
                             onDelete={() => handleDeleteQuiz(qid)}
                             onToggleActive={() => alert('Активация/деактивация теста пока не реализована на этой странице')}
                             isActive={quiz.isActive}
                           />
+                        ) : (
+                          <button onClick={() => startQuiz(quiz)}
+                            className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
+                            {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
+                          </button>
                         )}
                       </div>
                     </div>
