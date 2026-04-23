@@ -1083,8 +1083,7 @@ export default function Admin() {
                 <h2 className="text-2xl font-bold text-slate-900 mb-2 sm:mb-0">Зарегистрированные сотрудники</h2>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-base font-semibold text-slate-700 mr-2">Аквапарк:</span>
-                  {[
-                    { label: 'Все', value: 'all' },
+                  [
                     { label: 'Hawaii&Miami', value: 'Hawaii&Miami' },
                     { label: 'SanRemo', value: 'SanRemo' },
                   ].map(({ label, value }) => (
