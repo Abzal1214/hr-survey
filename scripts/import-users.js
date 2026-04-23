@@ -6,13 +6,13 @@ import path from 'path';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { User } from '../lib/models.js';
-import dotenv from 'dotenv';
 
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+import dotenv from 'dotenv';
+dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
-  console.error('MONGODB_URI не найден в .env.local');
+  console.error('MONGODB_URI не найден в .env');
   process.exit(1);
 }
 
