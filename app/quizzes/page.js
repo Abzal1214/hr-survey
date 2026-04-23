@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import KebabMenu from '../components/KebabMenu';
 
 export default function QuizzesPage() {
   const [quizzes, setQuizzes] = useState([]);
@@ -25,9 +26,29 @@ export default function QuizzesPage() {
       .catch(() => setQuizzes([]));
   };
 
+
   const handleEdit = (quiz) => {
     setEditQuiz({ ...quiz });
     setEditMsg('');
+  };
+
+  const handleDelete = async (quiz) => {
+    if (!window.confirm('Удалить тест?')) return;
+    await fetch(`/api/quizzes?id=${quiz.id}`, { method: 'DELETE' });
+    loadQuizzes(true);
+  };
+
+  const handleToggleActive = async (quiz) => {
+    await fetch('/api/quizzes', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: quiz.id, isActive: !quiz.isActive })
+    });
+    loadQuizzes(true);
+  };
+
+  const handleView = (quiz) => {
+    alert(`Просмотр теста: ${quiz.title}`);
   };
 
   const handleSave = async () => {
@@ -62,7 +83,13 @@ export default function QuizzesPage() {
                 <div className="text-slate-500 text-sm">{q.description}</div>
               </div>
               {isAdmin && (
-                <button onClick={() => handleEdit(q)} className="rounded bg-sky-100 text-sky-700 px-3 py-1 text-sm font-semibold hover:bg-sky-200">Редактировать</button>
+                <KebabMenu
+                  onEdit={() => handleEdit(q)}
+                  onDelete={() => handleDelete(q)}
+                  onToggleActive={() => handleToggleActive(q)}
+                  onView={() => handleView(q)}
+                  isActive={q.isActive}
+                />
               )}
               {!isAdmin && !q.isActive && (
                 <span className="text-xs text-red-500 font-semibold ml-2">Неактивен</span>
