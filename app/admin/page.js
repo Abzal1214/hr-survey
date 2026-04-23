@@ -1,12 +1,8 @@
-  // ВРЕМЕННО: выводим всех сотрудников в консоль для отладки
-  useEffect(() => {
-    if (usersData && usersData.length) {
-      console.log('usersData:', usersData);
-    } else {
-      console.log('usersData пустой или не загружен');
-    }
-  }, [usersData]);
+
 "use client";
+
+// ВРЕМЕННО: выводим всех сотрудников в консоль для отладки
+// (оставим хук ниже в компоненте)
 
 import { useState, useEffect, useRef } from 'react';
 import * as XLSX from 'xlsx';
