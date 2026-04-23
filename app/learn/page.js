@@ -26,8 +26,6 @@ export default function LearnPage() {
   const [trainingsPage, setTrainingsPage] = useState(1);
   const [trainingsSearch, setTrainingsSearch] = useState('');
   const TRAININGS_PAGE_SIZE = 6;
-
-                          />
   const [createQuizMsg, setCreateQuizMsg] = useState('');
   const [savingQuiz, setSavingQuiz] = useState(false);
 
