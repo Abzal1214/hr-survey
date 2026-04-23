@@ -1130,36 +1130,6 @@ export default function Admin() {
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <p className="text-slate-500">Показано {staffRows.length} сотрудников</p>
-                  <span>· по</span>
-                  <select
-                    value={staffPageSize}
-                    onChange={(e) => setStaffPageSize(Number(e.target.value))}
-                    className="rounded-xl border border-slate-300 bg-white px-2 py-1 text-slate-900"
-                  >
-                    <option value={10}>10</option>
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                  </select>
-                  <span>сотрудников</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setStaffPage((p) => Math.max(1, p - 1))}
-                    disabled={currentStaffPage === 1}
-                    className="rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 disabled:opacity-40"
-                  >
-                    Назад
-                  </button>
-                  <span className="text-sm text-slate-600">{currentStaffPage} / {totalStaffPages}</span>
-                  <button
-                    type="button"
-                    onClick={() => setStaffPage((p) => Math.min(totalStaffPages, p + 1))}
-                    disabled={currentStaffPage === totalStaffPages}
-                    className="rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 disabled:opacity-40"
-                  >
-                    Вперёд
-                  </button>
                 </div>
               </div>
             </div>
