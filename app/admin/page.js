@@ -163,24 +163,8 @@ export default function Admin() {
     );
   };
 
-  const normalize = (str) => String(str || '').replace(/\s+/g, '').toLowerCase();
-  const filteredStaff = usersData.filter((u) => {
-    // Показываем только сотрудников с выбранным workplaceType (без учёта регистра и пробелов)
-    return normalize(u.workplaceType) === normalize(waterparkFilter);
-  }).filter((u) => {
-    if (!staffSearch.trim()) return true;
-    const q = staffSearch.trim().toLowerCase();
-    return [
-      u.name, u.surname, u.phone, u.username,
-      u.department, u.position, u.points,
-      new Date(u.registeredAt).toLocaleDateString('ru-RU'),
-    ].some((v) => String(v ?? '').toLowerCase().includes(q));
-  });
-
-  const totalStaffPages = Math.max(1, Math.ceil(filteredStaff.length / staffPageSize));
-  const currentStaffPage = Math.min(staffPage, totalStaffPages);
-  const staffStart = (currentStaffPage - 1) * staffPageSize;
-  const staffRows = sortData(filteredStaff, staffSort).slice(staffStart, staffStart + staffPageSize);
+  // Показываем всех сотрудников без фильтрации
+  const staffRows = sortData(usersData, staffSort);
 
   useEffect(() => {
     setStaffPage(1);
@@ -1084,11 +1068,9 @@ export default function Admin() {
           {!loading && usersData.length > 0 && (
             <div className="mt-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                              {filteredStaff.length === 0 && (
+                              {usersData.length === 0 && (
                                 <div className="text-center text-red-500 font-semibold my-4">
-                                  Нет сотрудников для выбранного фильтра.<br/>
-                                  Проверьте поле workplaceType у сотрудников в базе.<br/>
-                                  Для отладки смотрите консоль браузера.<br/>
+                                  Нет сотрудников.<br/>
                                   <div className="mt-4 p-2 bg-slate-100 rounded text-xs text-left max-w-2xl mx-auto overflow-x-auto">
                                     <b>usersData:</b>
                                     <pre>{JSON.stringify(usersData, null, 2)}</pre>
@@ -1096,42 +1078,7 @@ export default function Admin() {
                                 </div>
                               )}
                 <h2 className="text-2xl font-bold text-slate-900 mb-2 sm:mb-0">Зарегистрированные сотрудники</h2>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-base font-semibold text-slate-700 mr-2">Аквапарк:</span>
-                  {[
-                    { label: 'Hawaii&Miami', value: 'Hawaii&Miami' },
-                    { label: 'SanRemo', value: 'SanRemo' },
-                  ].map(({ label, value }) => (
-                    <button
-                      key={value}
-                      className={`px-4 py-1.5 rounded-full text-sm font-medium border transition
-                        ${waterparkFilter === value
-                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-md'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}
-                        focus:outline-none focus:ring-2 focus:ring-emerald-400`}
-                      onClick={() => setWaterparkFilter(value)}
-                      type="button"
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <div className="relative">
-                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m0 0A7 7 0 104.65 4.65a7 7 0 0012 12z" />
-                    </svg>
-                    <input
-                      type="text"
-                      value={staffSearch}
-                      onChange={e => { setStaffSearch(e.target.value); setStaffPage(1); }}
-                      placeholder="Поиск"
-                      className="pl-9 pr-4 py-2 rounded-xl border border-slate-300 text-slate-900 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                    />
-                    {staffSearch && (
-                      <button onClick={() => setStaffSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">✕</button>
-                    )}
-                  </div>
                   <button
                     type="button"
                     onClick={handleStartAddEmployee}
