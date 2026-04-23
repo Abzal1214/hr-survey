@@ -27,29 +27,7 @@ export default function LearnPage() {
   const [trainingsSearch, setTrainingsSearch] = useState('');
   const TRAININGS_PAGE_SIZE = 6;
 
-  // Курсы
-  const [courses, setCourses] = useState([]);
-  const [courseProgresses, setCourseProgresses] = useState({});
-  const [activeCourse, setActiveCourse] = useState(null);
-  const [activeCourseProgress, setActiveCourseProgress] = useState({ completedSteps: [] });
-  const [showCreateCourse, setShowCreateCourse] = useState(false);
-  const [newCourse, setNewCourse] = useState({ title: '', description: '', department: '', steps: [] });
-  const [createCourseMsg, setCreateCourseMsg] = useState('');
-  const [savingCourse, setSavingCourse] = useState(false);
-  // inline quiz inside course
-  const [courseQuizAnswers, setCourseQuizAnswers] = useState({});
-  const [courseQuizResult, setCourseQuizResult] = useState(null);
-  const [courseQuizMsg, setCourseQuizMsg] = useState('');
-
-  // Тесты
-  const [quizzes, setQuizzes] = useState([]);
-  const [userResults, setUserResults] = useState({});
-  const [selectedQuiz, setSelectedQuiz] = useState(null);
-  const [answers, setAnswers] = useState({});
-  const [result, setResult] = useState(null);
-  const [quizMessage, setQuizMessage] = useState('');
-  const [showCreateQuiz, setShowCreateQuiz] = useState(false);
-  const [newQuiz, setNewQuiz] = useState({ title: '', description: '', coins: 3, department: '', questions: [emptyQuestion()] });
+                          />
   const [createQuizMsg, setCreateQuizMsg] = useState('');
   const [savingQuiz, setSavingQuiz] = useState(false);
 
