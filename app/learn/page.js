@@ -527,7 +527,6 @@ export default function LearnPage() {
                             onEdit={() => alert('Редактирование теста пока не реализовано на этой странице')}
                             onDelete={() => handleDeleteQuiz(qid)}
                             onToggleActive={() => alert('Активация/деактивация теста пока не реализована на этой странице')}
-                            onView={() => alert('Просмотр теста пока не реализован на этой странице')}
                             isActive={quiz.isActive}
                           />
                         )}
