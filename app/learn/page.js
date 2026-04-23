@@ -520,11 +520,62 @@ export default function LearnPage() {
                       <div className="flex items-center gap-2 mt-auto">
                         {isAdmin ? (
                           <KebabMenu
-                            onEdit={() => alert('Редактирование теста пока не реализовано на этой странице')}
+                            onEdit={() => {
+                              setShowCreateQuiz(false);
+                              setCreateQuizMsg('');
+                              setEditQuiz({ ...quiz, id: qid });
+                            }}
                             onDelete={() => handleDeleteQuiz(qid)}
-                            onToggleActive={() => alert('Активация/деактивация теста пока не реализована на этой странице')}
+                            onToggleActive={async () => {
+                              await fetch('/api/quizzes', {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
+                              });
+                              loadQuizzes(currentUser);
+                            }}
                             isActive={quiz.isActive}
                           />
+                          // Модальное окно для редактирования теста
+                          const [editQuiz, setEditQuiz] = useState(null);
+
+                          const handleSaveEditQuiz = async () => {
+                            if (!editQuiz.title) { setCreateQuizMsg('Введите название теста'); return; }
+                            setSavingQuiz(true);
+                            await fetch('/api/quizzes', {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ id: editQuiz.id, title: editQuiz.title, description: editQuiz.description, attemptsPerDay: editQuiz.attemptsPerDay })
+                            });
+                            setEditQuiz(null);
+                            setSavingQuiz(false);
+                            loadQuizzes(currentUser);
+                          };
+                              {editQuiz && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                                  <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
+                                    <button onClick={() => setEditQuiz(null)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
+                                    <h2 className="text-xl font-bold mb-4">Редактировать тест</h2>
+                                    <div className="space-y-4">
+                                      <div>
+                                        <label className="block text-sm font-semibold mb-1">Название</label>
+                                        <input type="text" value={editQuiz.title} onChange={e => setEditQuiz(p => ({ ...p, title: e.target.value }))} className="w-full rounded border p-2" />
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-semibold mb-1">Описание</label>
+                                        <textarea value={editQuiz.description} onChange={e => setEditQuiz(p => ({ ...p, description: e.target.value }))} className="w-full rounded border p-2" />
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-semibold mb-1">Попыток в день</label>
+                                        <input type="number" min="1" value={editQuiz.attemptsPerDay || 1} onChange={e => setEditQuiz(p => ({ ...p, attemptsPerDay: e.target.value }))} className="w-full rounded border p-2" />
+                                      </div>
+                                      <button onClick={handleSaveEditQuiz} disabled={savingQuiz} className="w-full rounded bg-sky-600 text-white py-2 font-semibold hover:bg-sky-700 transition disabled:opacity-50">
+                                        {savingQuiz ? 'Сохранение...' : 'Сохранить'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                         ) : (
                           <button onClick={() => startQuiz(quiz)}
                             className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
