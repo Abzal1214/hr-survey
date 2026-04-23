@@ -82,7 +82,7 @@ export default function QuizzesPage() {
                 <div className="font-bold text-lg">{q.title}</div>
                 <div className="text-slate-500 text-sm">{q.description}</div>
               </div>
-              {isAdmin && (
+              {isAdmin ? (
                 <KebabMenu
                   onEdit={() => handleEdit(q)}
                   onDelete={() => handleDelete(q)}
@@ -90,9 +90,14 @@ export default function QuizzesPage() {
                   onView={() => handleView(q)}
                   isActive={q.isActive}
                 />
-              )}
-              {!isAdmin && !q.isActive && (
-                <span className="text-xs text-red-500 font-semibold ml-2">Неактивен</span>
+              ) : (
+                q.isActive ? (
+                  <button className="rounded-2xl bg-emerald-600 text-white px-8 py-2 font-semibold flex items-center gap-2 hover:bg-emerald-700 transition">
+                    🚀 Начать
+                  </button>
+                ) : (
+                  <span className="text-xs text-red-500 font-semibold ml-2">Неактивен</span>
+                )
               )}
             </div>
             <div className="flex items-center gap-4 text-sm mt-2">
