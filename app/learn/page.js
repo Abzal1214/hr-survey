@@ -4,16 +4,95 @@ import { useEffect, useState } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
 import KebabMenu from '../components/KebabMenu';
 
-  // ...component code...
+                {quizzes.map((quiz) => {
+                  const qid = String(quiz._id || quiz.id);
+                  {quizzes.length === 0 ? (
+                    <div className="rounded-[24px] bg-white/95 p-10 text-center text-slate-500 shadow">
+                      {isAdmin ? 'Нет тестов. Создайте первый кнопкой выше.' : 'Тесты пока не добавлены.'}
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {quizzes.map((quiz) => {
+                        const qid = String(quiz._id || quiz.id);
+                        const res = userResults[qid];
+                        return (
+                          <div key={qid} className="rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <h3 className="text-lg font-bold text-slate-900">{quiz.title}</h3>
+                                {quiz.description && <p className="text-sm text-slate-500 mt-1">{quiz.description}</p>}
+                                <p className="text-xs text-slate-400 mt-1">{quiz.questions?.length || 0} вопросов</p>
+                                <p className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1"><GoldCoin size="xs" /> +{quiz.coins ?? 3} AQUA COIN</p>
+                              </div>
+                              {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
+                            </div>
+                            <div className="flex items-center gap-2 mt-auto">
+                              {isAdmin ? (
+                                <KebabMenu
+                                  onEdit={() => {
+                                    setShowCreateQuiz(false);
+                                    setCreateQuizMsg('');
+                                    setEditQuiz({ ...quiz, id: qid });
+                                  }}
+                                  onDelete={() => handleDeleteQuiz(qid)}
+                                  onToggleActive={async () => {
+                                    await fetch('/api/quizzes', {
+                                      method: 'PATCH',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
+                                    });
+                                    loadQuizzes(currentUser);
+                                  }}
+                                  isActive={quiz.isActive}
+                                />
+                              ) : (
+                                <button onClick={() => startQuiz(quiz)}
+                                  className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
+                                  {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
-  return (
-    <>
-      {tab === 'materials' && (
-            <div>
-              {isAdmin && (
-                <div className="mb-6">
-                  <button onClick={() => { setShowCreate(!showCreate); setCreateMsg(''); }}
-                    className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
+                  {/* Render the editQuiz modal only once, after the quizzes list */}
+                  {editQuiz && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
+                        <button onClick={() => setEditQuiz(null)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
+                        <h2 className="text-xl font-bold mb-4">Редактировать тест</h2>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-semibold mb-1">Название</label>
+                            <input type="text" value={editQuiz.title} onChange={e => setEditQuiz(p => ({ ...p, title: e.target.value }))} className="w-full rounded border p-2" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold mb-1">Описание</label>
+                            <textarea value={editQuiz.description} onChange={e => setEditQuiz(p => ({ ...p, description: e.target.value }))} className="w-full rounded border p-2" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold mb-1">Попыток в день</label>
+                            <input type="number" min="1" value={editQuiz.attemptsPerDay ?? ''} onChange={e => setEditQuiz(p => ({ ...p, attemptsPerDay: Number(e.target.value) }))} className="w-full rounded border p-2" />
+                          </div>
+                          <div className="flex gap-2 mt-4">
+                            <button onClick={handleSaveEditQuiz} className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer">Сохранить</button>
+                            <button onClick={() => setEditQuiz(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 active:scale-95 transition-all cursor-pointer">Отмена</button>
+                          </div>
+                          {createQuizMsg && <p className="text-sm text-red-600 mt-2">{createQuizMsg}</p>}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+
+                <div>
+                  <button
+                    onClick={() => setShowCreate(!showCreate)}
+                    className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg mb-4"
+                  >
                     {showCreate ? '✕ Отмена' : '+ Добавить материал'}
                   </button>
                   {showCreate && (
@@ -54,7 +133,6 @@ import KebabMenu from '../components/KebabMenu';
                     </div>
                   )}
                 </div>
-              )}
               {message && <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm">{message}</div>}
               {trainings.length > 0 && (
                 <div className="mb-5 relative">
@@ -82,6 +160,7 @@ import KebabMenu from '../components/KebabMenu';
                       </div>
                     ))}
                   </div>
+
                 </div>
               )}
 
@@ -93,81 +172,11 @@ import KebabMenu from '../components/KebabMenu';
                     className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
                     {showCreateQuiz ? '✕ Отмена' : '+ Добавить тест'}
                   </button>
-              </div>
+                </div>
               )}
               {/* ...rest of the tests tab code... */}
             </div>
           )}
-          );
-}
-        setQuizMessage(data.alreadyPassed ? 'Вы уже получали AQUA COIN за этот тест.' : `Тест пройден! +${data.bonus} AQUA COIN начислено.`);
-        if (currentUser?.phone) loadUserResults(currentUser.phone);
-      } else {
-        setQuizMessage('Для получения баллов нужно 70%+. Попробуйте ещё раз.');
-      }
-    } catch { setQuizMessage('Ошибка сохранения результата'); }
-  };
-
-  const quizId = selectedQuiz ? String(selectedQuiz._id || selectedQuiz.id) : null;
-  const isPassed = quizId ? userResults[quizId]?.passed : false;
-
-  if (selectedQuiz) {
-    const questions = selectedQuiz.questions || [];
-    return (
-      <div className="min-h-screen p-6">
-        <div className="max-w-3xl mx-auto">
-          <button onClick={() => setSelectedQuiz(null)} className="mb-6 text-white/80 hover:text-white flex items-center gap-2 text-sm">← Назад к тестам</button>
-          <div className="text-center mb-8">
-            <div className="text-5xl">🧠</div>
-            <h1 className="text-3xl font-bold text-white drop-shadow mt-4">{selectedQuiz.title}</h1>
-            {selectedQuiz.description && <p className="text-white/80 mt-2">{selectedQuiz.description}</p>}
-            <p className="text-white/60 mt-1 text-sm">{questions.length} вопросов · За прохождение: +{selectedQuiz.coins ?? 3} AQUA COIN</p>
-          </div>
-          {isPassed && !result ? (
-            <div className="bg-white rounded-[32px] p-10 shadow-2xl text-center">
-              <div className="text-6xl mb-4">🏆</div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">Тест уже пройден!</h2>
-              <p className="text-lg text-slate-600 mb-6">Монеты начисляются только один раз.</p>
-              <button onClick={() => setSelectedQuiz(null)} className="rounded-full bg-emerald-600 text-white px-8 py-3 font-semibold hover:bg-emerald-700 transition">К списку тестов</button>
-            </div>
-          ) : result ? (
-            <div className="bg-white rounded-[32px] p-10 shadow-2xl text-center">
-              <div className="text-6xl mb-4">{result.percent >= 70 ? '🏆' : '📚'}</div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">{result.percent}%</h2>
-              <p className="text-lg text-slate-600 mb-2">Правильных: {result.correct} из {result.total}</p>
-              <p className={`text-lg font-semibold mb-4 ${result.percent >= 70 ? 'text-emerald-600' : 'text-red-500'}`}>{result.percent >= 70 ? '✅ Тест пройден!' : '❌ Недостаточно правильных ответов'}</p>
-              {quizMessage && <p className="text-sm text-slate-500 mb-6">{quizMessage}</p>}
-              <div className="flex gap-3 justify-center flex-wrap">
-                {result.percent < 70 && <button onClick={() => { setAnswers({}); setResult(null); setQuizMessage(''); }} className="rounded-full bg-emerald-600 text-white px-8 py-3 font-semibold hover:bg-emerald-700 transition">Попробовать ещё раз</button>}
-                <button onClick={() => setSelectedQuiz(null)} className="rounded-full bg-slate-200 text-slate-700 px-8 py-3 font-semibold hover:bg-slate-300 transition">К списку тестов</button>
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {questions.map((q, idx) => (
-                <div key={idx} className="rounded-[24px] bg-white/95 p-6 shadow-lg">
-                  <p className="font-semibold text-slate-900 mb-4"><span className="text-emerald-600">{idx + 1}.</span> {q.text}</p>
-                  <div className="space-y-3">
-                    {q.options.map((opt, oi) => (
-                      <label key={oi} className={`flex items-center gap-3 cursor-pointer rounded-2xl px-4 py-3 border transition ${answers[idx] === oi ? 'bg-emerald-50 border-emerald-400' : 'bg-slate-50 border-slate-200 hover:border-emerald-300'}`}>
-                        <input type="radio" name={`q-${idx}`} checked={answers[idx] === oi} onChange={() => handleAnswer(idx, oi)} className="accent-emerald-600" />
-                        <span className="text-slate-800">{opt}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <button type="submit" disabled={Object.keys(answers).length < questions.length}
-                className="w-full rounded-full bg-emerald-600 text-white py-4 font-bold text-lg hover:bg-emerald-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed shadow-lg">
-                {Object.keys(answers).length < questions.length ? `Ответьте на все вопросы (${Object.keys(answers).length}/${questions.length})` : 'Завершить тест'}
-              </button>
-            </form>
-          )}
-        </div>
-        {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen">
@@ -196,9 +205,11 @@ import KebabMenu from '../components/KebabMenu';
           </button>
         </div>
 
-        {tab === 'materials' && (
-          <div>
-            {isAdmin && (
+        {/* Tab content fragment to ensure proper JSX structure */}
+        <>
+          {tab === 'materials' && (
+            <div>
+              {isAdmin && (
               <div className="mb-6">
                 <button onClick={() => { setShowCreate(!showCreate); setCreateMsg(''); }}
                   className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
@@ -412,63 +423,6 @@ import KebabMenu from '../components/KebabMenu';
                             }}
                             isActive={quiz.isActive}
                           />
-                          {editQuiz && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                              <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
-                                <button onClick={() => setEditQuiz(null)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
-                                <h2 className="text-xl font-bold mb-4">Редактировать тест</h2>
-                                <div className="space-y-4">
-                                  <div>
-                                    <label className="block text-sm font-semibold mb-1">Название</label>
-                                    <input type="text" value={editQuiz.title} onChange={e => setEditQuiz(p => ({ ...p, title: e.target.value }))} className="w-full rounded border p-2" />
-                                  </div>
-                                  <div>
-                                    <label className="block text-sm font-semibold mb-1">Описание</label>
-                                    <textarea value={editQuiz.description} onChange={e => setEditQuiz(p => ({ ...p, description: e.target.value }))} className="w-full rounded border p-2" />
-                                  </div>
-                                  <div>
-                                    <label className="block text-sm font-semibold mb-1">Попыток в день</label>
-                                    <input type="number" min="1" value={editQuiz.attemptsPerDay ?? ''} onChange={e => setEditQuiz(p => ({ ...p, attemptsPerDay: Number(e.target.value) }))} className="w-full rounded border p-2" />
-                                  </div>
-                                  <div className="flex gap-2 mt-4">
-                                    <button onClick={handleSaveEditQuiz} className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer">Сохранить</button>
-                                    <button onClick={() => setEditQuiz(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 active:scale-95 transition-all cursor-pointer">Отмена</button>
-                                  </div>
-                                  {createQuizMsg && <p className="text-sm text-red-600 mt-2">{createQuizMsg}</p>}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                                                      </div>
-                                                      <div>
-                                                        <label className="block text-sm font-semibold mb-1">Попыток в день</label>
-                                                        <input type="number" min="1" value={editQuiz.attemptsPerDay || 1} onChange={e => setEditQuiz(p => ({ ...p, attemptsPerDay: e.target.value }))} className="w-full rounded border p-2" />
-                                                      </div>
-                                                      <button onClick={handleSaveEditQuiz} disabled={savingQuiz} className="w-full rounded bg-sky-600 text-white py-2 font-semibold hover:bg-sky-700 transition disabled:opacity-50">
-                                                        {savingQuiz ? 'Сохранение...' : 'Сохранить'}
-                                                      </button>
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              )}
-                                        <label className="block text-sm font-semibold mb-1">Название</label>
-                                        <input type="text" value={editQuiz.title} onChange={e => setEditQuiz(p => ({ ...p, title: e.target.value }))} className="w-full rounded border p-2" />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-semibold mb-1">Описание</label>
-                                        <textarea value={editQuiz.description} onChange={e => setEditQuiz(p => ({ ...p, description: e.target.value }))} className="w-full rounded border p-2" />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-semibold mb-1">Попыток в день</label>
-                                        <input type="number" min="1" value={editQuiz.attemptsPerDay || 1} onChange={e => setEditQuiz(p => ({ ...p, attemptsPerDay: e.target.value }))} className="w-full rounded border p-2" />
-                                      </div>
-                                      <button onClick={handleSaveEditQuiz} disabled={savingQuiz} className="w-full rounded bg-sky-600 text-white py-2 font-semibold hover:bg-sky-700 transition disabled:opacity-50">
-                                        {savingQuiz ? 'Сохранение...' : 'Сохранить'}
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
                         ) : (
                           <button onClick={() => startQuiz(quiz)}
                             className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
@@ -484,40 +438,41 @@ import KebabMenu from '../components/KebabMenu';
           </div>
         )}
 
-        {tab === 'courses' && (
-          <CourseTab
-            isAdmin={isAdmin}
-            currentUser={currentUser}
-            courses={courses}
-            courseProgresses={courseProgresses}
-            trainings={trainings}
-            quizzes={quizzes}
-            userResults={userResults}
-            activeCourse={activeCourse}
-            setActiveCourse={(c) => { setActiveCourse(c); setCourseQuizAnswers({}); setCourseQuizResult(null); setCourseQuizMsg(''); if (c && currentUser?.phone) { fetch(`/api/course-progress?courseId=${c._id || c.id}&phone=${encodeURIComponent(currentUser.phone)}`).then(r=>r.json()).then(p=>setActiveCourseProgress(p||{completedSteps:[]})).catch(()=>{}); } }}
-            activeCourseProgress={activeCourseProgress}
-            setActiveCourseProgress={setActiveCourseProgress}
-            showCreateCourse={showCreateCourse}
-            setShowCreateCourse={setShowCreateCourse}
-            newCourse={newCourse}
-            setNewCourse={setNewCourse}
-            createCourseMsg={createCourseMsg}
-            setCreateCourseMsg={setCreateCourseMsg}
-            savingCourse={savingCourse}
-            setSavingCourse={setSavingCourse}
-            loadCourses={loadCourses}
-            loadCourseProgresses={loadCourseProgresses}
-            courseQuizAnswers={courseQuizAnswers}
-            setCourseQuizAnswers={setCourseQuizAnswers}
-            courseQuizResult={courseQuizResult}
-            setCourseQuizResult={setCourseQuizResult}
-            courseQuizMsg={courseQuizMsg}
-            setCourseQuizMsg={setCourseQuizMsg}
-            setConfirmModal={setConfirmModal}
-          />
-        )}
+          {tab === 'courses' && (
+            <CourseTab
+              isAdmin={isAdmin}
+              currentUser={currentUser}
+              courses={courses}
+              courseProgresses={courseProgresses}
+              trainings={trainings}
+              quizzes={quizzes}
+              userResults={userResults}
+              activeCourse={activeCourse}
+              setActiveCourse={(c) => { setActiveCourse(c); setCourseQuizAnswers({}); setCourseQuizResult(null); setCourseQuizMsg(''); if (c && currentUser?.phone) { fetch(`/api/course-progress?courseId=${c._id || c.id}&phone=${encodeURIComponent(currentUser.phone)}`).then(r=>r.json()).then(p=>setActiveCourseProgress(p||{completedSteps:[]})).catch(()=>{}); } }}
+              activeCourseProgress={activeCourseProgress}
+              setActiveCourseProgress={setActiveCourseProgress}
+              showCreateCourse={showCreateCourse}
+              setShowCreateCourse={setShowCreateCourse}
+              newCourse={newCourse}
+              setNewCourse={setNewCourse}
+              createCourseMsg={createCourseMsg}
+              setCreateCourseMsg={setCreateCourseMsg}
+              savingCourse={savingCourse}
+              setSavingCourse={setSavingCourse}
+              loadCourses={loadCourses}
+              loadCourseProgresses={loadCourseProgresses}
+              courseQuizAnswers={courseQuizAnswers}
+              setCourseQuizAnswers={setCourseQuizAnswers}
+              courseQuizResult={courseQuizResult}
+              setCourseQuizResult={setCourseQuizResult}
+              courseQuizMsg={courseQuizMsg}
+              setCourseQuizMsg={setCourseQuizMsg}
+              setConfirmModal={setConfirmModal}
+            />
+          )}
+          {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
+        </>
       </div>
-      {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
     </div>
   );
 }
