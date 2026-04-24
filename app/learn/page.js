@@ -471,7 +471,7 @@ import KebabMenu from '../components/KebabMenu';
         )}
         {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
       </div>
-  );
+    );
 }
 
 // ── CourseTab component ──────────────────────────────────────────────────────
