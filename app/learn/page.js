@@ -343,47 +343,76 @@ export default function LearnPage() {
                 <>
                   <div className="space-y-4">
                     {pageItems.map((item) => {
-                  const itemId = String(item._id || item.id);
+                  const qid = String(quiz._id || quiz.id);
+                  const res = userResults[qid];
                   return (
-                    <div key={itemId} className="rounded-[20px] border-l-4 border-emerald-400 bg-white/95 p-6 shadow-sm">
-                      {editingId === itemId ? (
-                        <div className="space-y-3">
-                          <input value={editForm.title} onChange={e => setEditForm(p => ({ ...p, title: e.target.value }))}
-                            className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm" />
-                          <textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
-                            className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm min-h-[80px]" />
+                    <>
+                      <div key={qid} className="rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3">
+                        <div className="flex items-start justify-between gap-2">
                           <div>
-                            <label className="block text-xs font-medium text-slate-600 mb-1">Дедлайн</label>
-                            <input type="date" value={editForm.deadline || ''} onChange={e => setEditForm(p => ({ ...p, deadline: e.target.value }))}
-                              className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm" />
+                            <h3 className="text-lg font-bold text-slate-900">{quiz.title}</h3>
+                            {quiz.description && <p className="text-sm text-slate-500 mt-1">{quiz.description}</p>}
+                            <p className="text-xs text-slate-400 mt-1">{quiz.questions?.length || 0} вопросов</p>
+                            <p className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1"><GoldCoin size="xs" /> +{quiz.coins ?? 3} AQUA COIN</p>
                           </div>
-                          <div className="flex gap-2">
-                            <button onClick={() => handleSaveEdit(itemId)} className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer">Сохранить</button>
-                            <button onClick={() => setEditingId(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 active:scale-95 transition-all cursor-pointer">Отмена</button>
+                          {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
+                        </div>
+                        <div className="flex items-center gap-2 mt-auto">
+                          {isAdmin ? (
+                            <KebabMenu
+                              onEdit={() => {
+                                setShowCreateQuiz(false);
+                                setCreateQuizMsg('');
+                                setEditQuiz({ ...quiz, id: qid });
+                              }}
+                              onDelete={() => handleDeleteQuiz(qid)}
+                              onToggleActive={async () => {
+                                await fetch('/api/quizzes', {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
+                                });
+                                loadQuizzes(currentUser);
+                              }}
+                              isActive={quiz.isActive}
+                            />
+                          ) : (
+                            <button onClick={() => startQuiz(quiz)}
+                              className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
+                              {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {editQuiz && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                          <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
+                            <button onClick={() => setEditQuiz(null)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
+                            <h2 className="text-xl font-bold mb-4">Редактировать тест</h2>
+                            <div className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-semibold mb-1">Название</label>
+                                <input type="text" value={editQuiz.title} onChange={e => setEditQuiz(p => ({ ...p, title: e.target.value }))} className="w-full rounded border p-2" />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-semibold mb-1">Описание</label>
+                                <textarea value={editQuiz.description} onChange={e => setEditQuiz(p => ({ ...p, description: e.target.value }))} className="w-full rounded border p-2" />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-semibold mb-1">Попыток в день</label>
+                                <input type="number" min="1" value={editQuiz.attemptsPerDay ?? ''} onChange={e => setEditQuiz(p => ({ ...p, attemptsPerDay: Number(e.target.value) }))} className="w-full rounded border p-2" />
+                              </div>
+                              <div className="flex gap-2 mt-4">
+                                <button onClick={handleSaveEditQuiz} className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer">Сохранить</button>
+                                <button onClick={() => setEditQuiz(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 active:scale-95 transition-all cursor-pointer">Отмена</button>
+                              </div>
+                              {createQuizMsg && <p className="text-sm text-red-600 mt-2">{createQuizMsg}</p>}
+                            </div>
                           </div>
                         </div>
-                      ) : (
-                        <>
-                          <div className="flex items-start justify-between gap-4">
-                            <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
-                            {isAdmin && <KebabMenu onEdit={() => { setEditingId(itemId); setEditForm({ title: item.title, description: item.description || '', deadline: item.deadline ? new Date(item.deadline).toISOString().split('T')[0] : '' }); }} onDelete={() => handleDelete(itemId)} />}
-                          </div>
-                          {item.description && <p className="text-slate-600 mt-2 text-sm">{item.description}</p>}
-                          {item.deadline && (
-                            <p className={`mt-2 text-xs font-semibold inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${new Date(item.deadline) < new Date() ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
-                              ⏰ Дедлайн: {new Date(item.deadline).toLocaleDateString('ru-RU')}
-                            </p>
-                          )}
-                          {item.attachments?.length > 0 && (
-                            <div className="mt-4 space-y-2">
-                              <p className="text-xs uppercase tracking-widest text-slate-400">Файлы</p>
-                              {item.attachments.map((url, i) => {
-                                const name = url.split('/').pop();
-                                const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(name);
-                                return (
-                                  <div key={i} className="rounded-xl bg-slate-50 border border-slate-200 p-3">
-                                    {isImg ? <img src={url} alt={name} className="w-full max-h-64 object-contain rounded-lg" />
-                                      : <a href={url} target="_blank" rel="noreferrer" className="text-sky-600 hover:text-sky-700 text-sm font-medium">{name}</a>}
+                      )}
+                    </>
+                  );
                                   </div>
                                 );
                               })}
@@ -525,7 +554,6 @@ export default function LearnPage() {
                             }}
                             isActive={quiz.isActive}
                           />
-                          {/* --- Модальное окно для редактирования теста --- */}
                           {editQuiz && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                               <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
