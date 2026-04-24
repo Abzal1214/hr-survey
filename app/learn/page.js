@@ -206,10 +206,10 @@ import KebabMenu from '../components/KebabMenu';
         </div>
 
         {/* Tab content fragment to ensure proper JSX structure */}
-        <>
-          {tab === 'materials' && (
-            <div>
-              {isAdmin && (
+        {/* Only one parent for tab content, no extra fragment needed */}
+        {tab === 'materials' && (
+          <div>
+            {isAdmin && (
               <div className="mb-6">
                 <button onClick={() => { setShowCreate(!showCreate); setCreateMsg(''); }}
                   className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
@@ -438,40 +438,39 @@ import KebabMenu from '../components/KebabMenu';
           </div>
         )}
 
-          {tab === 'courses' && (
-            <CourseTab
-              isAdmin={isAdmin}
-              currentUser={currentUser}
-              courses={courses}
-              courseProgresses={courseProgresses}
-              trainings={trainings}
-              quizzes={quizzes}
-              userResults={userResults}
-              activeCourse={activeCourse}
-              setActiveCourse={(c) => { setActiveCourse(c); setCourseQuizAnswers({}); setCourseQuizResult(null); setCourseQuizMsg(''); if (c && currentUser?.phone) { fetch(`/api/course-progress?courseId=${c._id || c.id}&phone=${encodeURIComponent(currentUser.phone)}`).then(r=>r.json()).then(p=>setActiveCourseProgress(p||{completedSteps:[]})).catch(()=>{}); } }}
-              activeCourseProgress={activeCourseProgress}
-              setActiveCourseProgress={setActiveCourseProgress}
-              showCreateCourse={showCreateCourse}
-              setShowCreateCourse={setShowCreateCourse}
-              newCourse={newCourse}
-              setNewCourse={setNewCourse}
-              createCourseMsg={createCourseMsg}
-              setCreateCourseMsg={setCreateCourseMsg}
-              savingCourse={savingCourse}
-              setSavingCourse={setSavingCourse}
-              loadCourses={loadCourses}
-              loadCourseProgresses={loadCourseProgresses}
-              courseQuizAnswers={courseQuizAnswers}
-              setCourseQuizAnswers={setCourseQuizAnswers}
-              courseQuizResult={courseQuizResult}
-              setCourseQuizResult={setCourseQuizResult}
-              courseQuizMsg={courseQuizMsg}
-              setCourseQuizMsg={setCourseQuizMsg}
-              setConfirmModal={setConfirmModal}
-            />
-          )}
-          {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
-        </>
+        {tab === 'courses' && (
+          <CourseTab
+            isAdmin={isAdmin}
+            currentUser={currentUser}
+            courses={courses}
+            courseProgresses={courseProgresses}
+            trainings={trainings}
+            quizzes={quizzes}
+            userResults={userResults}
+            activeCourse={activeCourse}
+            setActiveCourse={(c) => { setActiveCourse(c); setCourseQuizAnswers({}); setCourseQuizResult(null); setCourseQuizMsg(''); if (c && currentUser?.phone) { fetch(`/api/course-progress?courseId=${c._id || c.id}&phone=${encodeURIComponent(currentUser.phone)}`).then(r=>r.json()).then(p=>setActiveCourseProgress(p||{completedSteps:[]})).catch(()=>{}); } }}
+            activeCourseProgress={activeCourseProgress}
+            setActiveCourseProgress={setActiveCourseProgress}
+            showCreateCourse={showCreateCourse}
+            setShowCreateCourse={setShowCreateCourse}
+            newCourse={newCourse}
+            setNewCourse={setNewCourse}
+            createCourseMsg={createCourseMsg}
+            setCreateCourseMsg={setCreateCourseMsg}
+            savingCourse={savingCourse}
+            setSavingCourse={setSavingCourse}
+            loadCourses={loadCourses}
+            loadCourseProgresses={loadCourseProgresses}
+            courseQuizAnswers={courseQuizAnswers}
+            setCourseQuizAnswers={setCourseQuizAnswers}
+            courseQuizResult={courseQuizResult}
+            setCourseQuizResult={setCourseQuizResult}
+            courseQuizMsg={courseQuizMsg}
+            setCourseQuizMsg={setCourseQuizMsg}
+            setConfirmModal={setConfirmModal}
+          />
+        )}
+        {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
       </div>
     </div>
   );
