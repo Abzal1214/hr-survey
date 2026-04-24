@@ -402,10 +402,7 @@ import KebabMenu from '../components/KebabMenu';
                           <p className="text-xs text-slate-400 mt-1">{quiz.questions?.length || 0} вопросов</p>
                           <p className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1"><GoldCoin size="xs" /> +{quiz.coins ?? 3} AQUA COIN</p>
                         </div>
-                        {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
-                      </div>
-                      <div className="flex items-center gap-2 mt-auto">
-                        {isAdmin ? (
+                        <div className="flex items-center gap-2">
                           <KebabMenu
                             onEdit={() => {
                               setShowCreateQuiz(false);
@@ -423,12 +420,14 @@ import KebabMenu from '../components/KebabMenu';
                             }}
                             isActive={quiz.isActive}
                           />
-                        ) : (
-                          <button onClick={() => startQuiz(quiz)}
-                            className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
-                            {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
-                          </button>
-                        )}
+                          {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-auto">
+                        <button onClick={() => startQuiz(quiz)}
+                          className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
+                          {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
+                        </button>
                       </div>
                     </div>
                   );
