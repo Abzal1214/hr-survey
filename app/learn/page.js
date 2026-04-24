@@ -3,169 +3,103 @@
 import { useEffect, useState } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
 import KebabMenu from '../components/KebabMenu';
-import GoldCoin from '../components/GoldCoin';
 
-const emptyQuestion = () => ({ text: '', options: ['', '', '', ''], correct: '' });
+  // ...component code...
 
-export default function LearnPage() {
-  const [tab, setTab] = useState('materials');
-    // --- State and handlers for editing quizzes ---
-    const [editQuiz, setEditQuiz] = useState(null);
-    const handleSaveEditQuiz = async () => {
-      if (!editQuiz.title) { setCreateQuizMsg('Введите название теста'); return; }
-      setSavingQuiz(true);
-      await fetch('/api/quizzes', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: editQuiz.id, title: editQuiz.title, description: editQuiz.description, attemptsPerDay: editQuiz.attemptsPerDay })
-      });
-      setEditQuiz(null);
-      setSavingQuiz(false);
-      loadQuizzes(currentUser);
-    };
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [confirmModal, setConfirmModal] = useState(null);
+  return (
+    <>
+      {tab === 'materials' && (
+            <div>
+              {isAdmin && (
+                <div className="mb-6">
+                  <button onClick={() => { setShowCreate(!showCreate); setCreateMsg(''); }}
+                    className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
+                    {showCreate ? '✕ Отмена' : '+ Добавить материал'}
+                  </button>
+                  {showCreate && (
+                    <div className="mt-4 rounded-[28px] bg-white/95 p-6 shadow-2xl border border-slate-200">
+                      <h2 className="text-xl font-bold text-slate-900 mb-4">Новый материал</h2>
+                      <div className="space-y-4">
+                        <input value={newTraining.title} onChange={e => setNewTraining(p => ({ ...p, title: e.target.value }))}
+                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название *" />
+                        <textarea value={newTraining.description} onChange={e => setNewTraining(p => ({ ...p, description: e.target.value }))}
+                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900 min-h-[80px]" placeholder="Описание" />
+                        <select value={newTraining.department} onChange={e => setNewTraining(p => ({ ...p, department: e.target.value }))}
+                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
+                          <option value="">Все отделы</option>
+                          <option value="Аквапарк">Аквапарк</option>
+                          <option value="Ресторан">Ресторан</option>
+                          <option value="SPA">SPA</option>
+                          <option value="Магазин">Магазин</option>
+                          <option value="Офис">Офис</option>
+                        </select>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-1">Дедлайн (необязательно)</label>
+                          <input type="date" value={newTraining.deadline} onChange={e => setNewTraining(p => ({ ...p, deadline: e.target.value }))}
+                            className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">Файлы</label>
+                          <input type="file" multiple accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            onChange={e => setTrainingFiles(Array.from(e.target.files || []))}
+                            className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
+                          {trainingFiles.length > 0 && <p className="text-sm text-slate-600 mt-2">Выбрано: {trainingFiles.length}</p>}
+                        </div>
+                        {createMsg && <p className="text-sm text-red-600">{createMsg}</p>}
+                        <button onClick={handleAddTraining} disabled={saving}
+                          className="w-full rounded-2xl bg-emerald-600 text-white py-3 font-semibold hover:bg-emerald-700 transition disabled:opacity-50">
+                          {saving ? 'Сохранение...' : 'Добавить'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {message && <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm">{message}</div>}
+              {trainings.length > 0 && (
+                <div className="mb-5 relative">
+                  <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m0 0A7 7 0 104.65 4.65a7 7 0 0012 12z" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={trainingsSearch}
+                    onChange={e => { setTrainingsSearch(e.target.value); setTrainingsPage(1); }}
+                    placeholder="Поиск по материалам..."
+                    className="w-full pl-10 pr-10 py-3 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:bg-white/30 transition text-sm"
+                  />
+                  {/* Render trainings list here, ensure each map returns a single parent */}
+                  <div className="space-y-4 mt-4">
+                    {trainings.map((training) => (
+                      <div key={training._id || training.id} className="rounded-[20px] border-l-4 border-emerald-400 bg-white/95 p-6 shadow-sm">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <h3 className="font-bold text-lg">{training.title}</h3>
+                            <p className="text-sm text-slate-600">{training.description}</p>
+                          </div>
+                          {/* Add admin controls or actions here if needed */}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-  // Материалы
-  const [trainings, setTrainings] = useState([]);
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ title: '', description: '' });
-  const [showCreate, setShowCreate] = useState(false);
-  const [newTraining, setNewTraining] = useState({ title: '', description: '', department: '', deadline: '' });
-  const [trainingFiles, setTrainingFiles] = useState([]);
-  const [saving, setSaving] = useState(false);
-  const [createMsg, setCreateMsg] = useState('');
-  const [message, setMessage] = useState('');
-  const [trainingsPage, setTrainingsPage] = useState(1);
-  const [trainingsSearch, setTrainingsSearch] = useState('');
-  const TRAININGS_PAGE_SIZE = 6;
-  const [createQuizMsg, setCreateQuizMsg] = useState('');
-  const [savingQuiz, setSavingQuiz] = useState(false);
-
-  const loadTrainings = (u) => {
-    const dept = u && u.role && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
-    fetch('/api/trainings' + dept).then(r => r.json()).then(d => { setTrainings(Array.isArray(d) ? d : []); setTrainingsPage(1); }).catch(() => {});
-  };
-
-  const loadCourses = (u) => {
-    const dept = u && u.role && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
-    fetch('/api/courses' + dept).then(r => r.json()).then(d => setCourses(Array.isArray(d) ? d : [])).catch(() => {});
-  };
-
-  const loadCourseProgresses = (phone) => {
-    fetch(`/api/course-progress?phone=${encodeURIComponent(phone)}`)
-      .then(r => r.json()).then(list => {
-        const map = {};
-        (Array.isArray(list) ? list : []).forEach(p => { map[p.courseId] = p; });
-        setCourseProgresses(map);
-      }).catch(() => {});
-  };
-
-  const loadQuizzes = (u) => {
-    const dept = u && u.role && u.role !== 'admin' && u.department ? `?department=${encodeURIComponent(u.department)}` : '';
-    fetch('/api/quizzes' + dept).then(r => r.json()).then(d => setQuizzes(Array.isArray(d) ? d : [])).catch(() => {});
-  };
-
-  const loadUserResults = (phone) => {
-    fetch('/api/tests').then(r => r.json()).then(tests => {
-      const byQuiz = {};
-      tests.filter(t => t.phone === phone).forEach(t => {
-        const key = t.quizId || 'legacy';
-        if (!byQuiz[key] || t.score > byQuiz[key].score) byQuiz[key] = { passed: t.score >= 70, score: t.score };
-      });
-      setUserResults(byQuiz);
-    }).catch(() => {});
-  };
-
-  useEffect(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem('currentUser') || '{}');
-      setCurrentUser(u);
-      if (u.role === 'admin') setIsAdmin(true);
-      loadTrainings(u);
-      loadQuizzes(u);
-      loadCourses(u);
-      if (u.phone) { loadUserResults(u.phone); loadCourseProgresses(u.phone); }
-    } catch {
-      loadTrainings(); loadQuizzes(); loadCourses();
-    }
-  }, []);
-
-  const handleDelete = (id) => {
-    setConfirmModal({ message: 'Удалить этот материал?', onConfirm: async () => {
-      setConfirmModal(null);
-      await fetch(`/api/trainings?id=${id}`, { method: 'DELETE' });
-      setMessage('Удалено'); loadTrainings(); setTimeout(() => setMessage(''), 3000);
-    }});
-  };
-
-  const handleSaveEdit = async (id) => {
-    await fetch('/api/trainings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...editForm }) });
-    setEditingId(null); loadTrainings();
-  };
-
-  const handleAddTraining = async () => {
-    if (!newTraining.title) { setCreateMsg('Введите название'); return; }
-    setSaving(true);
-    let attachmentUrls = [];
-    if (trainingFiles.length > 0) {
-      const fd = new FormData();
-      trainingFiles.forEach(f => fd.append('files', f));
-      try {
-        const r = await fetch('/api/files', { method: 'POST', body: fd });
-        const d = await r.json();
-        if (r.ok) attachmentUrls = d.fileUrls || [];
-      } catch {}
-    }
-    const res = await fetch('/api/trainings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...newTraining, attachments: attachmentUrls }) });
-    if (res.ok) { setCreateMsg('Добавлено!'); setNewTraining({ title: '', description: '', department: '', deadline: '' }); setTrainingFiles([]); setShowCreate(false); loadTrainings(); }
-    else { const d = await res.json(); setCreateMsg(d.error || 'Ошибка'); }
-    setSaving(false);
-  };
-
-  const handleQuestionChange = (idx, field, value) => setNewQuiz(p => { const qs = [...p.questions]; qs[idx] = { ...qs[idx], [field]: value }; return { ...p, questions: qs }; });
-  const handleOptionChange = (qIdx, oIdx, value) => setNewQuiz(p => { const qs = [...p.questions]; const opts = [...qs[qIdx].options]; opts[oIdx] = value; qs[qIdx] = { ...qs[qIdx], options: opts }; return { ...p, questions: qs }; });
-  const addQuestion = () => setNewQuiz(p => ({ ...p, questions: [...p.questions, emptyQuestion()] }));
-  const removeQuestion = (idx) => setNewQuiz(p => ({ ...p, questions: p.questions.filter((_, i) => i !== idx) }));
-
-  const handleCreateQuiz = async () => {
-    if (!newQuiz.title) { setCreateQuizMsg('Введите название теста'); return; }
-    const valid = newQuiz.questions.every(q => q.text && q.correct && q.options.every(o => o));
-    if (!valid) { setCreateQuizMsg('Заполните все вопросы и отметьте правильные ответы'); return; }
-    setSavingQuiz(true);
-    const res = await fetch('/api/quizzes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newQuiz) });
-    if (res.ok) { setCreateQuizMsg('Тест создан!'); setNewQuiz({ title: '', description: '', coins: 3, department: '', questions: [emptyQuestion()] }); setShowCreateQuiz(false); loadQuizzes(); }
-    else { const d = await res.json(); setCreateQuizMsg(d.error || 'Ошибка'); }
-    setSavingQuiz(false);
-  };
-
-  const handleDeleteQuiz = (id) => {
-    setConfirmModal({ message: 'Удалить этот тест?', onConfirm: async () => {
-      setConfirmModal(null);
-      await fetch(`/api/quizzes?id=${id}`, { method: 'DELETE' }); loadQuizzes();
-    }});
-  };
-
-  const startQuiz = (quiz) => { setSelectedQuiz(quiz); setAnswers({}); setResult(null); setQuizMessage(''); };
-  const handleAnswer = (qIdx, optIdx) => setAnswers(p => ({ ...p, [qIdx]: optIdx }));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const questions = selectedQuiz.questions;
-    const correct = questions.filter((q, i) => q.options[answers[i]] === q.correct).length;
-    const percent = Math.round((correct / questions.length) * 100);
-    setResult({ correct, total: questions.length, percent });
-    try {
-      const res = await fetch('/api/tests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: currentUser?.phone, quizId: String(selectedQuiz._id || selectedQuiz.id), score: percent, answers, timestamp: new Date().toISOString() }) });
-      const data = await res.json();
-      if (percent >= 70) {
-        if (!data.alreadyPassed && data.bonus > 0 && currentUser) {
-          const updated = { ...currentUser, points: (currentUser.points || 0) + data.bonus };
-          setCurrentUser(updated);
-          localStorage.setItem('currentUser', JSON.stringify(updated));
-          window.dispatchEvent(new Event('userChanged'));
-        }
+          {tab === 'tests' && (
+            <div>
+              {isAdmin && (
+                <div className="mb-6">
+                  <button onClick={() => { setShowCreateQuiz(!showCreateQuiz); setCreateQuizMsg(''); }}
+                    className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
+                    {showCreateQuiz ? '✕ Отмена' : '+ Добавить тест'}
+                  </button>
+              </div>
+              )}
+              {/* ...rest of the tests tab code... */}
+            </div>
+          )}
+          );
+}
         setQuizMessage(data.alreadyPassed ? 'Вы уже получали AQUA COIN за этот тест.' : `Тест пройден! +${data.bonus} AQUA COIN начислено.`);
         if (currentUser?.phone) loadUserResults(currentUser.phone);
       } else {
@@ -342,88 +276,11 @@ export default function LearnPage() {
               return (
                 <>
                   <div className="space-y-4">
-                    {pageItems.map((item) => {
-                  const qid = String(quiz._id || quiz.id);
-                  const res = userResults[qid];
-                  return (
-                    <>
-                      <div key={qid} className="rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h3 className="text-lg font-bold text-slate-900">{quiz.title}</h3>
-                            {quiz.description && <p className="text-sm text-slate-500 mt-1">{quiz.description}</p>}
-                            <p className="text-xs text-slate-400 mt-1">{quiz.questions?.length || 0} вопросов</p>
-                            <p className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1"><GoldCoin size="xs" /> +{quiz.coins ?? 3} AQUA COIN</p>
-                          </div>
-                          {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
-                        </div>
-                        <div className="flex items-center gap-2 mt-auto">
-                          {isAdmin ? (
-                            <KebabMenu
-                              onEdit={() => {
-                                setShowCreateQuiz(false);
-                                setCreateQuizMsg('');
-                                setEditQuiz({ ...quiz, id: qid });
-                              }}
-                              onDelete={() => handleDeleteQuiz(qid)}
-                              onToggleActive={async () => {
-                                await fetch('/api/quizzes', {
-                                  method: 'PATCH',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
-                                });
-                                loadQuizzes(currentUser);
-                              }}
-                              isActive={quiz.isActive}
-                            />
-                          ) : (
-                            <button onClick={() => startQuiz(quiz)}
-                              className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
-                              {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
-                            </button>
-                          )}
-                        </div>
+                    {pageItems.map((item) => (
+                      <div key={item._id || item.id} className="rounded-[20px] border-l-4 border-emerald-400 bg-white/95 p-6 shadow-sm">
+                        {/* ...existing code for each training item... */}
                       </div>
-                      {editQuiz && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                          <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
-                            <button onClick={() => setEditQuiz(null)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
-                            <h2 className="text-xl font-bold mb-4">Редактировать тест</h2>
-                            <div className="space-y-4">
-                              <div>
-                                <label className="block text-sm font-semibold mb-1">Название</label>
-                                <input type="text" value={editQuiz.title} onChange={e => setEditQuiz(p => ({ ...p, title: e.target.value }))} className="w-full rounded border p-2" />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-semibold mb-1">Описание</label>
-                                <textarea value={editQuiz.description} onChange={e => setEditQuiz(p => ({ ...p, description: e.target.value }))} className="w-full rounded border p-2" />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-semibold mb-1">Попыток в день</label>
-                                <input type="number" min="1" value={editQuiz.attemptsPerDay ?? ''} onChange={e => setEditQuiz(p => ({ ...p, attemptsPerDay: Number(e.target.value) }))} className="w-full rounded border p-2" />
-                              </div>
-                              <div className="flex gap-2 mt-4">
-                                <button onClick={handleSaveEditQuiz} className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer">Сохранить</button>
-                                <button onClick={() => setEditQuiz(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 active:scale-95 transition-all cursor-pointer">Отмена</button>
-                              </div>
-                              {createQuizMsg && <p className="text-sm text-red-600 mt-2">{createQuizMsg}</p>}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  );
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                          <p className="text-xs text-slate-400 mt-4">{item.createdAt ? new Date(item.createdAt).toLocaleDateString('ru-RU') : ''}</p>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
+                    ))}
                   </div>
                   {totalPages > 1 && (
                     <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
@@ -453,34 +310,35 @@ export default function LearnPage() {
                           />
                         )}
                       </div>
-
-        {tab === 'tests' && (
-          <div>
-            {isAdmin && (
-              <div className="mb-6">
-                <button onClick={() => { setShowCreateQuiz(!showCreateQuiz); setCreateQuizMsg(''); }}
-                  className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
-                  {showCreateQuiz ? '✕ Отмена' : '+ Добавить тест'}
-                </button>
-                {showCreateQuiz && (
-                  <div className="mt-4 rounded-[28px] bg-white/95 p-6 shadow-2xl border border-slate-200">
-                    <h2 className="text-xl font-bold text-slate-900 mb-4">Новый тест</h2>
-                    <div className="space-y-4">
-                      <input value={newQuiz.title} onChange={e => setNewQuiz(p => ({ ...p, title: e.target.value }))}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название теста *" />
-                      <input value={newQuiz.description} onChange={e => setNewQuiz(p => ({ ...p, description: e.target.value }))}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Описание" />
-                      <select value={newQuiz.department} onChange={e => setNewQuiz(p => ({ ...p, department: e.target.value }))}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
-                        <option value="">Все отделы</option>
-                        <option value="Аквапарк">Аквапарк</option>
-                        <option value="Ресторан">Ресторан</option>
-                        <option value="SPA">SPA</option>
-                        <option value="Магазин">Магазин</option>
-                        <option value="Офис">Офис</option>
-                      </select>
-                      <div className="flex items-center gap-3">
-                        <label className="text-sm font-semibold text-slate-700 flex items-center gap-1"><GoldCoin size="xs" /> AQUA COIN:</label>
+                    </div>
+                  )}
+                {tab === 'tests' && (
+                  <div>
+                    {isAdmin && (
+                      <div className="mb-6">
+                        <button onClick={() => { setShowCreateQuiz(!showCreateQuiz); setCreateQuizMsg(''); }}
+                          className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
+                          {showCreateQuiz ? '✕ Отмена' : '+ Добавить тест'}
+                        </button>
+                        {showCreateQuiz && (
+                          <div className="mt-4 rounded-[28px] bg-white/95 p-6 shadow-2xl border border-slate-200">
+                            <h2 className="text-xl font-bold text-slate-900 mb-4">Новый тест</h2>
+                            <div className="space-y-4">
+                              <input value={newQuiz.title} onChange={e => setNewQuiz(p => ({ ...p, title: e.target.value }))}
+                                className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название теста *" />
+                              <input value={newQuiz.description} onChange={e => setNewQuiz(p => ({ ...p, description: e.target.value }))}
+                                className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Описание" />
+                              <select value={newQuiz.department} onChange={e => setNewQuiz(p => ({ ...p, department: e.target.value }))}
+                                className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
+                                <option value="">Все отделы</option>
+                                <option value="Аквапарк">Аквапарк</option>
+                                <option value="Ресторан">Ресторан</option>
+                                <option value="SPA">SPA</option>
+                                <option value="Магазин">Магазин</option>
+                                <option value="Офис">Офис</option>
+                              </select>
+                              <div className="flex items-center gap-3">
+                                <label className="text-sm font-semibold text-slate-700 flex items-center gap-1"><GoldCoin size="xs" /> AQUA COIN:</label>
                         <input type="number" min="1" max="100" value={newQuiz.coins} onChange={e => setNewQuiz(p => ({ ...p, coins: Number(e.target.value) }))}
                           className="w-24 rounded-2xl border border-slate-300 p-3 text-slate-900" />
                       </div>
