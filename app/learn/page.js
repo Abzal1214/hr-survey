@@ -100,44 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                      <input value={newTraining.title} onChange={e => setNewTraining(p => ({ ...p, title: e.target.value }))}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название *" />
-                      <textarea value={newTraining.description} onChange={e => setNewTraining(p => ({ ...p, description: e.target.value }))}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900 min-h-[80px]" placeholder="Описание" />
-                      <select value={newTraining.department} onChange={e => setNewTraining(p => ({ ...p, department: e.target.value }))}
-                        className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
-                        <option value="">Все отделы</option>
-                        <option value="Аквапарк">Аквапарк</option>
-                        <option value="Ресторан">Ресторан</option>
-                        <option value="SPA">SPA</option>
-                        <option value="Магазин">Магазин</option>
-                        <option value="Офис">Офис</option>
-                      </select>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Дедлайн (необязательно)</label>
-                        <input type="date" value={newTraining.deadline} onChange={e => setNewTraining(p => ({ ...p, deadline: e.target.value }))}
-                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Файлы</label>
-                        <input type="file" multiple accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                          onChange={e => setTrainingFiles(Array.from(e.target.files || []))}
-                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
-                        {trainingFiles.length > 0 && <p className="text-sm text-slate-600 mt-2">Выбрано: {trainingFiles.length}</p>}
-                      </div>
-                      {createMsg && <p className="text-sm text-red-600">{createMsg}</p>}
-                      <button onClick={handleAddTraining} disabled={saving}
-                        className="w-full rounded-2xl bg-emerald-600 text-white py-3 font-semibold hover:bg-emerald-700 transition disabled:opacity-50">
-                        {saving ? 'Сохранение...' : 'Добавить'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-            {message && <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm">{message}</div>}
-            {trainings.length > 0 && (
-              <div className="mb-5 relative">
                 <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m0 0A7 7 0 104.65 4.65a7 7 0 0012 12z" />
                 </svg>
