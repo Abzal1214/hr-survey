@@ -100,24 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                            {q.options.map((opt, oi) => (
-                              <div key={oi} className="flex items-center gap-2">
-                                <input type="radio" name={`correct-${qi}`} checked={q.correct === opt && opt !== ''} onChange={() => opt && handleQuestionChange(qi, 'correct', opt)} className="accent-emerald-600 shrink-0" />
-                                <input value={opt} onChange={e => handleOptionChange(qi, oi, e.target.value)}
-                                  className="flex-1 rounded-xl border border-slate-300 p-2 text-slate-900 text-sm" placeholder={`Вариант ${oi + 1} *`} />
-                              </div>
-                            ))}
-                          </div>
-                          {q.correct && <p className="text-xs text-emerald-600">✓ Правильный: {q.correct}</p>}
-                        </div>
-                      ))}
-                      <button onClick={addQuestion} className="rounded-xl bg-slate-100 text-slate-700 px-4 py-2 text-sm hover:bg-slate-200 transition">+ Добавить вопрос</button>
-                      {createQuizMsg && <p className="text-sm text-red-600">{createQuizMsg}</p>}
-                      <button onClick={handleCreateQuiz} disabled={savingQuiz}
-                        className="w-full rounded-2xl bg-emerald-600 text-white py-3 font-semibold hover:bg-emerald-700 transition disabled:opacity-50">
-                        {savingQuiz ? 'Сохранение...' : 'Создать тест'}
-                      </button>
-                    </div>
                   </div>
                 )}
               </div>
