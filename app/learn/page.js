@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-        <div className="grid gap-4 sm:grid-cols-2">
-          {courses.map((course) => {
-            const cid = String(course._id || course.id);
-            const prog = courseProgresses[cid];
-            const completed = prog?.completedSteps?.length || 0;
-            const total = course.steps?.length || 0;
-            const pct = total ? Math.round((completed / total) * 100) : 0;
-            return (
               <div key={cid} className="rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
