@@ -4,17 +4,18 @@ import { useEffect, useState } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
 import KebabMenu from '../components/KebabMenu';
 
-                {quizzes.map((quiz) => {
-                  const qid = String(quiz._id || quiz.id);
-                  {quizzes.length === 0 ? (
-                    <div className="rounded-[24px] bg-white/95 p-10 text-center text-slate-500 shadow">
-                      {isAdmin ? 'Нет тестов. Создайте первый кнопкой выше.' : 'Тесты пока не добавлены.'}
-                    </div>
-                  ) : (
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      {quizzes.map((quiz) => {
-                        const qid = String(quiz._id || quiz.id);
-                        const res = userResults[qid];
+export default function LearnPage() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {quizzes.length === 0 ? (
+        <div className="rounded-[24px] bg-white/95 p-10 text-center text-slate-500 shadow">
+          {isAdmin ? 'Нет тестов. Создайте первый кнопкой выше.' : 'Тесты пока не добавлены.'}
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {quizzes.map((quiz) => {
+            const qid = String(quiz._id || quiz.id);
+            const res = userResults[qid];
                         return (
                           <div key={qid} className="rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3">
                             <div className="flex items-start justify-between gap-2">
@@ -42,6 +43,7 @@ import KebabMenu from '../components/KebabMenu';
                                       body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
                                     });
                                     loadQuizzes(currentUser);
+
                                   }}
                                   isActive={quiz.isActive}
                                 />
@@ -160,9 +162,6 @@ import KebabMenu from '../components/KebabMenu';
                       </div>
                     ))}
                   </div>
-
-                </div>
-              )}
 
           {tab === 'tests' && (
             <div>
@@ -296,31 +295,6 @@ import KebabMenu from '../components/KebabMenu';
                   {totalPages > 1 && (
                     <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                       <p className="text-sm text-white/70">{filtered.length} материалов · стр. {curPage} из {totalPages}</p>
-                      <div className="flex items-center gap-2 mt-auto">
-                        <button onClick={() => startQuiz(quiz)}
-                          className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
-                          {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
-                        </button>
-                        {isAdmin && (
-                          <KebabMenu
-                            onEdit={() => {
-                              setShowCreateQuiz(false);
-                              setCreateQuizMsg('');
-                              setEditQuiz({ ...quiz, id: qid });
-                            }}
-                            onDelete={() => handleDeleteQuiz(qid)}
-                            onToggleActive={async () => {
-                              await fetch('/api/quizzes', {
-                                method: 'PATCH',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
-                              });
-                              loadQuizzes(currentUser);
-                            }}
-                            isActive={quiz.isActive}
-                          />
-                        )}
-                      </div>
                     </div>
                   )}
                 {tab === 'tests' && (
@@ -471,7 +445,6 @@ import KebabMenu from '../components/KebabMenu';
         )}
         {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
       );
-}
 
 // ── CourseTab component ──────────────────────────────────────────────────────
 
