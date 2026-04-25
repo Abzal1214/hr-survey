@@ -100,24 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                <div className="mb-6">
-                  <button onClick={() => { setShowCreateQuiz(!showCreateQuiz); setCreateQuizMsg(''); }}
-                    className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
-                    {showCreateQuiz ? '✕ Отмена' : '+ Добавить тест'}
-                  </button>
-                </div>
-              )}
-              {/* ...rest of the tests tab code... */}
-            </div>
-          )}
-
-  return (
-    <div className="min-h-screen">
-      <div className="relative flex flex-col items-center justify-center text-center px-6 py-20">
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-        <div className="relative z-10">
-          <span className="inline-block rounded-full bg-emerald-500 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white mb-4">Обучение</span>
-          <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">Обучение</h1>
           <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Учебные материалы и тесты для сотрудников аквапарков.</p>
         </div>
       </div>
