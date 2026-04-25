@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                    {trainings.map((training) => (
-                      <div key={training._id || training.id} className="rounded-[20px] border-l-4 border-emerald-400 bg-white/95 p-6 shadow-sm">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <h3 className="font-bold text-lg">{training.title}</h3>
-                            <p className="text-sm text-slate-600">{training.description}</p>
-                          </div>
-                          {/* Add admin controls or actions here if needed */}
                         </div>
                       </div>
                     ))}
