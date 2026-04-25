@@ -450,6 +450,7 @@ export default function LearnPage() {
         )}
         {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
       );
+    }
 
 // ── CourseTab component ──────────────────────────────────────────────────────
 
