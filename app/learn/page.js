@@ -409,10 +409,6 @@ export default function LearnPage() {
                         </button>
                       </div>
                     </div>
-                          {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
-                        </button>
-                      </div>
-                    </div>
                   );
                 })}
               </div>
