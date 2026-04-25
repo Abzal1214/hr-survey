@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-              const filtered = trainingsSearch.trim()
-                ? trainings.filter(t => [t.title, t.description].some(v => String(v || '').toLowerCase().includes(trainingsSearch.trim().toLowerCase())))
-                : trainings;
-              if (filtered.length === 0) return (
-                <div className="rounded-[24px] bg-white/95 p-10 text-center text-slate-500 shadow">
-                  {trainingsSearch ? `Ничего не найдено по запросу «${trainingsSearch}»` : (isAdmin ? 'Нет материалов. Добавьте первый кнопкой выше.' : 'Пока нет материалов.')}
-                </div>
-              );
               const totalPages = Math.max(1, Math.ceil(filtered.length / TRAININGS_PAGE_SIZE));
               const curPage = Math.min(trainingsPage, totalPages);
               const pageItems = filtered.slice((curPage - 1) * TRAININGS_PAGE_SIZE, curPage * TRAININGS_PAGE_SIZE);
