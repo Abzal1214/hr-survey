@@ -100,24 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-              const totalPages = Math.max(1, Math.ceil(filtered.length / TRAININGS_PAGE_SIZE));
-              const curPage = Math.min(trainingsPage, totalPages);
-              const pageItems = filtered.slice((curPage - 1) * TRAININGS_PAGE_SIZE, curPage * TRAININGS_PAGE_SIZE);
-              return (
-                <>
-                  <div className="space-y-4">
-                    {pageItems.map((item) => (
-                      <div key={item._id || item.id} className="rounded-[20px] border-l-4 border-emerald-400 bg-white/95 p-6 shadow-sm">
-                        {/* ...existing code for each training item... */}
-                      </div>
-                    ))}
-                  </div>
-                  {totalPages > 1 && (
-                    <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-                      <p className="text-sm text-white/70">{filtered.length} материалов · стр. {curPage} из {totalPages}</p>
-                    </div>
-                  )}
-                {tab === 'tests' && (
                   <div>
                     {isAdmin && (
                       <div className="mb-6">
