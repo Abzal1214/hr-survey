@@ -100,24 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-      await markStepComplete(stepIndex);
-    } else {
-      setCourseQuizMsg(`❌ ${percent}% — нужно 70%+. Попробуйте ещё раз.`);
-    }
-  };
-
-  const handleCreateCourse = async () => {
-    if (!newCourse.title) { setCreateCourseMsg('Введите название'); return; }
-    if (!newCourse.steps.length) { setCreateCourseMsg('Добавьте хотя бы один шаг'); return; }
-    setSavingCourse(true);
-    const res = await fetch('/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newCourse) });
-    if (res.ok) { setCreateCourseMsg('Курс создан!'); setNewCourse({ title: '', description: '', department: '', steps: [] }); setShowCreateCourse(false); loadCourses(); }
-    else { const d = await res.json(); setCreateCourseMsg(d.error || 'Ошибка'); }
-    setSavingCourse(false);
-  };
-
-  const addStep = (type, item) => {
-    const id = String(item._id || item.id);
     if (newCourse.steps.some(s => s.refId === id)) return;
     setNewCourse(p => ({ ...p, steps: [...p.steps, { type, refId: id, title: item.title }] }));
   };
