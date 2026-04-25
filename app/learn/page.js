@@ -378,7 +378,6 @@ export default function LearnPage() {
                           <p className="text-xs text-slate-400 mt-1">{quiz.questions?.length || 0} вопросов</p>
                           <p className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1"><GoldCoin size="xs" /> +{quiz.coins ?? 3} AQUA COIN</p>
                         </div>
-<<<<<<< HEAD
                         <div className="flex items-center gap-2">
                           <KebabMenu
                             onEdit={() => {
