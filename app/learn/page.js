@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                <button onClick={() => { setShowCreate(!showCreate); setCreateMsg(''); }}
-                  className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
-                  {showCreate ? '✕ Отмена' : '+ Добавить материал'}
-                </button>
-                {showCreate && (
-                  <div className="mt-4 rounded-[28px] bg-white/95 p-6 shadow-2xl border border-slate-200">
-                    <h2 className="text-xl font-bold text-slate-900 mb-4">Новый материал</h2>
-                    <div className="space-y-4">
                       <input value={newTraining.title} onChange={e => setNewTraining(p => ({ ...p, title: e.target.value }))}
                         className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название *" />
                       <textarea value={newTraining.description} onChange={e => setNewTraining(p => ({ ...p, description: e.target.value }))}
