@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                  </div>
-                )}
-              </div>
-            )}
-            {quizzes.length === 0 ? (
-              <div className="rounded-[24px] bg-white/95 p-10 text-center text-slate-500 shadow">
-                {isAdmin ? 'Нет тестов. Создайте первый кнопкой выше.' : 'Тесты пока не добавлены.'}
-              </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 {quizzes.map((quiz) => {
