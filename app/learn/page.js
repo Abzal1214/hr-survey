@@ -15,7 +15,6 @@ export default function LearnPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-<<<<<<< HEAD
       <div className="flex gap-4 mb-8">
         <button className={tab === "materials" ? "font-bold" : ""} onClick={() => setTab("materials")}>Материалы</button>
         <button className={tab === "tests" ? "font-bold" : ""} onClick={() => setTab("tests")}>Тесты</button>
@@ -26,18 +25,16 @@ export default function LearnPage() {
         <div>
           <h2 className="text-xl font-bold mb-4">Материалы</h2>
           {trainings.length === 0 ? (
-
-            import { useState } from "react";
-            import ConfirmModal from "../components/ConfirmModal";
-            import KebabMenu from "../components/KebabMenu";
-
-            export default function LearnPage() {
-              const [tab, setTab] = useState("materials");
-              const [quizzes] = useState([]);
-              const [trainings] = useState([]);
-              const [isAdmin] = useState(true);
-              const [userResults] = useState({});
-              const [showModal, setShowModal] = useState(false);
+            <div className="text-slate-500">Нет материалов</div>
+          ) : (
+            <ul>
+              {trainings.map((t) => (
+                <li key={t.id || t._id}>{t.title}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
               return (
                 <div className="container mx-auto px-4 py-8">
