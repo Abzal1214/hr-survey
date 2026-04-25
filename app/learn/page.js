@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                    type="text"
-                    value={trainingsSearch}
-                    onChange={e => { setTrainingsSearch(e.target.value); setTrainingsPage(1); }}
-                    placeholder="Поиск по материалам..."
-                    className="w-full pl-10 pr-10 py-3 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:bg-white/30 transition text-sm"
-                  />
-                  {/* Render trainings list here, ensure each map returns a single parent */}
-                  <div className="space-y-4 mt-4">
                     {trainings.map((training) => (
                       <div key={training._id || training.id} className="rounded-[20px] border-l-4 border-emerald-400 bg-white/95 p-6 shadow-sm">
                         <div className="flex justify-between items-center">
