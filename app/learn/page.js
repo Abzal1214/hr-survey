@@ -100,34 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
-                          <option value="">Все отделы</option>
-                          <option value="Аквапарк">Аквапарк</option>
-                          <option value="Ресторан">Ресторан</option>
-                          <option value="SPA">SPA</option>
-                          <option value="Магазин">Магазин</option>
-                          <option value="Офис">Офис</option>
-                        </select>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-1">Дедлайн (необязательно)</label>
-                          <input type="date" value={newTraining.deadline} onChange={e => setNewTraining(p => ({ ...p, deadline: e.target.value }))}
-                            className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">Файлы</label>
-                          <input type="file" multiple accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                            onChange={e => setTrainingFiles(Array.from(e.target.files || []))}
-                            className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" />
-                          {trainingFiles.length > 0 && <p className="text-sm text-slate-600 mt-2">Выбрано: {trainingFiles.length}</p>}
-                        </div>
-                        {createMsg && <p className="text-sm text-red-600">{createMsg}</p>}
-                        <button onClick={handleAddTraining} disabled={saving}
-                          className="w-full rounded-2xl bg-emerald-600 text-white py-3 font-semibold hover:bg-emerald-700 transition disabled:opacity-50">
-                          {saving ? 'Сохранение...' : 'Добавить'}
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
               {message && <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm">{message}</div>}
               {trainings.length > 0 && (
