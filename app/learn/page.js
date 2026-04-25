@@ -100,44 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-
-    return (
-      <div>
-        <button onClick={() => setActiveCourse(null)} className="mb-6 text-white/80 hover:text-white flex items-center gap-2 text-sm">← Назад к курсам</button>
-        <div className="rounded-[28px] bg-white/95 p-6 shadow-2xl mb-6">
-          <h2 className="text-2xl font-extrabold text-slate-900">{activeCourse.title}</h2>
-          {activeCourse.description && <p className="text-slate-600 mt-1">{activeCourse.description}</p>}
-          <div className="mt-4">
-            <div className="flex justify-between text-sm text-slate-500 mb-1">
-              <span>Прогресс: {totalCompleted}/{steps.length} шагов</span>
-              <span>{progressPct}%</span>
-            </div>
-            <div className="h-2.5 w-full rounded-full bg-slate-200">
-              <div className="h-2.5 rounded-full bg-emerald-500 transition-all" style={{ width: `${progressPct}%` }} />
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          {steps.map((step, idx) => {
-            const isCompleted = completed.includes(idx);
-            const prevDone = idx === 0 || completed.includes(idx - 1);
-            const locked = !prevDone && !isCompleted;
-            const material = step.type === 'material' ? trainings.find(t => String(t._id || t.id) === step.refId) : null;
-            const quiz = step.type === 'quiz' ? quizzes.find(q => String(q._id || q.id) === step.refId) : null;
-            const quizPassed = step.type === 'quiz' && quiz ? userResults[step.refId]?.passed : false;
-            const isActiveQuizStep = courseQuizResult?.stepIndex === idx;
-
-            return (
-              <div key={idx} className={`rounded-[20px] bg-white/95 shadow-lg overflow-hidden transition-opacity ${locked ? 'opacity-50' : ''}`}>
-                {/* Step header */}
-                <div className={`flex items-center gap-3 px-6 py-4 border-b border-slate-100 ${isCompleted ? 'bg-emerald-50' : 'bg-slate-50'}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${isCompleted ? 'bg-emerald-500 text-white' : locked ? 'bg-slate-200 text-slate-400' : 'bg-sky-100 text-sky-700'}`}>
-                    {isCompleted ? '✓' : locked ? '🔒' : idx + 1}
-                  </div>
-                  <div className="flex-1">
-                    <span className="text-xs uppercase tracking-widest text-slate-400 font-semibold">{step.type === 'material' ? 'Материал' : 'Тест'}</span>
-                    <p className="font-bold text-slate-900 text-sm">{step.title}</p>
                   </div>
                   {isCompleted && <span className="text-xs bg-emerald-100 text-emerald-700 rounded-full px-3 py-1 font-semibold">✓ Завершён</span>}
                   {locked && <span className="text-xs bg-slate-100 text-slate-500 rounded-full px-3 py-1 font-semibold">🔒 Заблокирован</span>}
