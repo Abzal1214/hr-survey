@@ -100,64 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                                      <input type="radio" name={`cq-${idx}-${qi}`} checked={courseQuizAnswers[qi] === oi} onChange={() => setCourseQuizAnswers(p => ({ ...p, [qi]: oi }))} className="accent-emerald-600" />
-                                      {opt}
-                                    </label>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                            <button type="submit" disabled={Object.keys(courseQuizAnswers).length < (quiz.questions?.length || 0)}
-                              className="rounded-2xl bg-emerald-600 text-white px-6 py-2.5 font-semibold text-sm hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                              Завершить тест
-                            </button>
-                          </form>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        {progressPct === 100 && (
-          <div className="mt-6 rounded-[24px] bg-gradient-to-r from-emerald-500 to-teal-400 p-8 text-center text-white shadow-2xl">
-            <div className="text-5xl mb-3">🎓</div>
-            <h3 className="text-2xl font-extrabold">Курс пройден!</h3>
-            <p className="mt-2 text-white/90">Вы завершили все шаги курса «{activeCourse.title}».</p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Course list
-  return (
-    <div>
-      {isAdmin && (
-        <div className="mb-6">
-          <button onClick={() => { setShowCreateCourse(!showCreateCourse); setCreateCourseMsg(''); }}
-            className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
-            {showCreateCourse ? '✕ Отмена' : '+ Создать курс'}
-          </button>
-          {showCreateCourse && (
-            <div className="mt-4 rounded-[28px] bg-white/95 p-6 shadow-2xl border border-slate-200">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">Новый курс</h2>
-              <div className="space-y-4">
-                <input value={newCourse.title} onChange={e => setNewCourse(p => ({ ...p, title: e.target.value }))}
-                  className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название курса *" />
-                <textarea value={newCourse.description} onChange={e => setNewCourse(p => ({ ...p, description: e.target.value }))}
-                  className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900 min-h-[70px]" placeholder="Описание" />
-                <select value={newCourse.department} onChange={e => setNewCourse(p => ({ ...p, department: e.target.value }))}
-                  className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
-                  <option value="">Все отделы</option>
-                  <option value="Аквапарк">Аквапарк</option>
-                  <option value="Ресторан">Ресторан</option>
-                  <option value="SPA">SPA</option>
-                  <option value="Магазин">Магазин</option>
-                  <option value="Офис">Офис</option>
-                </select>
 
                 {/* Steps constructor */}
                 <div>
