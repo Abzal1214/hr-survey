@@ -100,24 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-
-// ── CourseTab component ──────────────────────────────────────────────────────
-
-function CourseTab({ isAdmin, currentUser, courses, courseProgresses, trainings, quizzes, userResults,
-  activeCourse, setActiveCourse, activeCourseProgress, setActiveCourseProgress,
-  showCreateCourse, setShowCreateCourse, newCourse, setNewCourse, createCourseMsg, setCreateCourseMsg,
-  savingCourse, setSavingCourse, loadCourses, loadCourseProgresses,
-  courseQuizAnswers, setCourseQuizAnswers, courseQuizResult, setCourseQuizResult, courseQuizMsg, setCourseQuizMsg,
-  setConfirmModal }) {
-
-  // Mark material step complete
-  const markStepComplete = async (stepIndex) => {
-    if (!currentUser?.phone) return;
-    const courseId = String(activeCourse._id || activeCourse.id);
-    const res = await fetch('/api/course-progress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ courseId, phone: currentUser.phone, stepIndex }) });
-    if (res.ok) {
-      const updated = await res.json();
-      setActiveCourseProgress(updated);
       if (currentUser?.phone) loadCourseProgresses(currentUser.phone);
     }
   };
