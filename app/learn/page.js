@@ -100,44 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                  <div>
-                    {isAdmin && (
-                      <div className="mb-6">
-                        <button onClick={() => { setShowCreateQuiz(!showCreateQuiz); setCreateQuizMsg(''); }}
-                          className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
-                          {showCreateQuiz ? '✕ Отмена' : '+ Добавить тест'}
-                        </button>
-                        {showCreateQuiz && (
-                          <div className="mt-4 rounded-[28px] bg-white/95 p-6 shadow-2xl border border-slate-200">
-                            <h2 className="text-xl font-bold text-slate-900 mb-4">Новый тест</h2>
-                            <div className="space-y-4">
-                              <input value={newQuiz.title} onChange={e => setNewQuiz(p => ({ ...p, title: e.target.value }))}
-                                className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название теста *" />
-                              <input value={newQuiz.description} onChange={e => setNewQuiz(p => ({ ...p, description: e.target.value }))}
-                                className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Описание" />
-                              <select value={newQuiz.department} onChange={e => setNewQuiz(p => ({ ...p, department: e.target.value }))}
-                                className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
-                                <option value="">Все отделы</option>
-                                <option value="Аквапарк">Аквапарк</option>
-                                <option value="Ресторан">Ресторан</option>
-                                <option value="SPA">SPA</option>
-                                <option value="Магазин">Магазин</option>
-                                <option value="Офис">Офис</option>
-                              </select>
-                              <div className="flex items-center gap-3">
-                                <label className="text-sm font-semibold text-slate-700 flex items-center gap-1"><GoldCoin size="xs" /> AQUA COIN:</label>
-                        <input type="number" min="1" max="100" value={newQuiz.coins} onChange={e => setNewQuiz(p => ({ ...p, coins: Number(e.target.value) }))}
-                          className="w-24 rounded-2xl border border-slate-300 p-3 text-slate-900" />
-                      </div>
-                      {newQuiz.questions.map((q, qi) => (
-                        <div key={qi} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="font-semibold text-slate-700 text-sm">Вопрос {qi + 1}</span>
-                            {newQuiz.questions.length > 1 && <button onClick={() => removeQuestion(qi)} className="text-red-500 text-xs hover:text-red-700">✕ Удалить</button>}
-                          </div>
-                          <input value={q.text} onChange={e => handleQuestionChange(qi, 'text', e.target.value)}
-                            className="w-full rounded-xl border border-slate-300 p-2 text-slate-900 text-sm mb-3" placeholder="Текст вопроса *" />
-                          <div className="space-y-2 mb-2">
                             {q.options.map((opt, oi) => (
                               <div key={oi} className="flex items-center gap-2">
                                 <input type="radio" name={`correct-${qi}`} checked={q.correct === opt && opt !== ''} onChange={() => opt && handleQuestionChange(qi, 'correct', opt)} className="accent-emerald-600 shrink-0" />
