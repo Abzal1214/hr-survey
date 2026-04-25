@@ -100,9 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-slate-900">{course.title}</h3>
-                    {course.description && <p className="text-sm text-slate-500 mt-1">{course.description}</p>}
                     <p className="text-xs text-slate-400 mt-1">{total} шагов · {course.steps?.filter(s => s.type === 'material').length || 0} материалов, {course.steps?.filter(s => s.type === 'quiz').length || 0} тестов</p>
                   </div>
                   {pct === 100 && <span className="shrink-0 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1">🎓 Завершён</span>}
