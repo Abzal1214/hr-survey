@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-        </div>
-
-        {/* Tab content fragment to ensure proper JSX structure */}
-        {/* Only one parent for tab content, no extra fragment needed */}
-        {tab === 'materials' && (
-          <div>
-            {isAdmin && (
-              <div className="mb-6">
                 <button onClick={() => { setShowCreate(!showCreate); setCreateMsg(''); }}
                   className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
                   {showCreate ? '✕ Отмена' : '+ Добавить материал'}
