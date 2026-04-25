@@ -27,32 +27,35 @@ export default function LearnPage() {
                               </div>
                               {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
                             </div>
-                            <div className="flex items-center gap-2 mt-auto">
-                              {isAdmin ? (
-                                <KebabMenu
-                                  onEdit={() => {
-                                    setShowCreateQuiz(false);
-                                    setCreateQuizMsg('');
-                                    setEditQuiz({ ...quiz, id: qid });
-                                  }}
-                                  onDelete={() => handleDeleteQuiz(qid)}
-                                  onToggleActive={async () => {
-                                    await fetch('/api/quizzes', {
-                                      method: 'PATCH',
-                                      headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
-                                    });
-                                    loadQuizzes(currentUser);
-
-                                  }}
-                                  isActive={quiz.isActive}
-                                />
-                              ) : (
-                                <button onClick={() => startQuiz(quiz)}
-                                  className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
-                                  {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
-                                </button>
-                              )}
+                            <div className="flex items-center gap-2">
+                              <KebabMenu
+                                onEdit={() => {
+                                  setShowCreateQuiz(false);
+                                  setCreateQuizMsg('');
+                                  setEditQuiz({ ...quiz, id: qid });
+                                }}
+                                onDelete={() => handleDeleteQuiz(qid)}
+                                onToggleActive={async () => {
+                                  await fetch('/api/quizzes', {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
+                                  });
+                                  loadQuizzes(currentUser);
+                                }}
+                                isActive={quiz.isActive}
+                              />
+                              {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 mt-auto">
+                            <button
+                              onClick={() => startQuiz(quiz)}
+                              className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
+                              disabled={res?.passed}
+                            >
+                              {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
+                            </button>
                             </div>
                           </div>
                         );
@@ -376,6 +379,7 @@ export default function LearnPage() {
                           <p className="text-xs text-slate-400 mt-1">{quiz.questions?.length || 0} вопросов</p>
                           <p className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1"><GoldCoin size="xs" /> +{quiz.coins ?? 3} AQUA COIN</p>
                         </div>
+<<<<<<< HEAD
                         <div className="flex items-center gap-2">
                           <KebabMenu
                             onEdit={() => {
@@ -400,6 +404,22 @@ export default function LearnPage() {
                       <div className="flex items-center gap-2 mt-auto">
                         <button onClick={() => startQuiz(quiz)}
                           className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}>
+=======
+                        {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
+                      </div>
+                      <div className="flex items-center gap-2 mt-auto">
+                        <KebabMenu
+                          onEdit={() => alert('Редактирование теста пока не реализовано на этой странице')}
+                          onDelete={() => handleDeleteQuiz(qid)}
+                          onToggleActive={() => alert('Активация/деактивация теста пока не реализована на этой странице')}
+                          isActive={quiz.isActive}
+                        />
+                        <button
+                          onClick={() => startQuiz(quiz)}
+                          className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
+                          disabled={res?.passed}
+                        >
+>>>>>>> 1061ea0 (feat: show 'Начать' button for all users on quiz cards)
                           {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
                         </button>
                       </div>
