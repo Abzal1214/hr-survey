@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-          {tab === 'tests' && (
-            <div>
-              {isAdmin && (
                 <div className="mb-6">
                   <button onClick={() => { setShowCreateQuiz(!showCreateQuiz); setCreateQuizMsg(''); }}
                     className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg">
