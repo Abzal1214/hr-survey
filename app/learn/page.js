@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                    <p className="text-xs text-slate-400 mt-1">{total} шагов · {course.steps?.filter(s => s.type === 'material').length || 0} материалов, {course.steps?.filter(s => s.type === 'quiz').length || 0} тестов</p>
-                  </div>
-                  {pct === 100 && <span className="shrink-0 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1">🎓 Завершён</span>}
-                </div>
-                {total > 0 && (
-                  <div>
-                    <div className="flex justify-between text-xs text-slate-400 mb-1"><span>{completed}/{total}</span><span>{pct}%</span></div>
-                    <div className="h-2 w-full rounded-full bg-slate-200">
                       <div className="h-2 rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }} />
                     </div>
                   </div>
