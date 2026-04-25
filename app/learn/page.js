@@ -100,8 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-              <div key={cid} className="rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-slate-900">{course.title}</h3>
                     {course.description && <p className="text-sm text-slate-500 mt-1">{course.description}</p>}
