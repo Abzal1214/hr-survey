@@ -47,7 +47,6 @@ export default function LearnPage() {
                               />
                               {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
                             </div>
-                          </div>
                           <div className="flex items-center gap-2 mt-auto">
                             <button
                               onClick={() => startQuiz(quiz)}
@@ -56,8 +55,8 @@ export default function LearnPage() {
                             >
                               {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
                             </button>
-                            </div>
                           </div>
+                        </div>
                         );
                       })}
                     </div>
