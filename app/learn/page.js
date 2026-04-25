@@ -100,64 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                  </div>
-                  {isCompleted && <span className="text-xs bg-emerald-100 text-emerald-700 rounded-full px-3 py-1 font-semibold">✓ Завершён</span>}
-                  {locked && <span className="text-xs bg-slate-100 text-slate-500 rounded-full px-3 py-1 font-semibold">🔒 Заблокирован</span>}
-                </div>
-
-                {/* Step content (only if unlocked) */}
-                {!locked && (
-                  <div className="px-6 py-5">
-                    {step.type === 'material' && material && (
-                      <div>
-                        {material.description && <p className="text-slate-700 mb-4">{material.description}</p>}
-                        {material.attachments?.length > 0 && (
-                          <div className="space-y-3 mb-4">
-                            {material.attachments.map((url, i) => {
-                              const name = url.split('/').pop();
-                              const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(name);
-                              return (
-                                <div key={i} className="rounded-xl bg-slate-50 border border-slate-200 p-3">
-                                  {isImg ? <img src={url} alt={name} className="w-full max-h-64 object-contain rounded-lg" />
-                                    : <a href={url} target="_blank" rel="noreferrer" className="text-sky-600 hover:text-sky-700 text-sm font-medium">{name}</a>}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                        {!isCompleted && (
-                          <button onClick={() => markStepComplete(idx)}
-                            className="rounded-2xl bg-emerald-600 text-white px-6 py-2.5 font-semibold text-sm hover:bg-emerald-700 transition">
-                            ✓ Прочитал, продолжить
-                          </button>
-                        )}
-                      </div>
-                    )}
-                    {step.type === 'quiz' && quiz && (
-                      <div>
-                        <p className="text-slate-600 text-sm mb-1">{quiz.description}</p>
-                        <p className="text-xs text-slate-400 mb-4">{quiz.questions?.length || 0} вопросов · +{quiz.coins ?? 3} AQUA COIN</p>
-                        {(isCompleted || quizPassed) ? (
-                          <p className="text-emerald-600 font-semibold text-sm">✓ Тест пройден</p>
-                        ) : isActiveQuizStep && courseQuizResult ? (
-                          <div className="text-center">
-                            <p className={`text-lg font-bold mb-2 ${courseQuizResult.percent >= 70 ? 'text-emerald-600' : 'text-red-500'}`}>{courseQuizResult.percent}%</p>
-                            <p className="text-slate-600 text-sm mb-4">{courseQuizMsg}</p>
-                            {courseQuizResult.percent < 70 && (
-                              <button onClick={() => { setCourseQuizAnswers({}); setCourseQuizResult(null); setCourseQuizMsg(''); }}
-                                className="rounded-2xl bg-emerald-600 text-white px-6 py-2.5 font-semibold text-sm hover:bg-emerald-700 transition">
-                                Попробовать ещё раз
-                              </button>
-                            )}
-                          </div>
-                        ) : (
-                          <form onSubmit={(e) => handleCourseQuizSubmit(e, quiz, idx)} className="space-y-4">
-                            {quiz.questions.map((q, qi) => (
-                              <div key={qi} className="rounded-xl bg-slate-50 p-4">
-                                <p className="font-semibold text-slate-900 text-sm mb-3"><span className="text-emerald-600">{qi + 1}.</span> {q.text}</p>
-                                <div className="space-y-2">
-                                  {q.options.map((opt, oi) => (
-                                    <label key={oi} className={`flex items-center gap-2 cursor-pointer rounded-xl px-3 py-2 border text-sm transition ${courseQuizAnswers[qi] === oi ? 'bg-emerald-50 border-emerald-400' : 'bg-white border-slate-200 hover:border-emerald-300'}`}>
                                       <input type="radio" name={`cq-${idx}-${qi}`} checked={courseQuizAnswers[qi] === oi} onChange={() => setCourseQuizAnswers(p => ({ ...p, [qi]: oi }))} className="accent-emerald-600" />
                                       {opt}
                                     </label>
