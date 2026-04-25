@@ -100,14 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-                  className="w-full pl-10 pr-10 py-3 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:bg-white/30 transition text-sm"
-                />
-                {trainingsSearch && (
-                  <button onClick={() => { setTrainingsSearch(''); setTrainingsPage(1); }} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/60 hover:text-white text-sm">✕</button>
-                )}
-              </div>
-            )}
-            {(() => {
               const filtered = trainingsSearch.trim()
                 ? trainings.filter(t => [t.title, t.description].some(v => String(v || '').toLowerCase().includes(trainingsSearch.trim().toLowerCase())))
                 : trainings;
