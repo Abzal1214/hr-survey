@@ -100,24 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-          <p className="mt-4 max-w-xl mx-auto text-white/80 text-lg">Учебные материалы и тесты для сотрудников аквапарков.</p>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-5xl px-6 pb-16">
-        <div className="flex gap-2 mb-8 bg-white/20 backdrop-blur-sm rounded-2xl p-1 w-fit">
-          <button onClick={() => setTab('materials')}
-            className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition ${tab === 'materials' ? 'bg-white text-slate-900 shadow' : 'text-white hover:bg-white/20'}`}>
-            📚 Материалы
-          </button>
-          <button onClick={() => setTab('tests')}
-            className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition ${tab === 'tests' ? 'bg-white text-slate-900 shadow' : 'text-white hover:bg-white/20'}`}>
-            🧪 Тесты
-          </button>
-          <button onClick={() => setTab('courses')}
-            className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition ${tab === 'courses' ? 'bg-white text-slate-900 shadow' : 'text-white hover:bg-white/20'}`}>
-            🎓 Курсы
-          </button>
         </div>
 
         {/* Tab content fragment to ensure proper JSX structure */}
