@@ -1,65 +1,80 @@
-﻿'use client';
+﻿"use client";
 
-import { useEffect, useState } from 'react';
-import ConfirmModal from '../components/ConfirmModal';
-import KebabMenu from '../components/KebabMenu';
+import { useState } from "react";
+import ConfirmModal from "../components/ConfirmModal";
+import KebabMenu from "../components/KebabMenu";
 
 export default function LearnPage() {
+  const [tab, setTab] = useState("materials");
+  // Примерные данные, замените на реальные из props/fetch
+  const [quizzes] = useState([]);
+  const [trainings] = useState([]);
+  const [isAdmin] = useState(true);
+  const [userResults] = useState({});
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="container mx-auto px-4 py-8">
-      {quizzes.length === 0 ? (
-        <div className="rounded-[24px] bg-white/95 p-10 text-center text-slate-500 shadow">
-          {isAdmin ? 'Нет тестов. Создайте первый кнопкой выше.' : 'Тесты пока не добавлены.'}
+      <div className="flex gap-4 mb-8">
+        <button className={tab === "materials" ? "font-bold" : ""} onClick={() => setTab("materials")}>Материалы</button>
+        <button className={tab === "tests" ? "font-bold" : ""} onClick={() => setTab("tests")}>Тесты</button>
+        <button className={tab === "courses" ? "font-bold" : ""} onClick={() => setTab("courses")}>Курсы</button>
+      </div>
+
+      {tab === "materials" && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Материалы</h2>
+          {trainings.length === 0 ? (
+            <div className="text-slate-500">Нет материалов</div>
+          ) : (
+            <ul>
+              {trainings.map((t) => (
+                <li key={t.id || t._id}>{t.title}</li>
+              ))}
+            </ul>
+          )}
         </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {quizzes.map((quiz) => {
-            const qid = String(quiz._id || quiz.id);
-            const res = userResults[qid];
-                        return (
-                          <div key={qid} className="rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <h3 className="text-lg font-bold text-slate-900">{quiz.title}</h3>
-                                {quiz.description && <p className="text-sm text-slate-500 mt-1">{quiz.description}</p>}
-                                <p className="text-xs text-slate-400 mt-1">{quiz.questions?.length || 0} вопросов</p>
-                                <p className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1"><GoldCoin size="xs" /> +{quiz.coins ?? 3} AQUA COIN</p>
-                              </div>
-                              {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <KebabMenu
-                                onEdit={() => {
-                                  setShowCreateQuiz(false);
-                                  setCreateQuizMsg('');
-                                  setEditQuiz({ ...quiz, id: qid });
-                                }}
-                                onDelete={() => handleDeleteQuiz(qid)}
-                                onToggleActive={async () => {
-                                  await fetch('/api/quizzes', {
-                                    method: 'PATCH',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
-                                  });
-                                  loadQuizzes(currentUser);
-                                }}
-                                isActive={quiz.isActive}
-                              />
-                              {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
-                            </div>
-                          <div className="flex items-center gap-2 mt-auto">
-                            <button
-                              onClick={() => startQuiz(quiz)}
-                              className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
-                              disabled={res?.passed}
-                            >
-                              {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
-                            </button>
-                          </div>
-                        </div>
-                        );
+      )}
+
+      {tab === "tests" && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Тесты</h2>
+          {quizzes.length === 0 ? (
+            <div className="text-slate-500">Нет тестов</div>
+          ) : (
+            <ul>
+              {quizzes.map((quiz) => (
+                <li key={quiz.id || quiz._id} className="mb-4 p-4 border rounded">
+                  <div className="flex justify-between items-center">
+                    <span>{quiz.title}</span>
+                    <KebabMenu onEdit={() => {}} onDelete={() => {}} isActive={quiz.isActive} />
+                  </div>
+                  <button className="mt-2 px-4 py-2 bg-emerald-600 text-white rounded" onClick={() => setShowModal(true)}>
+                    Начать
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {tab === "courses" && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Курсы</h2>
+          <div className="text-slate-500">Раздел в разработке</div>
+        </div>
+      )}
+
+      {showModal && (
+        <ConfirmModal
+          message="Вы уверены, что хотите начать тест?"
+          onConfirm={() => setShowModal(false)}
+          onCancel={() => setShowModal(false)}
+        />
+      )}
+    </div>
                       })}
-                    </div>
                   )}
 
                   {/* Render the editQuiz modal only once, after the quizzes list */}
