@@ -100,9 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-          {isAdmin ? 'Нет курсов. Создайте первый кнопкой выше.' : 'Курсы пока не добавлены.'}
-        </div>
-      ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {courses.map((course) => {
             const cid = String(course._id || course.id);
