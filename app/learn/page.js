@@ -100,24 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-      if (currentUser?.phone) loadCourseProgresses(currentUser.phone);
-    }
-  };
-
-  // Submit quiz step
-  const handleCourseQuizSubmit = async (e, quiz, stepIndex) => {
-    e.preventDefault();
-    const questions = quiz.questions || [];
-    const correct = questions.filter((q, i) => q.options[courseQuizAnswers[i]] === q.correct).length;
-    const percent = Math.round((correct / questions.length) * 100);
-    setCourseQuizResult({ percent, correct, total: questions.length, stepIndex });
-    if (percent >= 70) {
-      // save test result
-      try {
-        await fetch('/api/tests', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: currentUser?.phone, quizId: String(quiz._id || quiz.id), score: percent, answers: courseQuizAnswers, timestamp: new Date().toISOString() }) });
-      } catch {}
-      setCourseQuizMsg('✅ Тест пройден! Шаг завершён.');
       await markStepComplete(stepIndex);
     } else {
       setCourseQuizMsg(`❌ ${percent}% — нужно 70%+. Попробуйте ещё раз.`);
