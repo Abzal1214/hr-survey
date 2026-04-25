@@ -100,24 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-    if (newCourse.steps.some(s => s.refId === id)) return;
-    setNewCourse(p => ({ ...p, steps: [...p.steps, { type, refId: id, title: item.title }] }));
-  };
-  const removeStep = (idx) => setNewCourse(p => ({ ...p, steps: p.steps.filter((_, i) => i !== idx) }));
-  const moveStep = (idx, dir) => {
-    const steps = [...newCourse.steps];
-    const to = idx + dir;
-    if (to < 0 || to >= steps.length) return;
-    [steps[idx], steps[to]] = [steps[to], steps[idx]];
-    setNewCourse(p => ({ ...p, steps }));
-  };
-
-  // Active course view
-  if (activeCourse) {
-    const steps = activeCourse.steps || [];
-    const completed = activeCourseProgress?.completedSteps || [];
-    const totalCompleted = completed.length;
-    const progressPct = steps.length ? Math.round((totalCompleted / steps.length) * 100) : 0;
 
     return (
       <div>
