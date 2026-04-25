@@ -100,34 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-            trainings={trainings}
-            quizzes={quizzes}
-            userResults={userResults}
-            activeCourse={activeCourse}
-            setActiveCourse={(c) => { setActiveCourse(c); setCourseQuizAnswers({}); setCourseQuizResult(null); setCourseQuizMsg(''); if (c && currentUser?.phone) { fetch(`/api/course-progress?courseId=${c._id || c.id}&phone=${encodeURIComponent(currentUser.phone)}`).then(r=>r.json()).then(p=>setActiveCourseProgress(p||{completedSteps:[]})).catch(()=>{}); } }}
-            activeCourseProgress={activeCourseProgress}
-            setActiveCourseProgress={setActiveCourseProgress}
-            showCreateCourse={showCreateCourse}
-            setShowCreateCourse={setShowCreateCourse}
-            newCourse={newCourse}
-            setNewCourse={setNewCourse}
-            createCourseMsg={createCourseMsg}
-            setCreateCourseMsg={setCreateCourseMsg}
-            savingCourse={savingCourse}
-            setSavingCourse={setSavingCourse}
-            loadCourses={loadCourses}
-            loadCourseProgresses={loadCourseProgresses}
-            courseQuizAnswers={courseQuizAnswers}
-            setCourseQuizAnswers={setCourseQuizAnswers}
-            courseQuizResult={courseQuizResult}
-            setCourseQuizResult={setCourseQuizResult}
-            courseQuizMsg={courseQuizMsg}
-            setCourseQuizMsg={setCourseQuizMsg}
-            setConfirmModal={setConfirmModal}
-          />
-        )}
-        {confirmModal && <ConfirmModal message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(null)} />}
-      );
 
 // ── CourseTab component ──────────────────────────────────────────────────────
 
