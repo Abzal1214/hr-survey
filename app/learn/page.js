@@ -15,6 +15,7 @@ export default function LearnPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+<<<<<<< HEAD
       <div className="flex gap-4 mb-8">
         <button className={tab === "materials" ? "font-bold" : ""} onClick={() => setTab("materials")}>Материалы</button>
         <button className={tab === "tests" ? "font-bold" : ""} onClick={() => setTab("tests")}>Тесты</button>
@@ -25,104 +26,83 @@ export default function LearnPage() {
         <div>
           <h2 className="text-xl font-bold mb-4">Материалы</h2>
           {trainings.length === 0 ? (
-            <div className="text-slate-500">Нет материалов</div>
-          ) : (
-            <ul>
-              {trainings.map((t) => (
-                <li key={t.id || t._id}>{t.title}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
 
-      {tab === "tests" && (
-        <div>
-          <h2 className="text-xl font-bold mb-4">Тесты</h2>
-          {quizzes.length === 0 ? (
-            <div className="text-slate-500">Нет тестов</div>
-          ) : (
-            <ul>
-              {quizzes.map((quiz) => (
-                <li key={quiz.id || quiz._id} className="mb-4 p-4 border rounded">
-                  <div className="flex justify-between items-center">
-                    <span>{quiz.title}</span>
-                    <KebabMenu onEdit={() => {}} onDelete={() => {}} isActive={quiz.isActive} />
+            import { useState } from "react";
+            import ConfirmModal from "../components/ConfirmModal";
+            import KebabMenu from "../components/KebabMenu";
+
+            export default function LearnPage() {
+              const [tab, setTab] = useState("materials");
+              const [quizzes] = useState([]);
+              const [trainings] = useState([]);
+              const [isAdmin] = useState(true);
+              const [userResults] = useState({});
+              const [showModal, setShowModal] = useState(false);
+
+              return (
+                <div className="container mx-auto px-4 py-8">
+                  <div className="flex gap-4 mb-8">
+                    <button className={tab === "materials" ? "font-bold" : ""} onClick={() => setTab("materials")}>Материалы</button>
+                    <button className={tab === "tests" ? "font-bold" : ""} onClick={() => setTab("tests")}>Тесты</button>
+                    <button className={tab === "courses" ? "font-bold" : ""} onClick={() => setTab("courses")}>Курсы</button>
                   </div>
-                  <button className="mt-2 px-4 py-2 bg-emerald-600 text-white rounded" onClick={() => setShowModal(true)}>
-                    Начать
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
 
-      {tab === "courses" && (
-        <div>
-          <h2 className="text-xl font-bold mb-4">Курсы</h2>
-          <div className="text-slate-500">Раздел в разработке</div>
-        </div>
-      )}
-
-      {showModal && (
-        <ConfirmModal
-          message="Вы уверены, что хотите начать тест?"
-          onConfirm={() => setShowModal(false)}
-          onCancel={() => setShowModal(false)}
-        />
-      )}
-    </div>
-                      })}
-                  )}
-
-                  {/* Render the editQuiz modal only once, after the quizzes list */}
-                  {editQuiz && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
-                        <button onClick={() => setEditQuiz(null)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
-                        <h2 className="text-xl font-bold mb-4">Редактировать тест</h2>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-semibold mb-1">Название</label>
-                            <input type="text" value={editQuiz.title} onChange={e => setEditQuiz(p => ({ ...p, title: e.target.value }))} className="w-full rounded border p-2" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-semibold mb-1">Описание</label>
-                            <textarea value={editQuiz.description} onChange={e => setEditQuiz(p => ({ ...p, description: e.target.value }))} className="w-full rounded border p-2" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-semibold mb-1">Попыток в день</label>
-                            <input type="number" min="1" value={editQuiz.attemptsPerDay ?? ''} onChange={e => setEditQuiz(p => ({ ...p, attemptsPerDay: Number(e.target.value) }))} className="w-full rounded border p-2" />
-                          </div>
-                          <div className="flex gap-2 mt-4">
-                            <button onClick={handleSaveEditQuiz} className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer">Сохранить</button>
-                            <button onClick={() => setEditQuiz(null)} className="rounded-xl bg-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold hover:bg-slate-300 active:scale-95 transition-all cursor-pointer">Отмена</button>
-                          </div>
-                          {createQuizMsg && <p className="text-sm text-red-600 mt-2">{createQuizMsg}</p>}
-                        </div>
-                      </div>
+                  {tab === "materials" && (
+                    <div>
+                      <h2 className="text-xl font-bold mb-4">Материалы</h2>
+                      {trainings.length === 0 ? (
+                        <div className="text-slate-500">Нет материалов</div>
+                      ) : (
+                        <ul>
+                          {trainings.map((t) => (
+                            <li key={t.id || t._id}>{t.title}</li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                   )}
 
+                  {tab === "tests" && (
+                    <div>
+                      <h2 className="text-xl font-bold mb-4">Тесты</h2>
+                      {quizzes.length === 0 ? (
+                        <div className="text-slate-500">Нет тестов</div>
+                      ) : (
+                        <ul>
+                          {quizzes.map((quiz) => (
+                            <li key={quiz.id || quiz._id} className="mb-4 p-4 border rounded">
+                              <div className="flex justify-between items-center">
+                                <span>{quiz.title}</span>
+                                <KebabMenu onEdit={() => {}} onDelete={() => {}} isActive={quiz.isActive} />
+                              </div>
+                              <button className="mt-2 px-4 py-2 bg-emerald-600 text-white rounded" onClick={() => setShowModal(true)}>
+                                Начать
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
 
-                <div>
-                  <button
-                    onClick={() => setShowCreate(!showCreate)}
-                    className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 font-semibold transition shadow-lg mb-4"
-                  >
-                    {showCreate ? '✕ Отмена' : '+ Добавить материал'}
-                  </button>
-                  {showCreate && (
-                    <div className="mt-4 rounded-[28px] bg-white/95 p-6 shadow-2xl border border-slate-200">
-                      <h2 className="text-xl font-bold text-slate-900 mb-4">Новый материал</h2>
-                      <div className="space-y-4">
-                        <input value={newTraining.title} onChange={e => setNewTraining(p => ({ ...p, title: e.target.value }))}
-                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900" placeholder="Название *" />
-                        <textarea value={newTraining.description} onChange={e => setNewTraining(p => ({ ...p, description: e.target.value }))}
-                          className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900 min-h-[80px]" placeholder="Описание" />
-                        <select value={newTraining.department} onChange={e => setNewTraining(p => ({ ...p, department: e.target.value }))}
+                  {tab === "courses" && (
+                    <div>
+                      <h2 className="text-xl font-bold mb-4">Курсы</h2>
+                      <div className="text-slate-500">Раздел в разработке</div>
+                    </div>
+                  )}
+
+                  {showModal && (
+                    <ConfirmModal
+                      message="Вы уверены, что хотите начать тест?"
+                      onConfirm={() => setShowModal(false)}
+                      onCancel={() => setShowModal(false)}
+                    />
+                  )}
+                </div>
+              );
+            }
+            // --- END OF FILE ---
                           className="w-full rounded-2xl border border-slate-300 p-3 text-slate-900">
                           <option value="">Все отделы</option>
                           <option value="Аквапарк">Аквапарк</option>
