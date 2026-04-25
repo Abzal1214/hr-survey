@@ -100,64 +100,6 @@ export default function LearnPage() {
               );
             }
             // --- END OF FILE ---
-            ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {quizzes.map((quiz) => {
-                  const qid = String(quiz._id || quiz.id);
-                  const res = userResults[qid];
-                  return (
-                    <div key={qid} className="rounded-[24px] bg-white/95 p-6 shadow-xl flex flex-col gap-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h3 className="text-lg font-bold text-slate-900">{quiz.title}</h3>
-                          {quiz.description && <p className="text-sm text-slate-500 mt-1">{quiz.description}</p>}
-                          <p className="text-xs text-slate-400 mt-1">{quiz.questions?.length || 0} вопросов</p>
-                          <p className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1"><GoldCoin size="xs" /> +{quiz.coins ?? 3} AQUA COIN</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <KebabMenu
-                            onEdit={() => {
-                              setShowCreateQuiz(false);
-                              setCreateQuizMsg('');
-                              setEditQuiz({ ...quiz, id: qid });
-                            }}
-                            onDelete={() => handleDeleteQuiz(qid)}
-                            onToggleActive={async () => {
-                              await fetch('/api/quizzes', {
-                                method: 'PATCH',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ id: qid, isActive: !quiz.isActive })
-                              });
-                              loadQuizzes(currentUser);
-                            }}
-                            isActive={quiz.isActive}
-                          />
-                          {res && <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${res.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>{res.passed ? `✓ ${res.score}%` : `✗ ${res.score}%`}</span>}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 mt-auto">
-                        <button
-                          onClick={() => startQuiz(quiz)}
-                          className={`flex-1 rounded-2xl py-2 font-semibold text-sm transition ${res?.passed ? 'bg-slate-100 text-slate-500 hover:bg-slate-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
-                          disabled={res?.passed}
-                        >
-                          {res?.passed ? '🏆 Пройден' : res ? '🔁 Пересдать' : '🚀 Начать'}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {tab === 'courses' && (
-          <CourseTab
-            isAdmin={isAdmin}
-            currentUser={currentUser}
-            courses={courses}
-            courseProgresses={courseProgresses}
             trainings={trainings}
             quizzes={quizzes}
             userResults={userResults}
