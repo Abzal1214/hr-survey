@@ -315,7 +315,7 @@ export default function LearnPage() {
             {/* Модалка добавления теста */}
             {showAddTestModal && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm overflow-y-auto">
-                <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl min-w-[min(90vw,600px)] relative animate-scale-in max-h-[90vh] overflow-y-auto">
+                <div className="bg-white rounded-2xl shadow-2xl p-12 w-full max-w-6xl min-w-[min(98vw,1100px)] relative animate-scale-in max-h-[95vh] overflow-y-auto">
                   <button onClick={() => setShowAddTestModal(false)} className="absolute top-3 right-3 text-slate-400 hover:text-slate-700 text-2xl">×</button>
                   <h2 className="text-3xl font-extrabold mb-6 text-sky-700">Добавить тест</h2>
                   <form onSubmit={handleAddTest}>
