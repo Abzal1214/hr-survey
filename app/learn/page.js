@@ -14,6 +14,22 @@ export default function LearnPage() {
   const [trainings, setTrainings] = useState([]);
   const [loadingTrainings, setLoadingTrainings] = useState(false);
   const [showAddTestModal, setShowAddTestModal] = useState(false);
+  // Состояния для создания теста (только UI)
+  const [newTest, setNewTest] = useState({
+    title: "",
+    timeLimit: 15,
+    startAt: "",
+    endAt: "",
+    reward: 3,
+    rewardThreshold: 70,
+    questions: [
+      {
+        text: "",
+        options: ["", "", "", ""],
+        correct: 0
+      }
+    ]
+  });
   const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
   const [newTestTitle, setNewTestTitle] = useState("");
   const [newMaterialTitle, setNewMaterialTitle] = useState("");
@@ -259,22 +275,68 @@ export default function LearnPage() {
             </div>
             {/* Модалка добавления теста */}
             {showAddTestModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-scale-in">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm overflow-y-auto">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl relative animate-scale-in max-h-[90vh] overflow-y-auto">
                   <button onClick={() => setShowAddTestModal(false)} className="absolute top-3 right-3 text-slate-400 hover:text-slate-700 text-2xl">×</button>
-                  <h2 className="text-2xl font-bold mb-4 text-sky-700">Добавить тест</h2>
-                  <form onSubmit={handleAddTest}>
-                    <label className="block text-sm font-semibold mb-2 text-slate-700">Название теста</label>
-                    <input
-                      className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-4"
-                      value={newTestTitle}
-                      onChange={e => setNewTestTitle(e.target.value)}
-                      placeholder="Введите название теста"
-                      required
-                    />
-                    <div className="flex gap-3 mt-4">
+                  <h2 className="text-2xl font-bold mb-4 text-sky-700">Создать тест</h2>
+                  <form onSubmit={e => { e.preventDefault(); alert('Сохранение теста реализуется на следующем этапе!'); }}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold mb-1 text-slate-700">Название теста</label>
+                        <input className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-2" value={newTest.title} onChange={e => setNewTest(t => ({...t, title: e.target.value}))} required />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1 text-slate-700">Временной лимит (минут)</label>
+                        <input type="number" min={1} max={180} className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-2" value={newTest.timeLimit} onChange={e => setNewTest(t => ({...t, timeLimit: Number(e.target.value)}))} required />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1 text-slate-700">Дата и время начала</label>
+                        <input type="datetime-local" className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-2" value={newTest.startAt} onChange={e => setNewTest(t => ({...t, startAt: e.target.value}))} required />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1 text-slate-700">Дата и время окончания</label>
+                        <input type="datetime-local" className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-2" value={newTest.endAt} onChange={e => setNewTest(t => ({...t, endAt: e.target.value}))} required />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1 text-slate-700">Награда (койны)</label>
+                        <input type="number" min={1} max={100} className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-2" value={newTest.reward} onChange={e => setNewTest(t => ({...t, reward: Number(e.target.value)}))} required />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1 text-slate-700">Порог для награды (%)</label>
+                        <input type="number" min={1} max={100} className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-2" value={newTest.rewardThreshold} onChange={e => setNewTest(t => ({...t, rewardThreshold: Number(e.target.value)}))} required />
+                      </div>
+                    </div>
+                    <div className="mt-6">
+                      <h3 className="font-bold text-lg mb-2 text-sky-700">Вопросы</h3>
+                      {newTest.questions.map((q, qi) => (
+                        <div key={qi} className="mb-6 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="font-semibold">Вопрос {qi+1}</span>
+                            {newTest.questions.length > 1 && (
+                              <button type="button" className="text-xs px-2 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200 transition" onClick={() => setNewTest(t => ({...t, questions: t.questions.filter((_,i) => i!==qi)}))}>Удалить</button>
+                            )}
+                          </div>
+                          <input className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-2" value={q.text} onChange={e => setNewTest(t => ({...t, questions: t.questions.map((qq,i) => i===qi ? {...qq, text: e.target.value} : qq)}))} placeholder="Текст вопроса" required />
+                          <div className="mb-2">
+                            <span className="text-sm font-semibold">Варианты ответа:</span>
+                            {q.options.map((opt, oi) => (
+                              <div key={oi} className="flex items-center gap-2 mt-1">
+                                <input type="radio" name={`correct-${qi}`} checked={q.correct === oi} onChange={() => setNewTest(t => ({...t, questions: t.questions.map((qq,i) => i===qi ? {...qq, correct: oi} : qq)}))} />
+                                <input className="rounded-xl border border-slate-300 px-3 py-1 flex-1" value={opt} onChange={e => setNewTest(t => ({...t, questions: t.questions.map((qq,i) => i===qi ? {...qq, options: qq.options.map((oo,j) => j===oi ? e.target.value : oo)} : qq)}))} placeholder={`Вариант ${oi+1}`} required />
+                                {q.options.length > 2 && (
+                                  <button type="button" className="text-xs px-2 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200 transition" onClick={() => setNewTest(t => ({...t, questions: t.questions.map((qq,i) => i===qi ? {...qq, options: qq.options.filter((_,j) => j!==oi), correct: qq.correct >= q.options.length-1 ? 0 : qq.correct} : qq)}))}>Удалить</button>
+                                )}
+                              </div>
+                            ))}
+                            <button type="button" className="mt-2 text-xs px-2 py-1 rounded bg-sky-100 text-sky-700 hover:bg-sky-200 transition" onClick={() => setNewTest(t => ({...t, questions: t.questions.map((qq,i) => i===qi ? {...qq, options: [...qq.options, ""]} : qq)}))}>Добавить вариант</button>
+                          </div>
+                        </div>
+                      ))}
+                      <button type="button" className="text-xs px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700 transition font-semibold" onClick={() => setNewTest(t => ({...t, questions: [...t.questions, {text: "", options: ["", "", "", ""], correct: 0}]}))}>Добавить вопрос</button>
+                    </div>
+                    <div className="flex gap-3 mt-6">
                       <button type="button" onClick={() => setShowAddTestModal(false)} className="flex-1 rounded-xl border border-slate-300 bg-slate-50 py-2 font-semibold text-slate-700 hover:bg-slate-100 transition">Отмена</button>
-                      <button type="submit" className="flex-1 rounded-xl bg-emerald-600 text-white py-2 font-semibold hover:bg-emerald-700 transition">Добавить</button>
+                      <button type="submit" className="flex-1 rounded-xl bg-emerald-600 text-white py-2 font-semibold hover:bg-emerald-700 transition">Сохранить тест</button>
                     </div>
                   </form>
                 </div>
