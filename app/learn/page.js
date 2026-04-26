@@ -173,12 +173,25 @@ export default function LearnPage() {
               <div className="grid gap-6 md:grid-cols-2">
                 {trainings.map((t) => (
                   <div key={t.id || t._id} className="rounded-2xl bg-white/90 border border-slate-200 shadow p-6 flex flex-col gap-3">
-                    <div className="font-bold text-lg text-sky-800 mb-2">{t.title}</div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="font-bold text-lg text-sky-800">{t.title}</div>
+                      {isAdmin && (
+                        <div className="flex gap-2">
+                          <button className="text-xs px-2 py-1 rounded bg-sky-100 text-sky-700 hover:bg-sky-200 transition" onClick={() => alert('Редактировать материал пока не реализовано')}>Редактировать</button>
+                          <button className="text-xs px-2 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200 transition" onClick={() => handleDeleteMaterial(t.id || t._id)}>Удалить</button>
+                        </div>
+                      )}
+                    </div>
                     <div className="flex flex-col gap-2">
                       {t.attachments && t.attachments.length > 0 && (
                         <ul className="list-disc pl-5 text-slate-700 text-sm">
                           {t.attachments.map((url, idx) => (
-                            <li key={idx}><a href={url} target="_blank" rel="noopener noreferrer" className="underline text-sky-700">Файл {idx+1}</a></li>
+                            <li key={idx} className="flex items-center gap-2">
+                              <a href={url} target="_blank" rel="noopener noreferrer" className="underline text-sky-700">Файл {idx+1}</a>
+                              {isAdmin && (
+                                <button className="text-xs px-1 py-0.5 rounded bg-red-100 text-red-700 hover:bg-red-200 transition" onClick={() => handleDeleteFile(t.id || t._id, url)}>Удалить</button>
+                              )}
+                            </li>
                           ))}
                         </ul>
                       )}
@@ -189,6 +202,25 @@ export default function LearnPage() {
                         </label>
                       )}
                     </div>
+                    // Удаление материала (UI + сервер)
+                    const handleDeleteMaterial = async (materialId) => {
+                      if (!window.confirm('Удалить материал?')) return;
+                      // Можно реализовать удаление через API, если есть DELETE /api/trainings
+                      // Пока только UI:
+                      setTrainings(prev => prev.filter(t => (t.id || t._id) !== materialId));
+                      // TODO: добавить fetch на сервер, если потребуется
+                    };
+
+                    // Удаление файла из материала (UI + сервер)
+                    const handleDeleteFile = async (materialId, fileUrl) => {
+                      if (!window.confirm('Удалить файл из материала?')) return;
+                      setTrainings(prev => prev.map(t =>
+                        (t.id === materialId || t._id === materialId)
+                          ? { ...t, attachments: t.attachments.filter(url => url !== fileUrl) }
+                          : t
+                      ));
+                      // TODO: добавить fetch на сервер, если потребуется
+                    };
                   </div>
                 ))}
               </div>
