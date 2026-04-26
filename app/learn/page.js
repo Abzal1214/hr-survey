@@ -1,14 +1,18 @@
 ﻿"use client";
 import { useState } from "react";
 import ConfirmModal from "../components/ConfirmModal";
+import ConfirmModal from "../components/ConfirmModal";
 import KebabMenu from "../components/KebabMenu";
 
-export default function LearnPage() {
   const [tab, setTab] = useState("materials");
   const [quizzes] = useState([]);
   const [trainings] = useState([]);
+  const [showAddTestModal, setShowAddTestModal] = useState(false);
   // Пример: определяем роль админа (замените на реальную логику)
   const isAdmin = typeof window !== 'undefined' && (localStorage.getItem('currentUser') ? JSON.parse(localStorage.getItem('currentUser')).role === 'admin' : false);
+
+  // Примитивная форма добавления теста (только UI)
+  const [newTestTitle, setNewTestTitle] = useState("");
 
   return (
     <div className="min-h-screen relative">
@@ -67,11 +71,34 @@ export default function LearnPage() {
               {isAdmin && (
                 <button
                   className="rounded-full bg-emerald-600 text-white px-5 py-2 font-semibold text-base shadow hover:bg-emerald-700 transition"
-                  onClick={() => alert('Добавить тест (реализуйте модалку)')}
+                  onClick={() => setShowAddTestModal(true)}
                 >
                   + Добавить тест
                 </button>
               )}
+                  {/* Модалка добавления теста */}
+                  {showAddTestModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-scale-in">
+                        <button onClick={() => setShowAddTestModal(false)} className="absolute top-3 right-3 text-slate-400 hover:text-slate-700 text-2xl">×</button>
+                        <h2 className="text-2xl font-bold mb-4 text-sky-700">Добавить тест</h2>
+                        <form onSubmit={e => { e.preventDefault(); setShowAddTestModal(false); setNewTestTitle(""); /* Здесь логика добавления теста */ }}>
+                          <label className="block text-sm font-semibold mb-2 text-slate-700">Название теста</label>
+                          <input
+                            className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-4"
+                            value={newTestTitle}
+                            onChange={e => setNewTestTitle(e.target.value)}
+                            placeholder="Введите название теста"
+                            required
+                          />
+                          <div className="flex gap-3 mt-4">
+                            <button type="button" onClick={() => setShowAddTestModal(false)} className="flex-1 rounded-xl border border-slate-300 bg-slate-50 py-2 font-semibold text-slate-700 hover:bg-slate-100 transition">Отмена</button>
+                            <button type="submit" className="flex-1 rounded-xl bg-emerald-600 text-white py-2 font-semibold hover:bg-emerald-700 transition">Добавить</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  )}
             </div>
             {quizzes.length === 0 ? (
               <div className="text-slate-500">Нет тестов</div>
