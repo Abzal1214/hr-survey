@@ -1,4 +1,5 @@
-﻿"use client";
+﻿  const [search, setSearch] = useState("");
+"use client";
 import { useState, useEffect } from "react";
 import ConfirmModal from "../components/ConfirmModal";
 import KebabMenu from "../components/KebabMenu";
@@ -131,16 +132,25 @@ export default function LearnPage() {
       <div className="max-w-2xl mx-auto bg-white/80 rounded-xl shadow border border-sky-100 backdrop-blur-md p-8 mt-4">
         {tab === "materials" && (
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
               <h2 className="text-2xl font-bold text-sky-700">Материалы</h2>
-              {isAdmin && (
-                <button
-                  className="rounded-full bg-emerald-600 text-white px-5 py-2 font-semibold text-base shadow hover:bg-emerald-700 transition"
-                  onClick={() => setShowAddMaterialModal(true)}
-                >
-                  + Добавить материал
-                </button>
-              )}
+              <div className="flex gap-2 items-center w-full md:w-auto">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Поиск по названию..."
+                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm w-full md:w-56"
+                />
+                {isAdmin && (
+                  <button
+                    className="rounded-full bg-emerald-600 text-white px-5 py-2 font-semibold text-base shadow hover:bg-emerald-700 transition"
+                    onClick={() => setShowAddMaterialModal(true)}
+                  >
+                    + Добавить материал
+                  </button>
+                )}
+              </div>
             </div>
             {/* Модалка добавления материала */}
             {showAddMaterialModal && (
@@ -171,7 +181,7 @@ export default function LearnPage() {
               <div className="text-slate-500">Нет материалов</div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2">
-                {trainings.map((t) => (
+                {trainings.filter(t => t.title.toLowerCase().includes(search.toLowerCase())).map((t) => (
                   <div key={t.id || t._id} className="rounded-2xl bg-white/90 border border-slate-200 shadow p-6 flex flex-col gap-3">
                     <div className="flex items-center justify-between mb-2">
                       <div className="font-bold text-lg text-sky-800">{t.title}</div>
