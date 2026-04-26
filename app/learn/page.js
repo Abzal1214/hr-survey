@@ -7,6 +7,8 @@ export default function LearnPage() {
   const [tab, setTab] = useState("materials");
   const [quizzes] = useState([]);
   const [trainings] = useState([]);
+  // Пример: определяем роль админа (замените на реальную логику)
+  const isAdmin = typeof window !== 'undefined' && (localStorage.getItem('currentUser') ? JSON.parse(localStorage.getItem('currentUser')).role === 'admin' : false);
 
   return (
     <div className="min-h-screen relative">
@@ -60,7 +62,17 @@ export default function LearnPage() {
 
         {tab === "tests" && (
           <div>
-            <h2 className="text-2xl font-bold mb-4 text-sky-700">Тесты</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-sky-700">Тесты</h2>
+              {isAdmin && (
+                <button
+                  className="rounded-full bg-emerald-600 text-white px-5 py-2 font-semibold text-base shadow hover:bg-emerald-700 transition"
+                  onClick={() => alert('Добавить тест (реализуйте модалку)')}
+                >
+                  + Добавить тест
+                </button>
+              )}
+            </div>
             {quizzes.length === 0 ? (
               <div className="text-slate-500">Нет тестов</div>
             ) : (
