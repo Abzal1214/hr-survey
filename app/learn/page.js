@@ -17,6 +17,7 @@ export default function LearnPage() {
   const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
   const [newTestTitle, setNewTestTitle] = useState("");
   const [newMaterialTitle, setNewMaterialTitle] = useState("");
+  const [newMaterialDesc, setNewMaterialDesc] = useState("");
   const [search, setSearch] = useState("");
 
   // Определяем роль админа (замените на реальную логику)
@@ -46,16 +47,17 @@ export default function LearnPage() {
   // Добавление материала через API
   const handleAddMaterial = async (e) => {
     e.preventDefault();
-    if (!newMaterialTitle.trim()) return;
+    if (!newMaterialTitle.trim() || !newMaterialDesc.trim()) return;
     const res = await fetch('/api/trainings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: newMaterialTitle.trim(), description: '', attachments: [] })
+      body: JSON.stringify({ title: newMaterialTitle.trim(), description: newMaterialDesc.trim(), attachments: [] })
     });
     if (res.ok) {
       const added = await res.json();
       setTrainings(prev => [added, ...prev]);
       setNewMaterialTitle("");
+      setNewMaterialDesc("");
       setShowAddMaterialModal(false);
     } else {
       alert('Ошибка добавления материала');
@@ -165,6 +167,14 @@ export default function LearnPage() {
                       value={newMaterialTitle}
                       onChange={e => setNewMaterialTitle(e.target.value)}
                       placeholder="Введите название материала"
+                      required
+                    />
+                    <label className="block text-sm font-semibold mb-2 text-slate-700">Описание</label>
+                    <textarea
+                      className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-4 min-h-[60px]"
+                      value={newMaterialDesc}
+                      onChange={e => setNewMaterialDesc(e.target.value)}
+                      placeholder="Введите описание материала"
                       required
                     />
                     <div className="flex gap-3 mt-4">
