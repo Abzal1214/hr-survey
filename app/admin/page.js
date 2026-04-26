@@ -1130,12 +1130,6 @@ export default function Admin() {
                             >
                               🗑️ Удалить
                             </button>
-                            <button
-                              className="px-3 py-1 rounded-lg bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition"
-                              onClick={() => handleActivateEmployee(user)}
-                            >
-                              ⚡ Активировать
-                            </button>
                           </div>
                         </td>
                       </tr>
