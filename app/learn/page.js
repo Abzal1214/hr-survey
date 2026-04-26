@@ -185,14 +185,29 @@ export default function LearnPage() {
                     <div className="flex flex-col gap-2">
                       {t.attachments && t.attachments.length > 0 && (
                         <ul className="list-disc pl-5 text-slate-700 text-sm">
-                          {t.attachments.map((url, idx) => (
-                            <li key={idx} className="flex items-center gap-2">
-                              <a href={url} target="_blank" rel="noopener noreferrer" className="underline text-sky-700">Файл {idx+1}</a>
-                              {isAdmin && (
-                                <button className="text-xs px-1 py-0.5 rounded bg-red-100 text-red-700 hover:bg-red-200 transition" onClick={() => handleDeleteFile(t.id || t._id, url)}>Удалить</button>
-                              )}
-                            </li>
-                          ))}
+                          {t.attachments.map((url, idx) => {
+                            const ext = url.split('.').pop().toLowerCase();
+                            const isImage = ["jpg","jpeg","png","gif","webp"].includes(ext);
+                            const isPdf = ext === "pdf";
+                            return (
+                              <li key={idx} className="flex flex-col gap-1 mb-2">
+                                <div className="flex items-center gap-2">
+                                  <a href={url} target="_blank" rel="noopener noreferrer" className="underline text-sky-700">Файл {idx+1}</a>
+                                  {isAdmin && (
+                                    <button className="text-xs px-1 py-0.5 rounded bg-red-100 text-red-700 hover:bg-red-200 transition" onClick={() => handleDeleteFile(t.id || t._id, url)}>Удалить</button>
+                                  )}
+                                </div>
+                                {isImage && (
+                                  <a href={url} target="_blank" rel="noopener noreferrer">
+                                    <img src={url} alt="preview" className="max-h-32 rounded border border-slate-200 shadow-sm" style={{maxWidth:'200px'}} />
+                                  </a>
+                                )}
+                                {isPdf && (
+                                  <iframe src={url} title={`PDF ${idx+1}`} className="w-full" style={{height:'300px', border:'1px solid #e5e7eb', borderRadius:'8px'}}></iframe>
+                                )}
+                              </li>
+                            );
+                          })}
                         </ul>
                       )}
                       {isAdmin && (
