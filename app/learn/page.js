@@ -1,5 +1,5 @@
 ﻿"use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ConfirmModal from "../components/ConfirmModal";
 import KebabMenu from "../components/KebabMenu";
 
@@ -10,11 +10,9 @@ export default function LearnPage() {
     { id: 1, title: "Тест по технике безопасности" },
     { id: 2, title: "Тест по продукту" },
   ]);
-  // trainings: { id, title, files: [File] }
-  const [trainings, setTrainings] = useState([
-    { id: 1, title: "Введение в компанию", files: [] },
-    { id: 2, title: "Обучение продажам", files: [] },
-  ]);
+  // trainings: { id, title, attachments: [url], ... }
+  const [trainings, setTrainings] = useState([]);
+  const [loadingTrainings, setLoadingTrainings] = useState(false);
   const [showAddTestModal, setShowAddTestModal] = useState(false);
   const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
   const [newTestTitle, setNewTestTitle] = useState("");
@@ -35,27 +33,65 @@ export default function LearnPage() {
     }
   };
 
-  const handleAddMaterial = (e) => {
+  // Загрузка материалов с сервера
+  useEffect(() => {
+    setLoadingTrainings(true);
+    fetch('/api/trainings')
+      .then(res => res.json())
+      .then(data => setTrainings(Array.isArray(data) ? data : []))
+      .finally(() => setLoadingTrainings(false));
+  }, []);
+
+  // Добавление материала через API
+  const handleAddMaterial = async (e) => {
     e.preventDefault();
-    if (newMaterialTitle.trim()) {
-      setTrainings(prev => [
-        ...prev,
-        { id: Date.now(), title: newMaterialTitle.trim(), files: [] }
-      ]);
+    if (!newMaterialTitle.trim()) return;
+    const res = await fetch('/api/trainings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: newMaterialTitle.trim(), description: '', attachments: [] })
+    });
+    if (res.ok) {
+      const added = await res.json();
+      setTrainings(prev => [added, ...prev]);
       setNewMaterialTitle("");
       setShowAddMaterialModal(false);
+    } else {
+      alert('Ошибка добавления материала');
     }
   };
 
-  // Добавление файла к материалу
-  const handleFileChange = (materialId, e) => {
+  // Загрузка файла и добавление ссылки к материалу
+  const handleFileChange = async (materialId, e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setTrainings(prev => prev.map(mat =>
-      mat.id === materialId
-        ? { ...mat, files: [...mat.files, file] }
-        : mat
-    ));
+    const formData = new FormData();
+    formData.append('file', file);
+    // Загрузка файла
+    const uploadRes = await fetch('/api/files', {
+      method: 'POST',
+      body: formData
+    });
+    if (!uploadRes.ok) {
+      alert('Ошибка загрузки файла');
+      return;
+    }
+    const { fileUrls } = await uploadRes.json();
+    const fileUrl = fileUrls && fileUrls[0];
+    if (!fileUrl) return;
+    // Обновление материала (добавление ссылки)
+    const mat = trainings.find(t => t.id === materialId || t._id === materialId);
+    const attachments = Array.isArray(mat.attachments) ? [...mat.attachments, fileUrl] : [fileUrl];
+    const updateRes = await fetch('/api/trainings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: materialId, attachments })
+    });
+    if (updateRes.ok) {
+      setTrainings(prev => prev.map(t => (t.id === materialId || t._id === materialId) ? { ...t, attachments } : t));
+    } else {
+      alert('Ошибка обновления материала');
+    }
   };
 
   return (
@@ -129,7 +165,9 @@ export default function LearnPage() {
                 </div>
               </div>
             )}
-            {trainings.length === 0 ? (
+            {loadingTrainings ? (
+              <div className="text-slate-500">Загрузка...</div>
+            ) : trainings.length === 0 ? (
               <div className="text-slate-500">Нет материалов</div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2">
@@ -137,17 +175,17 @@ export default function LearnPage() {
                   <div key={t.id || t._id} className="rounded-2xl bg-white/90 border border-slate-200 shadow p-6 flex flex-col gap-3">
                     <div className="font-bold text-lg text-sky-800 mb-2">{t.title}</div>
                     <div className="flex flex-col gap-2">
-                      {t.files && t.files.length > 0 && (
+                      {t.attachments && t.attachments.length > 0 && (
                         <ul className="list-disc pl-5 text-slate-700 text-sm">
-                          {t.files.map((file, idx) => (
-                            <li key={idx}>{file.name}</li>
+                          {t.attachments.map((url, idx) => (
+                            <li key={idx}><a href={url} target="_blank" rel="noopener noreferrer" className="underline text-sky-700">Файл {idx+1}</a></li>
                           ))}
                         </ul>
                       )}
                       {isAdmin && (
                         <label className="inline-block cursor-pointer mt-2">
                           <span className="rounded bg-emerald-600 text-white px-4 py-1 text-sm font-semibold hover:bg-emerald-700 transition">Добавить файл</span>
-                          <input type="file" className="hidden" onChange={e => handleFileChange(t.id, e)} />
+                          <input type="file" className="hidden" onChange={e => handleFileChange(t.id || t._id, e)} />
                         </label>
                       )}
                     </div>
