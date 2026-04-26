@@ -1,26 +1,25 @@
-﻿    // Удаление материала (UI + сервер)
-    const handleDeleteMaterial = async (materialId) => {
-      if (!window.confirm('Удалить материал?')) return;
-      setTrainings(prev => prev.filter(t => (t.id || t._id) !== materialId));
-      // TODO: добавить fetch на сервер, если потребуется
-    };
-
-    // Удаление файла из материала (UI + сервер)
-    const handleDeleteFile = async (materialId, fileUrl) => {
-      if (!window.confirm('Удалить файл из материала?')) return;
-      setTrainings(prev => prev.map(t =>
-        (t.id === materialId || t._id === materialId)
-          ? { ...t, attachments: t.attachments.filter(url => url !== fileUrl) }
-          : t
-      ));
-      // TODO: добавить fetch на сервер, если потребуется
-    };
+﻿
 "use client";
 import { useState, useEffect } from "react";
-// ...existing code...
-  const [search, setSearch] = useState("");
 import ConfirmModal from "../components/ConfirmModal";
 import KebabMenu from "../components/KebabMenu";
+
+export default function LearnPage() {
+  const [tab, setTab] = useState("materials");
+  const [quizzes, setQuizzes] = useState([
+    { id: 1, title: "Тест по технике безопасности" },
+    { id: 2, title: "Тест по продукту" },
+  ]);
+  // trainings: { id, title, attachments: [url], ... }
+  const [trainings, setTrainings] = useState([]);
+  const [loadingTrainings, setLoadingTrainings] = useState(false);
+  const [showAddTestModal, setShowAddTestModal] = useState(false);
+  const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
+  const [newTestTitle, setNewTestTitle] = useState("");
+  const [newMaterialTitle, setNewMaterialTitle] = useState("");
+  const [search, setSearch] = useState("");
+
+  // Определяем роль админа (замените на реальную логику)
 
 
 export default function LearnPage() {
