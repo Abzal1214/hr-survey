@@ -15,9 +15,10 @@
       ));
       // TODO: добавить fetch на сервер, если потребуется
     };
-  const [search, setSearch] = useState("");
 "use client";
 import { useState, useEffect } from "react";
+// ...existing code...
+  const [search, setSearch] = useState("");
 import ConfirmModal from "../components/ConfirmModal";
 import KebabMenu from "../components/KebabMenu";
 
