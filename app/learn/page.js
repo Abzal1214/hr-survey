@@ -5,14 +5,45 @@ import KebabMenu from "../components/KebabMenu";
 
 export default function LearnPage() {
   const [tab, setTab] = useState("materials");
-  const [quizzes] = useState([]);
-  const [trainings] = useState([]);
+  const [quizzes, setQuizzes] = useState([
+    { id: 1, title: "Тест по технике безопасности" },
+    { id: 2, title: "Тест по продукту" },
+  ]);
+  const [trainings, setTrainings] = useState([
+    { id: 1, title: "Введение в компанию" },
+    { id: 2, title: "Обучение продажам" },
+  ]);
   const [showAddTestModal, setShowAddTestModal] = useState(false);
-  // Пример: определяем роль админа (замените на реальную логику)
+  const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
+  const [newTestTitle, setNewTestTitle] = useState("");
+  const [newMaterialTitle, setNewMaterialTitle] = useState("");
+
+  // Определяем роль админа (замените на реальную логику)
   const isAdmin = typeof window !== 'undefined' && (localStorage.getItem('currentUser') ? JSON.parse(localStorage.getItem('currentUser')).role === 'admin' : false);
 
-  // Примитивная форма добавления теста (только UI)
-  const [newTestTitle, setNewTestTitle] = useState("");
+  const handleAddTest = (e) => {
+    e.preventDefault();
+    if (newTestTitle.trim()) {
+      setQuizzes(prev => [
+        ...prev,
+        { id: Date.now(), title: newTestTitle.trim() }
+      ]);
+      setNewTestTitle("");
+      setShowAddTestModal(false);
+    }
+  };
+
+  const handleAddMaterial = (e) => {
+    e.preventDefault();
+    if (newMaterialTitle.trim()) {
+      setTrainings(prev => [
+        ...prev,
+        { id: Date.now(), title: newMaterialTitle.trim() }
+      ]);
+      setNewMaterialTitle("");
+      setShowAddMaterialModal(false);
+    }
+  };
 
   return (
     <div className="min-h-screen relative">
@@ -51,7 +82,40 @@ export default function LearnPage() {
       <div className="max-w-2xl mx-auto bg-white/80 rounded-xl shadow border border-sky-100 backdrop-blur-md p-8 mt-4">
         {tab === "materials" && (
           <div>
-            <h2 className="text-2xl font-bold mb-4 text-sky-700">Материалы</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-sky-700">Материалы</h2>
+              {isAdmin && (
+                <button
+                  className="rounded-full bg-emerald-600 text-white px-5 py-2 font-semibold text-base shadow hover:bg-emerald-700 transition"
+                  onClick={() => setShowAddMaterialModal(true)}
+                >
+                  + Добавить материал
+                </button>
+              )}
+            </div>
+            {/* Модалка добавления материала */}
+            {showAddMaterialModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-scale-in">
+                  <button onClick={() => setShowAddMaterialModal(false)} className="absolute top-3 right-3 text-slate-400 hover:text-slate-700 text-2xl">×</button>
+                  <h2 className="text-2xl font-bold mb-4 text-sky-700">Добавить материал</h2>
+                  <form onSubmit={handleAddMaterial}>
+                    <label className="block text-sm font-semibold mb-2 text-slate-700">Название материала</label>
+                    <input
+                      className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-4"
+                      value={newMaterialTitle}
+                      onChange={e => setNewMaterialTitle(e.target.value)}
+                      placeholder="Введите название материала"
+                      required
+                    />
+                    <div className="flex gap-3 mt-4">
+                      <button type="button" onClick={() => setShowAddMaterialModal(false)} className="flex-1 rounded-xl border border-slate-300 bg-slate-50 py-2 font-semibold text-slate-700 hover:bg-slate-100 transition">Отмена</button>
+                      <button type="submit" className="flex-1 rounded-xl bg-emerald-600 text-white py-2 font-semibold hover:bg-emerald-700 transition">Добавить</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
             {trainings.length === 0 ? (
               <div className="text-slate-500">Нет материалов</div>
             ) : (
@@ -83,7 +147,7 @@ export default function LearnPage() {
                 <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-scale-in">
                   <button onClick={() => setShowAddTestModal(false)} className="absolute top-3 right-3 text-slate-400 hover:text-slate-700 text-2xl">×</button>
                   <h2 className="text-2xl font-bold mb-4 text-sky-700">Добавить тест</h2>
-                  <form onSubmit={e => { e.preventDefault(); setShowAddTestModal(false); setNewTestTitle(""); /* Здесь логика добавления теста */ }}>
+                  <form onSubmit={handleAddTest}>
                     <label className="block text-sm font-semibold mb-2 text-slate-700">Название теста</label>
                     <input
                       className="w-full rounded-xl border border-slate-300 px-4 py-2 mb-4"
