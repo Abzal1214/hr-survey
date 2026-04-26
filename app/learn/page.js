@@ -34,6 +34,28 @@ export default function LearnPage() {
           )}
         </div>
       )}
+
+      {tab === "tests" && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Тесты</h2>
+          {quizzes.length === 0 ? (
+            <div className="text-slate-500">Нет тестов</div>
+          ) : (
+            <ul>
+              {quizzes.map((quiz) => (
+                <li key={quiz.id || quiz._id}>{quiz.title}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {tab === "courses" && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Курсы</h2>
+          <div className="text-slate-500">Раздел в разработке</div>
+        </div>
+      )}
     </div>
   );
 }
