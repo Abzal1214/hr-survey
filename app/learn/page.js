@@ -1,4 +1,21 @@
-﻿  const [search, setSearch] = useState("");
+﻿    // Удаление материала (UI + сервер)
+    const handleDeleteMaterial = async (materialId) => {
+      if (!window.confirm('Удалить материал?')) return;
+      setTrainings(prev => prev.filter(t => (t.id || t._id) !== materialId));
+      // TODO: добавить fetch на сервер, если потребуется
+    };
+
+    // Удаление файла из материала (UI + сервер)
+    const handleDeleteFile = async (materialId, fileUrl) => {
+      if (!window.confirm('Удалить файл из материала?')) return;
+      setTrainings(prev => prev.map(t =>
+        (t.id === materialId || t._id === materialId)
+          ? { ...t, attachments: t.attachments.filter(url => url !== fileUrl) }
+          : t
+      ));
+      // TODO: добавить fetch на сервер, если потребуется
+    };
+  const [search, setSearch] = useState("");
 "use client";
 import { useState, useEffect } from "react";
 import ConfirmModal from "../components/ConfirmModal";
@@ -227,25 +244,6 @@ export default function LearnPage() {
                         </label>
                       )}
                     </div>
-                    // Удаление материала (UI + сервер)
-                    const handleDeleteMaterial = async (materialId) => {
-                      if (!window.confirm('Удалить материал?')) return;
-                      // Можно реализовать удаление через API, если есть DELETE /api/trainings
-                      // Пока только UI:
-                      setTrainings(prev => prev.filter(t => (t.id || t._id) !== materialId));
-                      // TODO: добавить fetch на сервер, если потребуется
-                    };
-
-                    // Удаление файла из материала (UI + сервер)
-                    const handleDeleteFile = async (materialId, fileUrl) => {
-                      if (!window.confirm('Удалить файл из материала?')) return;
-                      setTrainings(prev => prev.map(t =>
-                        (t.id === materialId || t._id === materialId)
-                          ? { ...t, attachments: t.attachments.filter(url => url !== fileUrl) }
-                          : t
-                      ));
-                      // TODO: добавить fetch на сервер, если потребуется
-                    };
                   </div>
                 ))}
               </div>
