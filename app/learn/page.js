@@ -20,23 +20,6 @@ export default function LearnPage() {
   const [search, setSearch] = useState("");
 
   // Определяем роль админа (замените на реальную логику)
-
-
-export default function LearnPage() {
-  const [tab, setTab] = useState("materials");
-  const [quizzes, setQuizzes] = useState([
-    { id: 1, title: "Тест по технике безопасности" },
-    { id: 2, title: "Тест по продукту" },
-  ]);
-  // trainings: { id, title, attachments: [url], ... }
-  const [trainings, setTrainings] = useState([]);
-  const [loadingTrainings, setLoadingTrainings] = useState(false);
-  const [showAddTestModal, setShowAddTestModal] = useState(false);
-  const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
-  const [newTestTitle, setNewTestTitle] = useState("");
-  const [newMaterialTitle, setNewMaterialTitle] = useState("");
-
-  // Определяем роль админа (замените на реальную логику)
   const isAdmin = typeof window !== 'undefined' && (localStorage.getItem('currentUser') ? JSON.parse(localStorage.getItem('currentUser')).role === 'admin' : false);
 
   const handleAddTest = (e) => {
