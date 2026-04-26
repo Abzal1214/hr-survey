@@ -1117,11 +1117,31 @@ export default function Admin() {
                         </td>
                         <td className="p-3 border-b text-slate-900">{new Date(user.registeredAt).toLocaleDateString('ru-RU')}</td>
                         <td className="p-3 border-b">
-                          <KebabMenu
-                            onEdit={() => handleSelectUser(user)}
-                            onDelete={() => handleDeleteEmployee(user)}
-                          />
+                          <div className="flex gap-2">
+                            <button
+                              className="px-3 py-1 rounded-lg bg-sky-500 text-white text-xs font-semibold hover:bg-sky-600 transition"
+                              onClick={() => handleSelectUser(user)}
+                            >
+                              ✏️ Изменить
+                            </button>
+                            <button
+                              className="px-3 py-1 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition"
+                              onClick={() => handleDeleteEmployee(user)}
+                            >
+                              🗑️ Удалить
+                            </button>
+                            <button
+                              className="px-3 py-1 rounded-lg bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition"
+                              onClick={() => handleActivateEmployee(user)}
+                            >
+                              ⚡ Активировать
+                            </button>
+                          </div>
                         </td>
+                        // Заглушка для активации сотрудника
+                        const handleActivateEmployee = (user) => {
+                          alert(`Сотрудник ${user.name} будет активирован (реализуйте логику)`);
+                        };
                       </tr>
                     ))}
                   </tbody>
