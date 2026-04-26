@@ -6,10 +6,7 @@ import KebabMenu from "../components/KebabMenu";
 
 export default function LearnPage() {
   const [tab, setTab] = useState("materials");
-  const [quizzes, setQuizzes] = useState([
-    { id: 1, title: "Тест по технике безопасности" },
-    { id: 2, title: "Тест по продукту" },
-  ]);
+  const [quizzes, setQuizzes] = useState([]);
   // trainings: { id, title, attachments: [url], ... }
   const [trainings, setTrainings] = useState([]);
   const [loadingTrainings, setLoadingTrainings] = useState(false);
@@ -39,15 +36,57 @@ export default function LearnPage() {
   // Определяем роль админа (замените на реальную логику)
   const isAdmin = typeof window !== 'undefined' && (localStorage.getItem('currentUser') ? JSON.parse(localStorage.getItem('currentUser')).role === 'admin' : false);
 
-  const handleAddTest = (e) => {
+
+  // Загрузка тестов с сервера
+  useEffect(() => {
+    fetch('/api/quizzes?admin=1')
+      .then(res => res.json())
+      .then(data => setQuizzes(Array.isArray(data) ? data : []));
+  }, []);
+
+  // Сохранение теста на сервере
+  const handleAddTest = async (e) => {
     e.preventDefault();
-    if (newTestTitle.trim()) {
-      setQuizzes(prev => [
-        ...prev,
-        { id: Date.now(), title: newTestTitle.trim() }
-      ]);
-      setNewTestTitle("");
+    if (!newTest.title.trim() || newTest.questions.length === 0) return;
+    const body = {
+      title: newTest.title.trim(),
+      description: '',
+      coins: newTest.reward,
+      questions: newTest.questions.map(q => ({
+        text: q.text,
+        options: q.options,
+        correct: q.correct
+      })),
+      attemptsPerDay: 1,
+      isActive: true
+      // Можно добавить department, startAt, endAt, timeLimit, rewardThreshold если потребуется
+    };
+    const res = await fetch('/api/quizzes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      const added = await res.json();
+      setQuizzes(prev => [added, ...prev]);
       setShowAddTestModal(false);
+      setNewTest({
+        title: "",
+        timeLimit: 15,
+        startAt: "",
+        endAt: "",
+        reward: 3,
+        rewardThreshold: 70,
+        questions: [
+          {
+            text: "",
+            options: ["", "", "", ""],
+            correct: 0
+          }
+        ]
+      });
+    } else {
+      alert('Ошибка добавления теста');
     }
   };
 
@@ -279,7 +318,7 @@ export default function LearnPage() {
                 <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl relative animate-scale-in max-h-[90vh] overflow-y-auto">
                   <button onClick={() => setShowAddTestModal(false)} className="absolute top-3 right-3 text-slate-400 hover:text-slate-700 text-2xl">×</button>
                   <h2 className="text-2xl font-bold mb-4 text-sky-700">Создать тест</h2>
-                  <form onSubmit={e => { e.preventDefault(); alert('Сохранение теста реализуется на следующем этапе!'); }}>
+                  <form onSubmit={handleAddTest}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold mb-1 text-slate-700">Название теста</label>
