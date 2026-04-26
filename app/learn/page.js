@@ -3,15 +3,17 @@ import { useState } from "react";
 import ConfirmModal from "../components/ConfirmModal";
 import KebabMenu from "../components/KebabMenu";
 
+
 export default function LearnPage() {
   const [tab, setTab] = useState("materials");
   const [quizzes, setQuizzes] = useState([
     { id: 1, title: "Тест по технике безопасности" },
     { id: 2, title: "Тест по продукту" },
   ]);
+  // trainings: { id, title, files: [File] }
   const [trainings, setTrainings] = useState([
-    { id: 1, title: "Введение в компанию" },
-    { id: 2, title: "Обучение продажам" },
+    { id: 1, title: "Введение в компанию", files: [] },
+    { id: 2, title: "Обучение продажам", files: [] },
   ]);
   const [showAddTestModal, setShowAddTestModal] = useState(false);
   const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
@@ -38,11 +40,22 @@ export default function LearnPage() {
     if (newMaterialTitle.trim()) {
       setTrainings(prev => [
         ...prev,
-        { id: Date.now(), title: newMaterialTitle.trim() }
+        { id: Date.now(), title: newMaterialTitle.trim(), files: [] }
       ]);
       setNewMaterialTitle("");
       setShowAddMaterialModal(false);
     }
+  };
+
+  // Добавление файла к материалу
+  const handleFileChange = (materialId, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setTrainings(prev => prev.map(mat =>
+      mat.id === materialId
+        ? { ...mat, files: [...mat.files, file] }
+        : mat
+    ));
   };
 
   return (
@@ -119,11 +132,28 @@ export default function LearnPage() {
             {trainings.length === 0 ? (
               <div className="text-slate-500">Нет материалов</div>
             ) : (
-              <ul className="list-disc pl-5 space-y-1">
+              <div className="grid gap-6 md:grid-cols-2">
                 {trainings.map((t) => (
-                  <li key={t.id || t._id}>{t.title}</li>
+                  <div key={t.id || t._id} className="rounded-2xl bg-white/90 border border-slate-200 shadow p-6 flex flex-col gap-3">
+                    <div className="font-bold text-lg text-sky-800 mb-2">{t.title}</div>
+                    <div className="flex flex-col gap-2">
+                      {t.files && t.files.length > 0 && (
+                        <ul className="list-disc pl-5 text-slate-700 text-sm">
+                          {t.files.map((file, idx) => (
+                            <li key={idx}>{file.name}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {isAdmin && (
+                        <label className="inline-block cursor-pointer mt-2">
+                          <span className="rounded bg-emerald-600 text-white px-4 py-1 text-sm font-semibold hover:bg-emerald-700 transition">Добавить файл</span>
+                          <input type="file" className="hidden" onChange={e => handleFileChange(t.id, e)} />
+                        </label>
+                      )}
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
         )}
@@ -167,7 +197,7 @@ export default function LearnPage() {
             {quizzes.length === 0 ? (
               <div className="text-slate-500">Нет тестов</div>
             ) : (
-              <ul className="list-disc pl-5 space-y-1">
+              <ul className="list-disc pl-5 space-y-1 text-slate-800">
                 {quizzes.map((quiz) => (
                   <li key={quiz.id || quiz._id}>{quiz.title}</li>
                 ))}
