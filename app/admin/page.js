@@ -1138,10 +1138,10 @@ export default function Admin() {
                             </button>
                           </div>
                         </td>
-                        // Заглушка для активации сотрудника
-                        const handleActivateEmployee = (user) => {
-                          alert(`Сотрудник ${user.name} будет активирован (реализуйте логику)`);
-                        };
+                      // Заглушка для активации сотрудника
+                      function handleActivateEmployee(user) {
+                        alert(`Сотрудник ${user.name} будет активирован (реализуйте логику)`);
+                      }
                       </tr>
                     ))}
                   </tbody>
