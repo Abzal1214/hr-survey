@@ -1,5 +1,13 @@
 import { NextResponse } from 'next/server';
 import { put, list } from '@vercel/blob';
+import { logError } from '../../../lib/log';
+
+function isAuthorized(request) {
+  const auth = request.headers.get('authorization') || '';
+  // Пример: токен хранится в localStorage и передаётся в заголовке
+  // Здесь можно реализовать свою проверку (например, JWT или session cookie)
+  return !!auth && auth.startsWith('Bearer ');
+}
 
 export async function GET() {
   try {
@@ -7,11 +15,15 @@ export async function GET() {
     const files = blobs.map(b => ({ name: b.pathname, url: b.url }));
     return NextResponse.json(files);
   } catch (error) {
+    logError('GET /api/files', error);
     return NextResponse.json({ error: 'Не удалось получить файлы' }, { status: 500 });
   }
 }
 
 export async function POST(request) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: 'Нет доступа' }, { status: 401 });
+  }
   try {
     const data = await request.formData();
     let files = data.getAll('files');
@@ -34,6 +46,7 @@ export async function POST(request) {
     }
     return NextResponse.json({ fileUrls: uploaded.map(f => f.url), files: uploaded });
   } catch (error) {
+    logError('POST /api/files', error);
     return NextResponse.json({ error: 'Ошибка загрузки файла: ' + error.message }, { status: 500 });
   }
 }
