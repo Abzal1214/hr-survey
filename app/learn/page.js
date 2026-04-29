@@ -286,9 +286,10 @@ export default function LearnPage() {
                         </ul>
                       )}
                       {isAdmin && (
-                        <div className="mt-2">
-                          <FileUpload onSuccess={() => {}} className="!mb-0" />
-                        </div>
+                        <label className="inline-block cursor-pointer mt-2">
+                          <span className="rounded bg-emerald-600 text-white px-4 py-1 text-sm font-semibold hover:bg-emerald-700 transition">Добавить файл</span>
+                          <input type="file" className="hidden" onChange={e => handleFileChange(t.id || t._id, e)} />
+                        </label>
                       )}
                     </div>
                   </div>
