@@ -1,8 +1,8 @@
-﻿
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import ConfirmModal from "../components/ConfirmModal";
 import KebabMenu from "../components/KebabMenu";
+import FileUpload from '../components/FileUpload';
 
 export default function LearnPage() {
   const [tab, setTab] = useState("materials");
@@ -286,10 +286,9 @@ export default function LearnPage() {
                         </ul>
                       )}
                       {isAdmin && (
-                        <label className="inline-block cursor-pointer mt-2">
-                          <span className="rounded bg-emerald-600 text-white px-4 py-1 text-sm font-semibold hover:bg-emerald-700 transition">Добавить файл</span>
-                          <input type="file" className="hidden" onChange={e => handleFileChange(t.id || t._id, e)} />
-                        </label>
+                        <div className="mt-2">
+                          <FileUpload onSuccess={() => {}} className="!mb-0" />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -410,4 +409,4 @@ export default function LearnPage() {
   );
 }
 
-                
+

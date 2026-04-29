@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function FileUpload({ onSuccess }) {
+export default function FileUpload({ onSuccess, className = "" }) {
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export default function FileUpload({ onSuccess }) {
   };
 
   return (
-    <form onSubmit={handleUpload} className="mb-4 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 bg-white/80 p-4 rounded-xl shadow-md max-w-xl mx-auto">
+    <form onSubmit={handleUpload} className={`mb-4 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 bg-white/80 p-4 rounded-xl shadow-md max-w-xl mx-auto ${className}`}>
       <input type="file" onChange={handleChange} disabled={loading} className="flex-1 border rounded px-2 py-1" />
       <button type="submit" disabled={loading || !file} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50">Загрузить</button>
       {loading && (

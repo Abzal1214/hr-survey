@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import GoldCoin from './components/GoldCoin';
 import FileList from './components/FileList';
-import FileUpload from './components/FileUpload';
 
 const staticLinks = [
   { icon: '📰', label: 'Новости', desc: 'Последние события компании', href: '/news', color: 'from-sky-400 to-blue-500' },
@@ -111,14 +110,6 @@ export default function Home() {
       </section>
 
       <main className="mx-auto max-w-6xl px-3 sm:px-6 pb-16">
-        {/* Загрузка файлов */}
-        <section className="mt-8 mb-4">
-          <FileUpload onSuccess={() => {
-            // Принудительно обновить список файлов, если FileList поддерживает проп onSuccess
-            const event = new Event('filesChanged');
-            window.dispatchEvent(event);
-          }} />
-        </section>
         {/* Список загруженных файлов */}
         <section className="mb-8">
           <FileList />
