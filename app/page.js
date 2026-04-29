@@ -110,10 +110,6 @@ export default function Home() {
       </section>
 
       <main className="mx-auto max-w-6xl px-3 sm:px-6 pb-16">
-        {/* Список загруженных файлов */}
-        <section className="mb-8">
-          <FileList />
-        </section>
         {/* Быстрые ссылки */}
         <section className="mt-4">
           <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow mb-4 sm:mb-6 text-center">Быстрый доступ</h2>
