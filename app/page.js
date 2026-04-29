@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import GoldCoin from './components/GoldCoin';
+import FileList from './components/FileList';
 
 const staticLinks = [
   { icon: '📰', label: 'Новости', desc: 'Последние события компании', href: '/news', color: 'from-sky-400 to-blue-500' },
@@ -109,6 +110,10 @@ export default function Home() {
       </section>
 
       <main className="mx-auto max-w-6xl px-3 sm:px-6 pb-16">
+        {/* Список загруженных файлов */}
+        <section className="mt-8 mb-8">
+          <FileList />
+        </section>
         {/* Быстрые ссылки */}
         <section className="mt-4">
           <h2 className="text-xl sm:text-2xl font-bold text-white drop-shadow mb-4 sm:mb-6 text-center">Быстрый доступ</h2>
