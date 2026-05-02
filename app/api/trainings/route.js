@@ -29,7 +29,7 @@ export async function POST(request) {
     }
     const training = await Training.create({ title, description, fileUrl: Array.isArray(attachments) ? attachments.join(',') : (attachments || ''), department, deadline: deadline ? new Date(deadline) : null });
     if (deadline) {
-      await Notification.create({ phone: '', type: 'deadline', title: '⏰ Новый материал с дедлайном', body: `«${title}» — до ${new Date(deadline).toLocaleDateString('ru-RU')}`, link: '/learn' });
+      await Notification.create({ phone: '', type: 'deadline', title: '⏰ Новый материал с дедлайном', body: `«${title}» — до ${new Date(deadline).toLocaleDateString('ru-RU')}` });
     }
     return NextResponse.json({ ...training.toObject(), id: training._id });
   } catch (error) {

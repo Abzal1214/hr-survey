@@ -52,9 +52,7 @@ export default function RootLayout({ children }) {
               <Link href="/news" className="rounded-full px-4 py-2 transition hover:bg-sky-500 hover:text-white">
                 Новости
               </Link>
-              <Link href="/learn" className="rounded-full px-4 py-2 transition hover:bg-sky-500 hover:text-white">
-                Обучение
-              </Link>
+              {/* Удалена ссылка на обучение */}
               <Link href="/tests" className="rounded-full px-4 py-2 transition hover:bg-sky-500 hover:text-white">
                 Тренинги
               </Link>

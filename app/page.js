@@ -7,7 +7,7 @@ import FileList from './components/FileList';
 
 const staticLinks = [
   { icon: '📰', label: 'Новости', desc: 'Последние события компании', href: '/news', color: 'from-sky-400 to-blue-500' },
-  { icon: '📚', label: 'Обучение', desc: 'Материалы и тесты', href: '/learn', color: 'from-emerald-400 to-teal-500' },
+  // { icon: '📚', label: 'Обучение', desc: 'Материалы и тесты', href: '/learn', color: 'from-emerald-400 to-teal-500' }, // Удалено обучение
   { icon: '📝', label: 'Опросы', desc: 'Поделитесь обратной связью', href: '/surveys', color: 'from-violet-400 to-purple-500' },
   { icon: '🏋️', label: 'Тренинги', desc: 'Запись на офлайн тренинги', href: '/tests', color: 'from-orange-400 to-red-500' },
   { icon: '🎁', label: 'Награды', desc: 'Обмен аква койнов на товары', href: '/rewards', color: 'from-yellow-400 to-amber-500' },

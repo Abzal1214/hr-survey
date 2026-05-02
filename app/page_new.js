@@ -31,9 +31,7 @@ export default function Home() {
               <a href="/tests" className="rounded-3xl bg-emerald-600 text-white py-4 px-6 text-center font-semibold shadow-lg hover:bg-emerald-700 transition">
                 Пройти тест
               </a>
-              <a href="/learn" className="rounded-3xl bg-violet-600 text-white py-4 px-6 text-center font-semibold shadow-lg hover:bg-violet-700 transition">
-                Материалы и новости
-              </a>
+              {/* Удалена ссылка на обучение */}
               <a href="/admin" className="rounded-3xl bg-orange-500 text-white py-4 px-6 text-center font-semibold shadow-lg hover:bg-orange-600 transition">
                 Админка
               </a>
@@ -58,7 +56,7 @@ export default function Home() {
           <div className="mt-12">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-slate-900">Последние новости</h2>
-              <a href="/learn" className="text-sky-700 font-semibold hover:underline">Все новости</a>
+              {/* Удалена ссылка на обучение */}
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {news.length === 0 ? (

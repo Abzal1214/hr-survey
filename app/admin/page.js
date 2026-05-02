@@ -980,10 +980,7 @@ export default function Admin() {
                 <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.35em]">Тесты</p>
                 <p className="mt-4 text-lg font-semibold text-slate-900">Пройдите проверку знаний</p>
               </a>
-              <a href="/learn" className="block rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm hover:border-sky-200 transition">
-                <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.35em]">Материалы</p>
-                <p className="mt-4 text-lg font-semibold text-slate-900">Смотрите презентации и информационные листы</p>
-              </a>
+              {/* Удалена ссылка на обучение */}
             </div>
           </div>
         </div>
